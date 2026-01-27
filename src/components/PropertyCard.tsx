@@ -3,20 +3,26 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Bed, Bath, Square, MapPin } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Property } from "@/data/sampleProperties";
 
 interface PropertyCardProps {
   property: Property;
   onSave?: (id: string) => void;
-  onView?: (id: string) => void;
 }
 
-export function PropertyCard({ property, onSave, onView }: PropertyCardProps) {
+export function PropertyCard({ property, onSave }: PropertyCardProps) {
   const [isSaved, setIsSaved] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSave = () => {
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsSaved(!isSaved);
     onSave?.(property.id);
+  };
+
+  const handleViewDetails = () => {
+    navigate(`/property/${property.id}`);
   };
 
   return (
@@ -93,7 +99,7 @@ export function PropertyCard({ property, onSave, onView }: PropertyCardProps) {
         <Button
           className="w-full"
           variant="outline"
-          onClick={() => onView?.(property.id)}
+          onClick={handleViewDetails}
         >
           View Details
         </Button>

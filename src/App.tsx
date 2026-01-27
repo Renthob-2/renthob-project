@@ -9,6 +9,7 @@ import HowItWorksPage from "./pages/HowItWorksPage";
 import FeaturesPage from "./pages/FeaturesPage";
 import FAQsPage from "./pages/FAQsPage";
 import SearchPage from "./pages/SearchPage";
+import PropertyDetailPage from "./pages/PropertyDetailPage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/features" element={<FeaturesPage />} />
             <Route path="/faqs" element={<FAQsPage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/property/:id" element={<PropertyDetailPage />} />
           </Route>
           
           {/* Auth Routes (no header/footer) */}
