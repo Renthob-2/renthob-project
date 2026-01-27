@@ -1,248 +1,163 @@
 
 
-# Renthob - Rental Platform Implementation Plan
+# Property Search Page Implementation
 
-## Project Overview
-A multi-portal rental platform connecting renters with landlords and agencies, featuring a **warm & welcoming design** with **blue tones**, built with **AI-ready architecture** for future enhancements.
-
----
-
-## Phase 1: Public Website (No Login Required)
-
-### 1.1 Landing Page
-- Hero section with compelling headline and search bar preview
-- Featured property cards showcase (with sample data)
-- Trust indicators (stats: "1000+ listings", "500+ happy renters")
-- Call-to-action buttons for renters and landlords
-- Footer with navigation links
-
-### 1.2 How It Works Page
-- Step-by-step visual guide for renters (Search → Apply → Move In)
-- Step-by-step visual guide for landlords (List → Review → Manage)
-- Benefits comparison for each user type
-
-### 1.3 Features Overview Page
-- Feature cards with icons and descriptions
-- **AI Placeholder sections** marked as "Coming Soon":
-  - Smart neighborhood insights
-  - AI-powered pricing suggestions
-  - Personalized property recommendations
-- Current available features highlighted
-
-### 1.4 FAQs Page
-- Accordion-style Q&A sections
-- Categories for Renters, Landlords, and General questions
-
-### 1.5 Sign Up / Login Pages
-- Clean authentication forms
-- Role selection during signup (Renter or Landlord/Agency)
-- Email & password authentication
-- "Forgot password" flow
+## Overview
+Create a comprehensive property search page with advanced filtering capabilities, using sample data to demonstrate the full functionality before backend integration.
 
 ---
 
-## Phase 2: Backend Foundation (Supabase)
+## What Will Be Built
 
-### 2.1 Database Schema
-**Core Tables:**
-- `profiles` - User profile data with role reference
-- `user_roles` - Role management (renter, landlord, agency, admin)
-- `properties` - Property listings with all details
-- `neighborhoods` - Area information and data
-- `property_categories` - Property types (apartment, house, studio, etc.)
-- `applications` - Rental applications
-- `messages` - Messaging between users
-- `payments` - Payment tracking records
-- `saved_listings` - Bookmarked properties
-- `documents` - Lease document storage
+### 1. Search Page Layout (`/search`)
+A responsive two-panel layout:
+- **Left Panel**: Filter sidebar (collapsible on mobile)
+- **Right Panel**: Results grid with sort controls and pagination
 
-**AI-Ready Fields (placeholders):**
-- `suggested_price` on properties (nullable, for future AI)
-- `neighborhood_score` on neighborhoods (nullable)
-- `recommendation_score` on saved listings (nullable)
+### 2. Filter Components
 
-### 2.2 Authentication & Authorization
-- Email/password authentication via Supabase Auth
-- Row-Level Security (RLS) policies per role
-- Secure session handling
-- Role-based redirection after login
+**Location Filter**
+- Text input with search icon
+- Dropdown suggestions for neighborhoods/cities
 
----
+**Price Range Filter**
+- Dual-handle slider for min/max price
+- Quick preset buttons ($500-$1000, $1000-$2000, etc.)
+- Manual input fields for custom range
 
-## Phase 3: Landlord / Agency Portal (Priority Focus)
+**Bedrooms Filter**
+- Toggle group buttons: Studio, 1, 2, 3, 4+
+- Multi-select supported
 
-### 3.1 Dashboard
-- Overview cards (total listings, applications, tenants)
-- Recent activity feed
-- Quick action buttons
+**Bathrooms Filter**
+- Toggle group buttons: 1, 1.5, 2, 2.5, 3+
 
-### 3.2 Property Management
-- Create new listing form with:
-  - Property details (beds, baths, sqft, amenities)
-  - Image upload (multiple)
-  - Location & neighborhood selection
-  - Manual pricing input
-  - **Placeholder field**: "AI Suggested Price - Coming Soon"
-- Edit and delete listings
-- Listing status management (active, rented, draft)
+**Property Type Filter**
+- Checkbox list: Apartment, House, Studio, Condo, Townhouse
 
-### 3.3 Application Management
-- View incoming rental applications
-- Renter profile preview
-- Approve or reject with notes
-- Application status tracking
+**Amenities Filter**
+- Checkbox grid with common amenities:
+  - Parking, Pet Friendly, In-Unit Laundry
+  - Air Conditioning, Dishwasher, Balcony
+  - Gym, Pool, Doorman
 
-### 3.4 Tenant Management
-- Current tenants list
-- Lease details and documents
-- Payment history per tenant
+**Square Footage Filter**
+- Range slider with min/max inputs
 
-### 3.5 Payment Tracking
-- Record rent payments manually
-- Payment history and status
-- Overdue payment alerts
+### 3. Results Section
 
-### 3.6 Messaging
-- Inbox with conversations
-- Message threads with renters
-- Notification indicators
+**Header Bar**
+- Results count ("24 properties found")
+- Sort dropdown (Price: Low to High, Price: High to Low, Newest, Bedrooms)
+- View toggle (Grid/List - optional)
+
+**Property Grid**
+- Responsive grid: 1 column (mobile), 2 columns (tablet), 3 columns (desktop)
+- Uses existing `PropertyCard` component
+- Loading skeleton states
+
+**Pagination**
+- Page numbers with Previous/Next buttons
+- Results per page indicator
+
+### 4. Mobile Experience
+- Filters hidden in a slide-out sheet (drawer)
+- Floating "Filters" button with active filter count badge
+- Sticky sort bar at top of results
 
 ---
 
-## Phase 4: Renter Portal
+## Sample Data
 
-### 4.1 Profile Setup
-- Personal information
-- Budget range input
-- Income range (stored only, not processed)
-- Lifestyle preferences (pet-friendly, parking needs, etc.)
-- **Placeholder**: "Personalized recommendations coming soon"
+Expand property data to include 12+ properties with variety:
+- Different property types (Apartment, House, Studio, Condo, Townhouse)
+- Various neighborhoods (Downtown, Riverside, Uptown, Midtown, etc.)
+- Price range: $800 - $5,000/month
+- Bedrooms: 0 (Studio) to 5
+- Diverse amenities
+- Mix of "new" and regular listings
 
-### 4.2 Property Search
-- Search with filters (location, price, bedrooms, amenities)
-- Map view integration option
-- List and grid view toggle
-- Sort options (price, date, distance)
-
-### 4.3 Property Details
-- Full property information
-- Image gallery
-- Amenities list
-- **Placeholder card**: "Neighborhood Insights - Coming Soon"
-- Contact landlord button
-- Apply button
-
-### 4.4 Saved Listings
-- Bookmark favorite properties
-- Quick comparison view
-
-### 4.5 Applications
-- Application form submission
-- Application status tracking
-- Application history
-
-### 4.6 Documents & Payments
-- View and download lease documents
-- Payment history (view only)
-- Record of rent payments
-
-### 4.7 Messaging
-- Conversations with landlords/agencies
-- Message notifications
+Add amenities array to Property interface.
 
 ---
 
-## Phase 5: Admin Portal
+## Files to Create/Modify
 
-### 5.1 Dashboard
-- Platform analytics overview
-- Key metrics (users, listings, applications)
-- Activity charts
-
-### 5.2 User Management
-- View all users
-- Filter by role
-- Approve, suspend, or delete accounts
-- Role management
-
-### 5.3 Property Moderation
-- Review all listings
-- Approve, flag, or remove listings
-- Content moderation tools
-
-### 5.4 Data Management
-- **Neighborhoods CRUD** - Add/edit/delete neighborhood data
-- **Property Categories CRUD** - Manage property types
-- Manual pricing data input for neighborhoods
-- **Placeholder**: "AI Training Data - Coming Soon"
-
-### 5.5 Reports & Disputes
-- User-reported issues
-- Dispute resolution interface
-- Report status tracking
+| File | Purpose |
+|------|---------|
+| `src/pages/SearchPage.tsx` | Main search page component |
+| `src/components/search/SearchFilters.tsx` | Filter sidebar component |
+| `src/components/search/SearchResults.tsx` | Results grid with pagination |
+| `src/components/search/MobileFiltersSheet.tsx` | Mobile filter drawer |
+| `src/components/PropertyCard.tsx` | Update interface to include amenities |
+| `src/data/sampleProperties.ts` | Centralized sample property data |
+| `src/App.tsx` | Add `/search` route |
+| `src/components/layout/Header.tsx` | Add "Browse Properties" nav link |
 
 ---
 
-## Design System
+## Technical Details
 
-### Colors
-- **Primary**: Soft blue (#3B82F6) for trust and reliability
-- **Secondary**: Warm cream/beige accents for welcoming feel
-- **Accents**: Gentle gradients, soft shadows
+### Property Interface Update
+```text
+interface Property {
+  id: string;
+  title: string;
+  address: string;
+  neighborhood: string;      // NEW
+  price: number;
+  bedrooms: number;
+  bathrooms: number;
+  sqft: number;
+  imageUrl: string;
+  propertyType: string;
+  amenities: string[];       // NEW
+  isNew?: boolean;
+  listedAt?: Date;           // NEW (for sorting)
+}
+```
 
-### UI Elements
-- Rounded corners for friendliness
-- Soft drop shadows
-- Clean typography with good readability
-- Consistent card-based layouts
-- Warm imagery and illustrations
+### Filter State Management
+- Use React `useState` for filter state
+- Filters object structure:
+```text
+{
+  location: string,
+  priceRange: [min, max],
+  bedrooms: number[],
+  bathrooms: number[],
+  propertyTypes: string[],
+  amenities: string[],
+  sqftRange: [min, max]
+}
+```
 
-### Responsive Design
-- Mobile-first approach
-- Collapsible sidebar navigation for portals
-- Touch-friendly components
-- Optimized for tablets and desktops
+### Filtering Logic
+- All filters combined with AND logic
+- Real-time filtering as user adjusts filters
+- "Clear All Filters" button to reset
+
+### URL Sync (Future-Ready)
+- Structure supports query parameter sync for shareable searches
+- Not implemented now but easily added later
 
 ---
 
-## Technical Architecture
+## Design Consistency
 
-### Frontend
-- React with TypeScript
-- Tailwind CSS for styling
-- Shadcn/UI component library
-- React Router for navigation
-- React Query for data fetching
-
-### Backend (Supabase)
-- PostgreSQL database with RLS
-- Supabase Auth for authentication
-- Supabase Storage for images/documents
-- Edge Functions ready for future AI integration
-
-### AI-Ready Design Patterns
-- Separate data input fields from AI output fields
-- API endpoints designed for future AI module integration
-- Placeholder UI components that can receive AI data
-- Clean separation of concerns for easy module injection
+- Warm blue color scheme maintained
+- Rounded corners on all filter cards
+- Soft shadows on filter sections
+- Consistent spacing using existing Tailwind classes
+- Animations for filter changes and results loading
 
 ---
 
-## MVP Delivery Summary
+## Responsive Breakpoints
 
-### ✅ Included
-- Complete public website (5 pages)
-- Full authentication system with role management
-- Landlord/Agency portal with all core features
-- Renter portal with all core features
-- Admin portal with management tools
-- Messaging system between users
-- Document and payment tracking
-- Mobile-responsive design
-
-### ❌ Explicitly Excluded (Ready for Future)
-- AI recommendations
-- Automated pricing logic
-- Predictive analytics
-- Smart matching algorithms
+| Screen | Behavior |
+|--------|----------|
+| Mobile (<768px) | Full-width results, sheet-based filters |
+| Tablet (768-1024px) | 2-column grid, collapsible sidebar |
+| Desktop (>1024px) | Fixed sidebar, 3-column grid |
 
