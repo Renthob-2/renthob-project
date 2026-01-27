@@ -4,6 +4,7 @@ import { Home, Menu, X } from "lucide-react";
 import { useState } from "react";
 
 const navLinks = [
+  { href: "/search", label: "Browse Properties" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/features", label: "Features" },
   { href: "/faqs", label: "FAQs" },

@@ -3,19 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Bed, Bath, Square, MapPin } from "lucide-react";
 import { useState } from "react";
-
-export interface Property {
-  id: string;
-  title: string;
-  address: string;
-  price: number;
-  bedrooms: number;
-  bathrooms: number;
-  sqft: number;
-  imageUrl: string;
-  propertyType: string;
-  isNew?: boolean;
-}
+import { Property } from "@/data/sampleProperties";
 
 interface PropertyCardProps {
   property: Property;

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PropertyCard, type Property } from "@/components/PropertyCard";
+import { PropertyCard } from "@/components/PropertyCard";
+import { Property } from "@/data/sampleProperties";
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -20,36 +21,45 @@ const featuredProperties: Property[] = [
     id: "1",
     title: "Modern Downtown Apartment",
     address: "123 Main Street, Downtown",
+    neighborhood: "Downtown",
     price: 2500,
     bedrooms: 2,
     bathrooms: 2,
     sqft: 1200,
     imageUrl: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=60",
     propertyType: "Apartment",
+    amenities: ["Gym", "Doorman", "Elevator"],
     isNew: true,
+    listedAt: new Date("2026-01-25"),
   },
   {
     id: "2",
     title: "Cozy Suburban Home",
     address: "456 Oak Avenue, Riverside",
+    neighborhood: "Riverside",
     price: 3200,
     bedrooms: 3,
     bathrooms: 2,
     sqft: 1800,
     imageUrl: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop&q=60",
     propertyType: "House",
+    amenities: ["Parking", "Pet Friendly", "In-Unit Laundry"],
+    listedAt: new Date("2026-01-20"),
   },
   {
     id: "3",
     title: "Luxury Studio Loft",
     address: "789 Art District, Uptown",
+    neighborhood: "Uptown",
     price: 1800,
     bedrooms: 1,
     bathrooms: 1,
     sqft: 750,
     imageUrl: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=60",
     propertyType: "Studio",
+    amenities: ["Hardwood Floors", "Air Conditioning"],
     isNew: true,
+    listedAt: new Date("2026-01-24"),
   },
 ];
 

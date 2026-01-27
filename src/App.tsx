@@ -8,6 +8,7 @@ import LandingPage from "./pages/LandingPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
 import FeaturesPage from "./pages/FeaturesPage";
 import FAQsPage from "./pages/FAQsPage";
+import SearchPage from "./pages/SearchPage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import NotFound from "./pages/NotFound";
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/how-it-works" element={<HowItWorksPage />} />
             <Route path="/features" element={<FeaturesPage />} />
             <Route path="/faqs" element={<FAQsPage />} />
+            <Route path="/search" element={<SearchPage />} />
           </Route>
           
           {/* Auth Routes (no header/footer) */}
