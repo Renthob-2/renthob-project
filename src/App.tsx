@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import LandingPage from "./pages/LandingPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
@@ -22,24 +23,26 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          {/* Public Website Routes */}
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/how-it-works" element={<HowItWorksPage />} />
-            <Route path="/features" element={<FeaturesPage />} />
-            <Route path="/faqs" element={<FAQsPage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/property/:id" element={<PropertyDetailPage />} />
-          </Route>
-          
-          {/* Auth Routes (no header/footer) */}
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            {/* Public Website Routes */}
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/how-it-works" element={<HowItWorksPage />} />
+              <Route path="/features" element={<FeaturesPage />} />
+              <Route path="/faqs" element={<FAQsPage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/property/:id" element={<PropertyDetailPage />} />
+            </Route>
+            
+            {/* Auth Routes (no header/footer) */}
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

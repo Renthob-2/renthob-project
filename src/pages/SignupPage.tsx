@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,16 +10,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Home, Building2, Eye, EyeOff } from "lucide-react";
+import { Home, Building2, Users, Eye, EyeOff, Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
-type Role = "renter" | "landlord";
+type Role = "tenant" | "landlord" | "agent";
+
+const roles: { value: Role; label: string; icon: React.ElementType; description: string }[] = [
+  { value: "tenant", label: "Tenant", icon: Home, description: "Looking for a place to rent" },
+  { value: "landlord", label: "Landlord", icon: Building2, description: "List and manage properties" },
+  { value: "agent", label: "Agent", icon: Users, description: "Help clients find homes" },
+];
 
 export default function SignupPage() {
   const [searchParams] = useSearchParams();
-  const initialRole = (searchParams.get("role") as Role) || "renter";
+  const navigate = useNavigate();
+  const { signUp } = useAuth();
+  const { toast } = useToast();
+  
+  const initialRole = (searchParams.get("role") as Role) || "tenant";
 
   const [selectedRole, setSelectedRole] = useState<Role>(initialRole);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -31,14 +44,57 @@ export default function SignupPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement signup with Supabase
-    console.log("Signup:", { ...formData, role: selectedRole });
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Passwords don't match",
+        description: "Please make sure your passwords match.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Password too short",
+        description: "Password must be at least 6 characters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    
+    const { error } = await signUp(
+      formData.email,
+      formData.password,
+      formData.fullName,
+      selectedRole
+    );
+
+    setIsLoading(false);
+
+    if (error) {
+      toast({
+        title: "Sign up failed",
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Account created!",
+      description: "Welcome to Renthob. You're now logged in.",
+    });
+    
+    navigate("/");
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-muted/30">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
@@ -63,60 +119,44 @@ export default function SignupPage() {
           </CardHeader>
           <CardContent>
             {/* Role Selection */}
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <button
-                type="button"
-                onClick={() => setSelectedRole("renter")}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-                  selectedRole === "renter"
-                    ? "border-primary bg-accent"
-                    : "border-border hover:border-primary/50"
-                }`}
-              >
-                <Home
-                  className={`h-6 w-6 ${
-                    selectedRole === "renter"
-                      ? "text-primary"
-                      : "text-muted-foreground"
-                  }`}
-                />
-                <span
-                  className={`text-sm font-medium ${
-                    selectedRole === "renter"
-                      ? "text-foreground"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  I'm a Renter
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSelectedRole("landlord")}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
-                  selectedRole === "landlord"
-                    ? "border-primary bg-accent"
-                    : "border-border hover:border-primary/50"
-                }`}
-              >
-                <Building2
-                  className={`h-6 w-6 ${
-                    selectedRole === "landlord"
-                      ? "text-primary"
-                      : "text-muted-foreground"
-                  }`}
-                />
-                <span
-                  className={`text-sm font-medium ${
-                    selectedRole === "landlord"
-                      ? "text-foreground"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  I'm a Landlord
-                </span>
-              </button>
+            <div className="grid grid-cols-3 gap-2 mb-6">
+              {roles.map((role) => {
+                const Icon = role.icon;
+                return (
+                  <button
+                    key={role.value}
+                    type="button"
+                    onClick={() => setSelectedRole(role.value)}
+                    className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all ${
+                      selectedRole === role.value
+                        ? "border-primary bg-accent"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <Icon
+                      className={`h-5 w-5 ${
+                        selectedRole === role.value
+                          ? "text-primary"
+                          : "text-muted-foreground"
+                      }`}
+                    />
+                    <span
+                      className={`text-xs font-medium ${
+                        selectedRole === role.value
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {role.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
+            
+            <p className="text-xs text-muted-foreground text-center mb-6">
+              {roles.find(r => r.value === selectedRole)?.description}
+            </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -128,6 +168,7 @@ export default function SignupPage() {
                   value={formData.fullName}
                   onChange={handleInputChange}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -141,6 +182,7 @@ export default function SignupPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -155,6 +197,7 @@ export default function SignupPage() {
                     value={formData.password}
                     onChange={handleInputChange}
                     required
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
@@ -180,11 +223,19 @@ export default function SignupPage() {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   required
+                  disabled={isLoading}
                 />
               </div>
 
-              <Button type="submit" className="w-full" size="lg">
-                Create Account
+              <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </form>
 
