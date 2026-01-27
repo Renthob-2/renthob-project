@@ -88,7 +88,6 @@ export function SearchResults({
               <PropertyCard
                 key={property.id}
                 property={property}
-                onView={(id) => console.log("View property:", id)}
                 onSave={(id) => console.log("Save property:", id)}
               />
             ))}
