@@ -53,6 +53,19 @@ export function Header() {
     );
   };
 
+  const getDashboardPath = () => {
+    switch (role) {
+      case "tenant":
+        return "/dashboard/tenant";
+      case "landlord":
+        return "/dashboard/landlord";
+      case "agent":
+        return "/dashboard/agent";
+      default:
+        return "/";
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
@@ -105,7 +118,7 @@ export function Header() {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to="/dashboard" className="flex items-center gap-2">
+                  <Link to={getDashboardPath()} className="flex items-center gap-2">
                     <User className="h-4 w-4" />
                     Dashboard
                   </Link>
@@ -172,7 +185,7 @@ export function Header() {
                     </div>
                   </div>
                   <Button variant="ghost" asChild className="w-full justify-start">
-                    <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link to={getDashboardPath()} onClick={() => setIsMobileMenuOpen(false)}>
                       <User className="h-4 w-4 mr-2" />
                       Dashboard
                     </Link>
