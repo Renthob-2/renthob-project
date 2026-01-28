@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,17 +14,38 @@ import { Home, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
+const getDashboardPath = (role: string | null) => {
+  switch (role) {
+    case "tenant":
+      return "/dashboard/tenant";
+    case "landlord":
+      return "/dashboard/landlord";
+    case "agent":
+      return "/dashboard/agent";
+    default:
+      return "/";
+  }
+};
+
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn, role, user } = useAuth();
   const { toast } = useToast();
   
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  // Redirect after role is fetched
+  useEffect(() => {
+    if (loginSuccess && user && role) {
+      navigate(getDashboardPath(role));
+    }
+  }, [loginSuccess, user, role, navigate]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -52,7 +73,7 @@ export default function LoginPage() {
       description: "You've successfully logged in.",
     });
     
-    navigate("/");
+    setLoginSuccess(true);
   };
 
   return (
