@@ -2,13 +2,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 import { 
   Home, 
   Plus, 
   Users, 
   MessageSquare, 
-  TrendingUp,
-  Eye,
   Building2,
   Wallet,
   BarChart3,
@@ -88,9 +87,11 @@ export default function AgentDashboard() {
               <UserPlus className="h-5 w-5 mr-2" />
               Add Client
             </Button>
-            <Button size="lg">
-              <Plus className="h-5 w-5 mr-2" />
-              Add Listing
+            <Button size="lg" asChild>
+              <Link to="/property/create">
+                <Plus className="h-5 w-5 mr-2" />
+                Add Listing
+              </Link>
             </Button>
           </div>
         </div>
@@ -312,9 +313,11 @@ export default function AgentDashboard() {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button variant="outline" className="w-full justify-start">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add New Listing
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <Link to="/property/create">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New Listing
+                  </Link>
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <UserPlus className="h-4 w-4 mr-2" />
