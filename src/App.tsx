@@ -18,6 +18,7 @@ import TenantDashboard from "./pages/dashboards/TenantDashboard";
 import LandlordDashboard from "./pages/dashboards/LandlordDashboard";
 import AgentDashboard from "./pages/dashboards/AgentDashboard";
 import CreateListingPage from "./pages/CreateListingPage";
+import MyPropertiesPage from "./pages/MyPropertiesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,10 +62,15 @@ const App = () => (
               </ProtectedRoute>
             } />
             
-            {/* Property Listing Route */}
+            {/* Property Management Routes */}
             <Route path="/property/create" element={
               <ProtectedRoute allowedRoles={["landlord", "agent"]}>
                 <CreateListingPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/my-properties" element={
+              <ProtectedRoute allowedRoles={["landlord", "agent"]}>
+                <MyPropertiesPage />
               </ProtectedRoute>
             } />
             

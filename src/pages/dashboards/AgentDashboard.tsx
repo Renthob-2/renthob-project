@@ -168,7 +168,9 @@ export default function AgentDashboard() {
                   </CardTitle>
                   <CardDescription>Properties you're managing</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm">View All</Button>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/my-properties">View All</Link>
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
