@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { Link } from "react-router-dom";
 import { 
   Home, 
   Plus, 
@@ -9,8 +10,6 @@ import {
   MessageSquare, 
   TrendingUp,
   Eye,
-  Clock,
-  CheckCircle,
   Building2,
   Wallet,
   BarChart3,
@@ -72,9 +71,11 @@ export default function LandlordDashboard() {
               Manage your properties and connect with potential tenants
             </p>
           </div>
-          <Button className="mt-4 md:mt-0" size="lg">
-            <Plus className="h-5 w-5 mr-2" />
-            List New Property
+          <Button className="mt-4 md:mt-0" size="lg" asChild>
+            <Link to="/property/create">
+              <Plus className="h-5 w-5 mr-2" />
+              List New Property
+            </Link>
           </Button>
         </div>
 
@@ -225,9 +226,11 @@ export default function LandlordDashboard() {
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                <Button variant="outline" className="w-full justify-start">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add New Property
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <Link to="/property/create">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New Property
+                  </Link>
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <MessageSquare className="h-4 w-4 mr-2" />
