@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PropertyCard } from "@/components/PropertyCard";
-import { Property } from "@/data/sampleProperties";
+import { useProperties } from "@/hooks/useProperties";
 import { Link } from "react-router-dom";
 import {
   Search,
@@ -13,55 +13,8 @@ import {
   Home,
   ArrowRight,
   CheckCircle2,
+  Loader2,
 } from "lucide-react";
-
-// Sample featured properties data
-const featuredProperties: Property[] = [
-  {
-    id: "1",
-    title: "Modern Downtown Apartment",
-    address: "123 Main Street, Downtown",
-    neighborhood: "Downtown",
-    price: 2500,
-    bedrooms: 2,
-    bathrooms: 2,
-    sqft: 1200,
-    imageUrl: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=60",
-    propertyType: "Apartment",
-    amenities: ["Gym", "Doorman", "Elevator"],
-    isNew: true,
-    listedAt: new Date("2026-01-25"),
-  },
-  {
-    id: "2",
-    title: "Cozy Suburban Home",
-    address: "456 Oak Avenue, Riverside",
-    neighborhood: "Riverside",
-    price: 3200,
-    bedrooms: 3,
-    bathrooms: 2,
-    sqft: 1800,
-    imageUrl: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&auto=format&fit=crop&q=60",
-    propertyType: "House",
-    amenities: ["Parking", "Pet Friendly", "In-Unit Laundry"],
-    listedAt: new Date("2026-01-20"),
-  },
-  {
-    id: "3",
-    title: "Luxury Studio Loft",
-    address: "789 Art District, Uptown",
-    neighborhood: "Uptown",
-    price: 1800,
-    bedrooms: 1,
-    bathrooms: 1,
-    sqft: 750,
-    imageUrl: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&auto=format&fit=crop&q=60",
-    propertyType: "Studio",
-    amenities: ["Hardwood Floors", "Air Conditioning"],
-    isNew: true,
-    listedAt: new Date("2026-01-24"),
-  },
-];
 
 const stats = [
   { value: "1,000+", label: "Active Listings" },
@@ -89,6 +42,11 @@ const benefits = [
 ];
 
 export default function LandingPage() {
+  const { properties, loading } = useProperties();
+  
+  // Get first 3 properties as featured (or show empty state)
+  const featuredProperties = properties.slice(0, 3);
+  
   return (
     <div>
       {/* Hero Section */}
@@ -158,11 +116,28 @@ export default function LandingPage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProperties.map((property) => (
-              <PropertyCard key={property.id} property={property} />
-            ))}
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : featuredProperties.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredProperties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-muted/50 rounded-xl">
+              <Home className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No properties available yet</h3>
+              <p className="text-muted-foreground mb-4">
+                Be the first to list a property on Renthob!
+              </p>
+              <Button asChild>
+                <Link to="/signup">Get Started</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 

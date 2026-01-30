@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Heart, Bed, Bath, Square, MapPin } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Property } from "@/data/sampleProperties";
+import type { SearchProperty } from "@/hooks/useProperties";
 
 interface PropertyCardProps {
-  property: Property;
+  property: SearchProperty;
   onSave?: (id: string) => void;
 }
 
@@ -23,6 +23,13 @@ export function PropertyCard({ property, onSave }: PropertyCardProps) {
 
   const handleViewDetails = () => {
     navigate(`/property/${property.id}`);
+  };
+
+  const formatPrice = (price: number) => {
+    if (price >= 1000000) {
+      return `₦${(price / 1000000).toFixed(1)}M`;
+    }
+    return `₦${price.toLocaleString()}`;
   };
 
   return (
@@ -63,9 +70,11 @@ export function PropertyCard({ property, onSave }: PropertyCardProps) {
         {/* Price */}
         <div className="flex items-baseline justify-between mb-2">
           <span className="text-2xl font-bold text-foreground">
-            ${property.price.toLocaleString()}
+            {formatPrice(property.price)}
           </span>
-          <span className="text-sm text-muted-foreground">/month</span>
+          <span className="text-sm text-muted-foreground">
+            /{property.pricePeriod === "year" ? "yr" : "mo"}
+          </span>
         </div>
 
         {/* Title */}
@@ -89,10 +98,12 @@ export function PropertyCard({ property, onSave }: PropertyCardProps) {
             <Bath className="h-4 w-4" />
             <span>{property.bathrooms} baths</span>
           </div>
-          <div className="flex items-center gap-1">
-            <Square className="h-4 w-4" />
-            <span>{property.sqft.toLocaleString()} sqft</span>
-          </div>
+          {property.sqft > 0 && (
+            <div className="flex items-center gap-1">
+              <Square className="h-4 w-4" />
+              <span>{property.sqft.toLocaleString()} sqft</span>
+            </div>
+          )}
         </div>
 
         {/* CTA Button */}

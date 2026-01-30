@@ -7,13 +7,13 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Search, ChevronDown, X } from "lucide-react";
 import { useState } from "react";
-import { PROPERTY_TYPES, AMENITIES, NEIGHBORHOODS } from "@/data/sampleProperties";
 import {
   FilterState,
-  DEFAULT_FILTERS,
   PRICE_PRESETS,
   BEDROOM_OPTIONS,
   BATHROOM_OPTIONS,
+  PROPERTY_TYPES,
+  AMENITIES,
 } from "@/types/filters";
 
 interface SearchFiltersProps {
@@ -89,29 +89,12 @@ export function SearchFilters({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search neighborhoods..."
+            placeholder="Search by city, area..."
             value={filters.location}
             onChange={(e) => updateFilter("location", e.target.value)}
             className="pl-9"
           />
         </div>
-        {filters.location && (
-          <div className="flex flex-wrap gap-1 mt-2">
-            {NEIGHBORHOODS.filter((n) =>
-              n.toLowerCase().includes(filters.location.toLowerCase())
-            ).map((neighborhood) => (
-              <Button
-                key={neighborhood}
-                variant="outline"
-                size="sm"
-                className="text-xs"
-                onClick={() => updateFilter("location", neighborhood)}
-              >
-                {neighborhood}
-              </Button>
-            ))}
-          </div>
-        )}
       </FilterSection>
 
       {/* Price Range */}
@@ -126,7 +109,7 @@ export function SearchFilters({
               <Label className="text-xs text-muted-foreground">Min</Label>
               <Input
                 type="number"
-                placeholder="$0"
+                placeholder="₦0"
                 value={filters.priceRange[0] || ""}
                 onChange={(e) =>
                   updateFilter("priceRange", [
@@ -140,27 +123,17 @@ export function SearchFilters({
               <Label className="text-xs text-muted-foreground">Max</Label>
               <Input
                 type="number"
-                placeholder="$10,000"
-                value={filters.priceRange[1] === 10000 ? "" : filters.priceRange[1]}
+                placeholder="₦50M"
+                value={filters.priceRange[1] === 50000000 ? "" : filters.priceRange[1]}
                 onChange={(e) =>
                   updateFilter("priceRange", [
                     filters.priceRange[0],
-                    Number(e.target.value) || 10000,
+                    Number(e.target.value) || 50000000,
                   ])
                 }
               />
             </div>
           </div>
-          <Slider
-            value={filters.priceRange}
-            onValueChange={(value) =>
-              updateFilter("priceRange", value as [number, number])
-            }
-            min={0}
-            max={10000}
-            step={100}
-            className="mt-2"
-          />
           <div className="flex flex-wrap gap-1">
             {PRICE_PRESETS.map((preset) => (
               <Button
@@ -243,16 +216,16 @@ export function SearchFilters({
         <div className="space-y-2">
           {PROPERTY_TYPES.map((type) => (
             <label
-              key={type}
+              key={type.value}
               className="flex items-center gap-2 cursor-pointer"
             >
               <Checkbox
-                checked={filters.propertyTypes.includes(type)}
+                checked={filters.propertyTypes.includes(type.value)}
                 onCheckedChange={() =>
-                  toggleArrayFilter("propertyTypes", type)
+                  toggleArrayFilter("propertyTypes", type.value)
                 }
               />
-              <span className="text-sm">{type}</span>
+              <span className="text-sm">{type.label}</span>
             </label>
           ))}
         </div>
@@ -267,14 +240,14 @@ export function SearchFilters({
         <div className="grid grid-cols-1 gap-2">
           {AMENITIES.map((amenity) => (
             <label
-              key={amenity}
+              key={amenity.value}
               className="flex items-center gap-2 cursor-pointer"
             >
               <Checkbox
-                checked={filters.amenities.includes(amenity)}
-                onCheckedChange={() => toggleArrayFilter("amenities", amenity)}
+                checked={filters.amenities.includes(amenity.value)}
+                onCheckedChange={() => toggleArrayFilter("amenities", amenity.value)}
               />
-              <span className="text-sm">{amenity}</span>
+              <span className="text-sm">{amenity.label}</span>
             </label>
           ))}
         </div>
