@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -13,7 +13,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { X, Upload, Loader2, ImagePlus } from "lucide-react";
+import { X, Upload, Loader2, ImagePlus, Save } from "lucide-react";
+import type { Database } from "@/integrations/supabase/types";
+
+type Property = Database["public"]["Tables"]["properties"]["Row"];
 
 const AMENITIES_OPTIONS = [
   { id: "wifi", label: "WiFi" },
@@ -67,13 +70,20 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function PropertyListingForm() {
+interface PropertyListingFormProps {
+  property?: Property;
+  isEditing?: boolean;
+}
+
+export default function PropertyListingForm({ property, isEditing = false }: PropertyListingFormProps) {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
 
   const form = useForm<FormValues>({
@@ -94,6 +104,28 @@ export default function PropertyListingForm() {
       amenities: [],
     },
   });
+
+  // Populate form with existing property data when editing
+  useEffect(() => {
+    if (isEditing && property) {
+      form.reset({
+        title: property.title,
+        description: property.description || "",
+        property_type: property.property_type,
+        price: property.price.toString(),
+        price_period: property.price_period as "month" | "year",
+        location: property.location,
+        address: property.address || "",
+        city: property.city,
+        state: property.state,
+        bedrooms: property.bedrooms.toString(),
+        bathrooms: property.bathrooms.toString(),
+        square_feet: property.square_feet?.toString() || "",
+        amenities: property.amenities || [],
+      });
+      setExistingImages(property.images || []);
+    }
+  }, [isEditing, property, form]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -132,6 +164,25 @@ export default function PropertyListingForm() {
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const removeExistingImage = (index: number) => {
+    const imageUrl = existingImages[index];
+    setImagesToDelete((prev) => [...prev, imageUrl]);
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const deleteRemovedImages = async () => {
+    if (imagesToDelete.length === 0) return;
+
+    const filePaths = imagesToDelete.map((url) => {
+      const parts = url.split("/property-images/");
+      return parts[1] || "";
+    }).filter(Boolean);
+
+    if (filePaths.length > 0) {
+      await supabase.storage.from("property-images").remove(filePaths);
+    }
+  };
+
   const uploadImages = async (): Promise<string[]> => {
     if (!user || images.length === 0) return [];
 
@@ -167,19 +218,25 @@ export default function PropertyListingForm() {
 
   const onSubmit = async (values: FormValues) => {
     if (!user) {
-      toast({ title: "Error", description: "You must be logged in to create a listing", variant: "destructive" });
+      toast({ title: "Error", description: `You must be logged in to ${isEditing ? "update" : "create"} a listing`, variant: "destructive" });
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Upload images first
-      const imageUrls = await uploadImages();
+      // Delete removed images first (for edit mode)
+      if (isEditing) {
+        await deleteRemovedImages();
+      }
 
-      // Insert property
-      const { error } = await supabase.from("properties").insert({
-        owner_id: user.id,
+      // Upload new images
+      const newImageUrls = await uploadImages();
+
+      // Combine existing images with new uploads
+      const allImages = isEditing ? [...existingImages, ...newImageUrls] : newImageUrls;
+
+      const propertyData = {
         title: values.title,
         description: values.description,
         property_type: values.property_type,
@@ -193,18 +250,38 @@ export default function PropertyListingForm() {
         bathrooms: parseInt(values.bathrooms),
         square_feet: values.square_feet ? parseInt(values.square_feet) : null,
         amenities: values.amenities,
-        images: imageUrls,
-        status: "pending",
-      });
+        images: allImages,
+      };
 
-      if (error) throw error;
+      if (isEditing && property) {
+        // Update existing property
+        const { error } = await supabase
+          .from("properties")
+          .update(propertyData)
+          .eq("id", property.id)
+          .eq("owner_id", user.id);
 
-      toast({ title: "Success!", description: "Your property listing has been submitted for review." });
-      navigate(-1);
+        if (error) throw error;
+
+        toast({ title: "Success!", description: "Your property listing has been updated." });
+      } else {
+        // Insert new property
+        const { error } = await supabase.from("properties").insert({
+          ...propertyData,
+          owner_id: user.id,
+          status: "pending",
+        });
+
+        if (error) throw error;
+
+        toast({ title: "Success!", description: "Your property listing has been submitted for review." });
+      }
+
+      navigate("/my-properties");
     } catch (error: any) {
-      console.error("Error creating listing:", error);
+      console.error(`Error ${isEditing ? "updating" : "creating"} listing:`, error);
       toast({ 
-        title: "Error creating listing", 
+        title: `Error ${isEditing ? "updating" : "creating"} listing`, 
         description: error.message || "Something went wrong", 
         variant: "destructive" 
       });
@@ -218,9 +295,13 @@ export default function PropertyListingForm() {
       <div className="container mx-auto px-4 max-w-4xl">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">List Your Property</CardTitle>
+            <CardTitle className="text-2xl">
+              {isEditing ? "Edit Property" : "List Your Property"}
+            </CardTitle>
             <CardDescription>
-              Fill in the details below to create your property listing. All listings are reviewed before going live.
+              {isEditing 
+                ? "Update your property listing details below." 
+                : "Fill in the details below to create your property listing. All listings are reviewed before going live."}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -502,8 +583,28 @@ export default function PropertyListingForm() {
                   </FormDescription>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {/* Existing Images (for editing) */}
+                    {existingImages.map((url, index) => (
+                      <div key={`existing-${index}`} className="relative aspect-square rounded-lg overflow-hidden border bg-muted">
+                        <img src={url} alt={`Property ${index + 1}`} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeExistingImage(index)}
+                          className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1 hover:bg-destructive/90"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                        {index === 0 && imagePreviews.length === 0 && (
+                          <span className="absolute bottom-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
+                            Cover
+                          </span>
+                        )}
+                      </div>
+                    ))}
+
+                    {/* New Image Previews */}
                     {imagePreviews.map((preview, index) => (
-                      <div key={index} className="relative aspect-square rounded-lg overflow-hidden border bg-muted">
+                      <div key={`new-${index}`} className="relative aspect-square rounded-lg overflow-hidden border bg-muted">
                         <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
                         <button
                           type="button"
@@ -512,15 +613,18 @@ export default function PropertyListingForm() {
                         >
                           <X className="h-4 w-4" />
                         </button>
-                        {index === 0 && (
+                        {index === 0 && existingImages.length === 0 && (
                           <span className="absolute bottom-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
                             Cover
                           </span>
                         )}
+                        <span className="absolute bottom-2 right-2 bg-secondary text-secondary-foreground text-xs px-2 py-1 rounded">
+                          New
+                        </span>
                       </div>
                     ))}
                     
-                    {images.length < 10 && (
+                    {(existingImages.length + images.length) < 10 && (
                       <label className="flex flex-col items-center justify-center aspect-square rounded-lg border-2 border-dashed border-muted-foreground/25 hover:border-primary/50 cursor-pointer transition-colors">
                         <ImagePlus className="h-8 w-8 text-muted-foreground mb-2" />
                         <span className="text-sm text-muted-foreground">Add Image</span>
@@ -550,12 +654,12 @@ export default function PropertyListingForm() {
                     {isSubmitting ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        {uploadingImages ? "Uploading Images..." : "Creating Listing..."}
+                        {uploadingImages ? "Uploading Images..." : isEditing ? "Saving Changes..." : "Creating Listing..."}
                       </>
                     ) : (
                       <>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Submit Listing
+                        {isEditing ? <Save className="h-4 w-4 mr-2" /> : <Upload className="h-4 w-4 mr-2" />}
+                        {isEditing ? "Save Changes" : "Submit Listing"}
                       </>
                     )}
                   </Button>

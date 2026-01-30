@@ -18,6 +18,7 @@ import TenantDashboard from "./pages/dashboards/TenantDashboard";
 import LandlordDashboard from "./pages/dashboards/LandlordDashboard";
 import AgentDashboard from "./pages/dashboards/AgentDashboard";
 import CreateListingPage from "./pages/CreateListingPage";
+import EditPropertyPage from "./pages/EditPropertyPage";
 import MyPropertiesPage from "./pages/MyPropertiesPage";
 import NotFound from "./pages/NotFound";
 
@@ -66,6 +67,11 @@ const App = () => (
             <Route path="/property/create" element={
               <ProtectedRoute allowedRoles={["landlord", "agent"]}>
                 <CreateListingPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/property/:id/edit" element={
+              <ProtectedRoute allowedRoles={["landlord", "agent"]}>
+                <EditPropertyPage />
               </ProtectedRoute>
             } />
             <Route path="/my-properties" element={
