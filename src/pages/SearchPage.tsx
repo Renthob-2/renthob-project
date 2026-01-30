@@ -2,12 +2,13 @@ import { useState, useMemo } from "react";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
 import { MobileFiltersSheet } from "@/components/search/MobileFiltersSheet";
-import { sampleProperties, Property } from "@/data/sampleProperties";
+import { useProperties, useFilteredProperties } from "@/hooks/useProperties";
 import { FilterState, SortOption, DEFAULT_FILTERS } from "@/types/filters";
 
 const RESULTS_PER_PAGE = 6;
 
 export default function SearchPage() {
+  const { properties, loading } = useProperties();
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,7 +18,7 @@ export default function SearchPage() {
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (filters.location) count++;
-    if (filters.priceRange[0] > 0 || filters.priceRange[1] < 10000) count++;
+    if (filters.priceRange[0] > 0 || filters.priceRange[1] < 50000000) count++;
     if (filters.bedrooms.length > 0) count++;
     if (filters.bathrooms.length > 0) count++;
     if (filters.propertyTypes.length > 0) count++;
@@ -26,91 +27,8 @@ export default function SearchPage() {
     return count;
   }, [filters]);
 
-  // Filter and sort properties
-  const filteredProperties = useMemo(() => {
-    let result = sampleProperties.filter((property) => {
-      // Location filter
-      if (filters.location) {
-        const searchTerm = filters.location.toLowerCase();
-        const matchesLocation =
-          property.neighborhood.toLowerCase().includes(searchTerm) ||
-          property.address.toLowerCase().includes(searchTerm) ||
-          property.title.toLowerCase().includes(searchTerm);
-        if (!matchesLocation) return false;
-      }
-
-      // Price range filter
-      if (
-        property.price < filters.priceRange[0] ||
-        property.price > filters.priceRange[1]
-      ) {
-        return false;
-      }
-
-      // Bedrooms filter
-      if (filters.bedrooms.length > 0) {
-        const matchesBedrooms = filters.bedrooms.some((bed) => {
-          if (bed === 4) return property.bedrooms >= 4;
-          return property.bedrooms === bed;
-        });
-        if (!matchesBedrooms) return false;
-      }
-
-      // Bathrooms filter
-      if (filters.bathrooms.length > 0) {
-        const matchesBathrooms = filters.bathrooms.some((bath) => {
-          if (bath === 3) return property.bathrooms >= 3;
-          return property.bathrooms === bath;
-        });
-        if (!matchesBathrooms) return false;
-      }
-
-      // Property type filter
-      if (filters.propertyTypes.length > 0) {
-        if (!filters.propertyTypes.includes(property.propertyType)) {
-          return false;
-        }
-      }
-
-      // Amenities filter (property must have ALL selected amenities)
-      if (filters.amenities.length > 0) {
-        const hasAllAmenities = filters.amenities.every((amenity) =>
-          property.amenities.includes(amenity)
-        );
-        if (!hasAllAmenities) return false;
-      }
-
-      // Square footage filter
-      if (
-        property.sqft < filters.sqftRange[0] ||
-        property.sqft > filters.sqftRange[1]
-      ) {
-        return false;
-      }
-
-      return true;
-    });
-
-    // Sort
-    switch (sortBy) {
-      case "price-asc":
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case "price-desc":
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case "newest":
-        result.sort(
-          (a, b) => b.listedAt.getTime() - a.listedAt.getTime()
-        );
-        break;
-      case "bedrooms":
-        result.sort((a, b) => b.bedrooms - a.bedrooms);
-        break;
-    }
-
-    return result;
-  }, [filters, sortBy]);
+  // Filter and sort properties using the hook
+  const filteredProperties = useFilteredProperties(properties, filters, sortBy);
 
   const totalPages = Math.ceil(filteredProperties.length / RESULTS_PER_PAGE);
 
@@ -138,7 +56,7 @@ export default function SearchPage() {
             Find Your Perfect Rental
           </h1>
           <p className="text-muted-foreground">
-            Browse {sampleProperties.length}+ properties in your area
+            {loading ? "Loading properties..." : `Browse ${properties.length} properties available`}
           </p>
         </div>
       </div>
@@ -173,6 +91,7 @@ export default function SearchPage() {
 
             <SearchResults
               properties={filteredProperties}
+              isLoading={loading}
               sortBy={sortBy}
               onSortChange={setSortBy}
               currentPage={currentPage}

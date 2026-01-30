@@ -10,9 +10,10 @@ export interface FilterState {
 
 export type SortOption = "price-asc" | "price-desc" | "newest" | "bedrooms";
 
+// Price range in Naira (Nigerian currency)
 export const DEFAULT_FILTERS: FilterState = {
   location: "",
-  priceRange: [0, 10000],
+  priceRange: [0, 50000000], // Up to 50 million Naira
   bedrooms: [],
   bathrooms: [],
   propertyTypes: [],
@@ -27,12 +28,13 @@ export const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "bedrooms", label: "Most Bedrooms" },
 ];
 
+// Price presets in Naira
 export const PRICE_PRESETS = [
-  { label: "Under $1,000", min: 0, max: 1000 },
-  { label: "$1,000 - $2,000", min: 1000, max: 2000 },
-  { label: "$2,000 - $3,000", min: 2000, max: 3000 },
-  { label: "$3,000 - $4,000", min: 3000, max: 4000 },
-  { label: "$4,000+", min: 4000, max: 10000 },
+  { label: "Under ₦500K", min: 0, max: 500000 },
+  { label: "₦500K - ₦1M", min: 500000, max: 1000000 },
+  { label: "₦1M - ₦2M", min: 1000000, max: 2000000 },
+  { label: "₦2M - ₦5M", min: 2000000, max: 5000000 },
+  { label: "₦5M+", min: 5000000, max: 50000000 },
 ];
 
 export const BEDROOM_OPTIONS = [
@@ -49,4 +51,30 @@ export const BATHROOM_OPTIONS = [
   { value: 2, label: "2" },
   { value: 2.5, label: "2.5" },
   { value: 3, label: "3+" },
+];
+
+export const PROPERTY_TYPES = [
+  { value: "apartment", label: "Apartment" },
+  { value: "house", label: "House" },
+  { value: "duplex", label: "Duplex" },
+  { value: "studio", label: "Studio" },
+  { value: "penthouse", label: "Penthouse" },
+  { value: "villa", label: "Villa" },
+  { value: "office", label: "Office" },
+  { value: "shop", label: "Shop" },
+];
+
+export const AMENITIES = [
+  { value: "wifi", label: "WiFi" },
+  { value: "parking", label: "Parking" },
+  { value: "gym", label: "Gym" },
+  { value: "pool", label: "Swimming Pool" },
+  { value: "security", label: "24/7 Security" },
+  { value: "generator", label: "Generator" },
+  { value: "water", label: "Running Water" },
+  { value: "ac", label: "Air Conditioning" },
+  { value: "furnished", label: "Furnished" },
+  { value: "balcony", label: "Balcony" },
+  { value: "laundry", label: "Laundry" },
+  { value: "elevator", label: "Elevator" },
 ];

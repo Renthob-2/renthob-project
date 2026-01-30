@@ -1,5 +1,5 @@
 import { PropertyCard } from "@/components/PropertyCard";
-import { Property } from "@/data/sampleProperties";
+import type { SearchProperty } from "@/hooks/useProperties";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -13,7 +13,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SortOption, SORT_OPTIONS } from "@/types/filters";
 
 interface SearchResultsProps {
-  properties: Property[];
+  properties: SearchProperty[];
   isLoading?: boolean;
   sortBy: SortOption;
   onSortChange: (sort: SortOption) => void;
@@ -110,17 +110,25 @@ export function SearchResults({
                   Previous
                 </Button>
                 <div className="flex items-center gap-1">
-                  {Array.from({ length: totalPages }).map((_, i) => (
-                    <Button
-                      key={i + 1}
-                      variant={currentPage === i + 1 ? "default" : "ghost"}
-                      size="sm"
-                      className="w-8 h-8 p-0"
-                      onClick={() => onPageChange(i + 1)}
-                    >
-                      {i + 1}
-                    </Button>
-                  ))}
+                  {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
+                    // Show first few pages, or pages around current page
+                    let pageNum = i + 1;
+                    if (totalPages > 5 && currentPage > 3) {
+                      pageNum = currentPage - 2 + i;
+                      if (pageNum > totalPages) pageNum = totalPages - 4 + i;
+                    }
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? "default" : "ghost"}
+                        size="sm"
+                        className="w-8 h-8 p-0"
+                        onClick={() => onPageChange(pageNum)}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
                 </div>
                 <Button
                   variant="outline"
