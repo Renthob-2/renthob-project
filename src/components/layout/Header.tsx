@@ -1,8 +1,10 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Menu, X, LogOut, User } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Home, Menu, X, LogOut, User, Mail } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useMessages } from "@/hooks/useMessages";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +24,7 @@ const navLinks = [
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, profile, role, signOut, loading } = useAuth();
+  const { unreadCount } = useMessages();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -123,6 +126,17 @@ export function Header() {
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/messages" className="flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    Messages
+                    {unreadCount > 0 && (
+                      <Badge variant="destructive" className="ml-auto h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                        {unreadCount}
+                      </Badge>
+                    )}
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
                   <LogOut className="h-4 w-4 mr-2" />
@@ -188,6 +202,17 @@ export function Header() {
                     <Link to={getDashboardPath()} onClick={() => setIsMobileMenuOpen(false)}>
                       <User className="h-4 w-4 mr-2" />
                       Dashboard
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" asChild className="w-full justify-start">
+                    <Link to="/messages" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Mail className="h-4 w-4 mr-2" />
+                      Messages
+                      {unreadCount > 0 && (
+                        <Badge variant="destructive" className="ml-2 h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                          {unreadCount}
+                        </Badge>
+                      )}
                     </Link>
                   </Button>
                   <Button 

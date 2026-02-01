@@ -20,6 +20,7 @@ import AgentDashboard from "./pages/dashboards/AgentDashboard";
 import CreateListingPage from "./pages/CreateListingPage";
 import EditPropertyPage from "./pages/EditPropertyPage";
 import MyPropertiesPage from "./pages/MyPropertiesPage";
+import MessagesPage from "./pages/MessagesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -77,6 +78,11 @@ const App = () => (
             <Route path="/my-properties" element={
               <ProtectedRoute allowedRoles={["landlord", "agent"]}>
                 <MyPropertiesPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/messages" element={
+              <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
+                <MessagesPage />
               </ProtectedRoute>
             } />
             

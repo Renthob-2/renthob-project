@@ -1,8 +1,10 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
   ArrowLeft, 
   Bed, 
@@ -13,19 +15,95 @@ import {
   Heart,
   Share2,
   Phone,
-  Mail,
   CheckCircle2
 } from "lucide-react";
-import { useState } from "react";
-import { sampleProperties } from "@/data/sampleProperties";
 import { PropertyImageGallery } from "@/components/property/PropertyImageGallery";
+import { ContactLandlordDialog } from "@/components/messaging/ContactLandlordDialog";
+import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
+
+type DbProperty = Database["public"]["Tables"]["properties"]["Row"];
+
+interface PropertyWithOwner extends DbProperty {
+  owner_profile?: {
+    full_name: string | null;
+    email: string | null;
+  };
+}
+
+function formatPrice(price: number): string {
+  if (price >= 1000000) {
+    return `₦${(price / 1000000).toFixed(1)}M`;
+  }
+  if (price >= 1000) {
+    return `₦${(price / 1000).toFixed(0)}K`;
+  }
+  return `₦${price.toLocaleString()}`;
+}
 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [property, setProperty] = useState<PropertyWithOwner | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
 
-  const property = sampleProperties.find((p) => p.id === id);
+  useEffect(() => {
+    async function fetchProperty() {
+      if (!id) return;
+
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from("properties")
+          .select("*")
+          .eq("id", id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          // Fetch owner profile
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("full_name, email")
+            .eq("user_id", data.owner_id)
+            .maybeSingle();
+
+          setProperty({
+            ...data,
+            owner_profile: profile || undefined,
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching property:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProperty();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-6">
+          <Skeleton className="h-8 w-24 mb-4" />
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <Skeleton className="h-96 w-full rounded-xl" />
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
+            <div>
+              <Skeleton className="h-64 w-full rounded-xl" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!property) {
     return (
@@ -42,19 +120,27 @@ export default function PropertyDetailPage() {
     );
   }
 
-  // Generate multiple images for gallery (simulating multiple property images)
-  const galleryImages = [
-    property.imageUrl,
-    property.imageUrl.replace("w=800", "w=801"), // Slight variation to simulate different images
-    property.imageUrl.replace("w=800", "w=802"),
-    property.imageUrl.replace("w=800", "w=803"),
-  ];
+  const galleryImages = property.images && property.images.length > 0
+    ? property.images
+    : ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800"];
 
-  const formattedDate = property.listedAt.toLocaleDateString("en-US", {
+  const createdAt = new Date(property.created_at);
+  const formattedDate = createdAt.toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
   });
+
+  const daysSinceCreated = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+  const isNew = daysSinceCreated <= 7;
+
+  const ownerName = property.owner_profile?.full_name || "Property Owner";
+  const ownerInitials = ownerName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <div className="min-h-screen bg-background">
@@ -107,10 +193,10 @@ export default function PropertyDetailPage() {
             {/* Property Header */}
             <div>
               <div className="flex flex-wrap items-start gap-2 mb-2">
-                {property.isNew && (
+                {isNew && (
                   <Badge className="bg-primary text-primary-foreground">New Listing</Badge>
                 )}
-                <Badge variant="secondary">{property.propertyType}</Badge>
+                <Badge variant="secondary" className="capitalize">{property.property_type}</Badge>
               </div>
               
               <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">
@@ -119,9 +205,9 @@ export default function PropertyDetailPage() {
               
               <div className="flex items-center gap-1 text-muted-foreground mb-4">
                 <MapPin className="h-4 w-4" />
-                <span>{property.address}</span>
+                <span>{property.address || `${property.location}, ${property.city}`}</span>
                 <span className="mx-2">•</span>
-                <span>{property.neighborhood}</span>
+                <span>{property.state}</span>
               </div>
 
               {/* Key Stats */}
@@ -144,15 +230,17 @@ export default function PropertyDetailPage() {
                     <p className="text-xs text-muted-foreground">Bathrooms</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Square className="h-5 w-5 text-primary" />
+                {property.square_feet && (
+                  <div className="flex items-center gap-2">
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <Square className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-semibold">{property.square_feet.toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">Sq. Ft.</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-semibold">{property.sqft.toLocaleString()}</p>
-                    <p className="text-xs text-muted-foreground">Sq. Ft.</p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -161,35 +249,41 @@ export default function PropertyDetailPage() {
             {/* Description */}
             <div>
               <h2 className="text-xl font-semibold text-foreground mb-3">About This Property</h2>
-              <p className="text-muted-foreground leading-relaxed">
-                Welcome to this beautiful {property.propertyType.toLowerCase()} located in the heart of {property.neighborhood}. 
-                This {property.bedrooms > 0 ? `${property.bedrooms}-bedroom` : "studio"} home features {property.sqft.toLocaleString()} square feet 
-                of thoughtfully designed living space. With {property.bathrooms} bathroom{property.bathrooms !== 1 ? "s" : ""} and 
-                modern finishes throughout, this property offers the perfect blend of comfort and style.
-              </p>
-              <p className="text-muted-foreground leading-relaxed mt-4">
-                The property includes premium amenities such as {property.amenities.slice(0, 3).join(", ").toLowerCase()}, 
-                making it an ideal choice for those seeking quality living in a prime location.
-              </p>
+              {property.description ? (
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {property.description}
+                </p>
+              ) : (
+                <p className="text-muted-foreground leading-relaxed">
+                  Welcome to this beautiful {property.property_type} located in {property.location}, {property.city}. 
+                  This {property.bedrooms > 0 ? `${property.bedrooms}-bedroom` : "studio"} home features 
+                  {property.square_feet ? ` ${property.square_feet.toLocaleString()} square feet of` : ""} thoughtfully 
+                  designed living space. With {property.bathrooms} bathroom{property.bathrooms !== 1 ? "s" : ""} and 
+                  modern finishes throughout, this property offers the perfect blend of comfort and style.
+                </p>
+              )}
             </div>
 
-            <Separator />
-
-            {/* Amenities */}
-            <div>
-              <h2 className="text-xl font-semibold text-foreground mb-4">Amenities & Features</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {property.amenities.map((amenity) => (
-                  <div
-                    key={amenity}
-                    className="flex items-center gap-2 p-3 rounded-lg bg-muted/50"
-                  >
-                    <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />
-                    <span className="text-sm text-foreground">{amenity}</span>
+            {property.amenities && property.amenities.length > 0 && (
+              <>
+                <Separator />
+                {/* Amenities */}
+                <div>
+                  <h2 className="text-xl font-semibold text-foreground mb-4">Amenities & Features</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {property.amenities.map((amenity) => (
+                      <div
+                        key={amenity}
+                        className="flex items-center gap-2 p-3 rounded-lg bg-muted/50"
+                      >
+                        <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="text-sm text-foreground">{amenity}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
+                </div>
+              </>
+            )}
 
             <Separator />
 
@@ -200,8 +294,8 @@ export default function PropertyDetailPage() {
                 <div className="flex items-start gap-3">
                   <MapPin className="h-5 w-5 text-primary mt-0.5" />
                   <div>
-                    <p className="font-medium text-foreground">{property.address}</p>
-                    <p className="text-sm text-muted-foreground">{property.neighborhood}</p>
+                    <p className="font-medium text-foreground">{property.address || property.location}</p>
+                    <p className="text-sm text-muted-foreground">{property.city}, {property.state}</p>
                   </div>
                 </div>
                 {/* Placeholder for future map integration */}
@@ -219,9 +313,9 @@ export default function PropertyDetailPage() {
                 <CardHeader className="pb-4">
                   <div className="flex items-baseline justify-between">
                     <CardTitle className="text-3xl font-bold text-foreground">
-                      ${property.price.toLocaleString()}
+                      {formatPrice(Number(property.price))}
                     </CardTitle>
-                    <span className="text-muted-foreground">/month</span>
+                    <span className="text-muted-foreground">/{property.price_period}</span>
                   </div>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
@@ -236,21 +330,23 @@ export default function PropertyDetailPage() {
                     <Phone className="h-4 w-4 mr-2" />
                     Schedule a Tour
                   </Button>
-                  <Button variant="ghost" className="w-full" size="lg">
-                    <Mail className="h-4 w-4 mr-2" />
-                    Contact Landlord
-                  </Button>
+                  <ContactLandlordDialog
+                    propertyId={property.id}
+                    propertyTitle={property.title}
+                    landlordId={property.owner_id}
+                    landlordName={ownerName}
+                  />
 
                   <Separator />
 
-                  {/* Agent/Landlord Info Placeholder */}
+                  {/* Owner Info */}
                   <div className="flex items-center gap-3">
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-primary font-semibold">JD</span>
+                      <span className="text-primary font-semibold">{ownerInitials}</span>
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">John Doe</p>
-                      <p className="text-sm text-muted-foreground">Property Manager</p>
+                      <p className="font-medium text-foreground">{ownerName}</p>
+                      <p className="text-sm text-muted-foreground">Property Owner</p>
                     </div>
                   </div>
 
