@@ -32,8 +32,10 @@ export function useMessages() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const userId = user?.id;
+
   const fetchMessages = useCallback(async () => {
-    if (!user) {
+    if (!userId) {
       setMessages([]);
       setLoading(false);
       return;
@@ -46,7 +48,7 @@ export function useMessages() {
       const { data: messagesData, error: messagesError } = await supabase
         .from("messages")
         .select("*")
-        .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+        .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
         .order("created_at", { ascending: false });
 
       if (messagesError) throw messagesError;
@@ -90,7 +92,7 @@ export function useMessages() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
     fetchMessages();
@@ -98,7 +100,7 @@ export function useMessages() {
 
   // Subscribe to realtime changes
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
 
     const channel = supabase
       .channel('messages-realtime')
@@ -108,7 +110,7 @@ export function useMessages() {
           event: 'INSERT',
           schema: 'public',
           table: 'messages',
-          filter: `recipient_id=eq.${user.id}`,
+          filter: `recipient_id=eq.${userId}`,
         },
         async (payload) => {
           // Fetch the sender's profile for the notification
@@ -159,7 +161,7 @@ export function useMessages() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, fetchMessages]);
+  }, [userId, fetchMessages]);
 
   const sendMessage = async (
     recipientId: string,
@@ -167,12 +169,12 @@ export function useMessages() {
     message: string,
     propertyId?: string
   ) => {
-    if (!user) throw new Error("Must be logged in to send messages");
+    if (!userId) throw new Error("Must be logged in to send messages");
 
     const { data, error } = await supabase
       .from("messages")
       .insert({
-        sender_id: user.id,
+        sender_id: userId,
         recipient_id: recipientId,
         subject,
         message,
@@ -213,7 +215,7 @@ export function useMessages() {
   };
 
   const unreadCount = messages.filter(
-    m => m.recipient_id === user?.id && !m.is_read
+    m => m.recipient_id === userId && !m.is_read
   ).length;
 
   return {
