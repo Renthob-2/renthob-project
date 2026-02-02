@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 export interface Message {
   id: string;
@@ -31,7 +32,7 @@ export function useMessages() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     if (!user) {
       setMessages([]);
       setLoading(false);
@@ -89,11 +90,76 @@ export function useMessages() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchMessages();
-  }, [user]);
+  }, [fetchMessages]);
+
+  // Subscribe to realtime changes
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('messages-realtime')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `recipient_id=eq.${user.id}`,
+        },
+        async (payload) => {
+          // Fetch the sender's profile for the notification
+          const { data: senderProfile } = await supabase
+            .from("profiles")
+            .select("full_name, email")
+            .eq("user_id", payload.new.sender_id)
+            .single();
+
+          const senderName = senderProfile?.full_name || senderProfile?.email || "Someone";
+          
+          toast.info(`New message from ${senderName}`, {
+            description: payload.new.subject,
+            action: {
+              label: "View",
+              onClick: () => window.location.href = "/messages",
+            },
+          });
+
+          // Refresh messages to include the new one
+          fetchMessages();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'messages',
+        },
+        () => {
+          fetchMessages();
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'messages',
+        },
+        () => {
+          fetchMessages();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, fetchMessages]);
 
   const sendMessage = async (
     recipientId: string,
