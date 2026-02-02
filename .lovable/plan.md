@@ -1,163 +1,135 @@
 
-
-# Property Search Page Implementation
+# Property Comparison Feature
 
 ## Overview
-Create a comprehensive property search page with advanced filtering capabilities, using sample data to demonstrate the full functionality before backend integration.
+Add a side-by-side property comparison feature that allows tenants to select multiple properties (up to 4) and view them in a detailed comparison table highlighting key differences in price, size, amenities, and features.
 
----
+## User Experience Flow
 
-## What Will Be Built
+1. **Selecting Properties**: Users browse the search page and click a "Compare" button on property cards to add them to a comparison list
+2. **Comparison Tray**: A floating tray appears at the bottom of the screen showing selected properties (thumbnails) with a "Compare Now" button
+3. **Comparison View**: Opens a full-screen sheet/drawer displaying properties side-by-side with rows for each attribute
+4. **Actions**: Users can remove properties from comparison, clear all, or navigate to individual property details
 
-### 1. Search Page Layout (`/search`)
-A responsive two-panel layout:
-- **Left Panel**: Filter sidebar (collapsible on mobile)
-- **Right Panel**: Results grid with sort controls and pagination
+## Implementation Details
 
-### 2. Filter Components
+### 1. Create Comparison Context (State Management)
 
-**Location Filter**
-- Text input with search icon
-- Dropdown suggestions for neighborhoods/cities
+**File**: `src/contexts/ComparisonContext.tsx`
 
-**Price Range Filter**
-- Dual-handle slider for min/max price
-- Quick preset buttons ($500-$1000, $1000-$2000, etc.)
-- Manual input fields for custom range
+- Create a React Context to manage comparison state globally
+- Store array of selected property IDs (max 4)
+- Provide functions: `addToCompare`, `removeFromCompare`, `clearComparison`, `isInComparison`
+- Persist selection in sessionStorage so it survives navigation
 
-**Bedrooms Filter**
-- Toggle group buttons: Studio, 1, 2, 3, 4+
-- Multi-select supported
+### 2. Update PropertyCard Component
 
-**Bathrooms Filter**
-- Toggle group buttons: 1, 1.5, 2, 2.5, 3+
+**File**: `src/components/PropertyCard.tsx`
 
-**Property Type Filter**
-- Checkbox list: Apartment, House, Studio, Condo, Townhouse
+- Add a "Compare" toggle button (using a checkbox-style icon like `GitCompare` or `Scale`)
+- Display visual indicator when property is in comparison list
+- Connect to ComparisonContext
+- New prop: `showCompareButton?: boolean` (default: true)
 
-**Amenities Filter**
-- Checkbox grid with common amenities:
-  - Parking, Pet Friendly, In-Unit Laundry
-  - Air Conditioning, Dishwasher, Balcony
-  - Gym, Pool, Doorman
+### 3. Create Comparison Tray Component
 
-**Square Footage Filter**
-- Range slider with min/max inputs
+**File**: `src/components/comparison/ComparisonTray.tsx`
 
-### 3. Results Section
+- Fixed position at bottom of viewport
+- Shows only when 1+ properties are selected
+- Displays:
+  - Property thumbnails (small circular images)
+  - Property count badge ("2 of 4")
+  - "Compare Now" button (enabled when 2+ selected)
+  - "Clear All" button
+- Animated slide-up appearance
 
-**Header Bar**
-- Results count ("24 properties found")
-- Sort dropdown (Price: Low to High, Price: High to Low, Newest, Bedrooms)
-- View toggle (Grid/List - optional)
+### 4. Create Comparison Sheet Component
 
-**Property Grid**
-- Responsive grid: 1 column (mobile), 2 columns (tablet), 3 columns (desktop)
-- Uses existing `PropertyCard` component
-- Loading skeleton states
+**File**: `src/components/comparison/ComparisonSheet.tsx`
 
-**Pagination**
-- Page numbers with Previous/Next buttons
-- Results per page indicator
+- Full-screen sheet (slides from right) using existing Sheet UI component
+- Header with title and close button
+- Content: Scrollable comparison table
 
-### 4. Mobile Experience
-- Filters hidden in a slide-out sheet (drawer)
-- Floating "Filters" button with active filter count badge
-- Sticky sort bar at top of results
-
----
-
-## Sample Data
-
-Expand property data to include 12+ properties with variety:
-- Different property types (Apartment, House, Studio, Condo, Townhouse)
-- Various neighborhoods (Downtown, Riverside, Uptown, Midtown, etc.)
-- Price range: $800 - $5,000/month
-- Bedrooms: 0 (Studio) to 5
-- Diverse amenities
-- Mix of "new" and regular listings
-
-Add amenities array to Property interface.
-
----
-
-## Files to Create/Modify
-
-| File | Purpose |
-|------|---------|
-| `src/pages/SearchPage.tsx` | Main search page component |
-| `src/components/search/SearchFilters.tsx` | Filter sidebar component |
-| `src/components/search/SearchResults.tsx` | Results grid with pagination |
-| `src/components/search/MobileFiltersSheet.tsx` | Mobile filter drawer |
-| `src/components/PropertyCard.tsx` | Update interface to include amenities |
-| `src/data/sampleProperties.ts` | Centralized sample property data |
-| `src/App.tsx` | Add `/search` route |
-| `src/components/layout/Header.tsx` | Add "Browse Properties" nav link |
-
----
-
-## Technical Details
-
-### Property Interface Update
-```text
-interface Property {
-  id: string;
-  title: string;
-  address: string;
-  neighborhood: string;      // NEW
-  price: number;
-  bedrooms: number;
-  bathrooms: number;
-  sqft: number;
-  imageUrl: string;
-  propertyType: string;
-  amenities: string[];       // NEW
-  isNew?: boolean;
-  listedAt?: Date;           // NEW (for sorting)
-}
+**Comparison Table Structure**:
+```
+| Attribute      | Property 1  | Property 2  | Property 3  | Property 4  |
+|----------------|-------------|-------------|-------------|-------------|
+| Image          | [thumbnail] | [thumbnail] | [thumbnail] | [thumbnail] |
+| Title          | ...         | ...         | ...         | ...         |
+| Price          | ₦2.5M/yr    | ₦1.8M/yr    | ...         | ...         |
+| Location       | ...         | ...         | ...         | ...         |
+| Bedrooms       | 3           | 2           | ...         | ...         |
+| Bathrooms      | 2           | 2           | ...         | ...         |
+| Square Feet    | 1,500       | 1,200       | ...         | ...         |
+| Property Type  | Apartment   | Duplex      | ...         | ...         |
+| Amenities      | [list]      | [list]      | ...         | ...         |
 ```
 
-### Filter State Management
-- Use React `useState` for filter state
-- Filters object structure:
-```text
-{
-  location: string,
-  priceRange: [min, max],
-  bedrooms: number[],
-  bathrooms: number[],
-  propertyTypes: string[],
-  amenities: string[],
-  sqftRange: [min, max]
-}
+- Highlight best values (lowest price, most bedrooms, etc.)
+- Each column has "Remove" and "View Details" buttons
+
+### 5. Create Comparison Table Component
+
+**File**: `src/components/comparison/ComparisonTable.tsx`
+
+- Responsive table layout
+- Row-based comparison with clear labels
+- Visual highlighting for:
+  - Lowest price (green)
+  - Most bedrooms/bathrooms (highlighted)
+  - Common vs unique amenities
+- Mobile-friendly horizontal scroll
+
+### 6. Custom Hook for Comparison Data
+
+**File**: `src/hooks/useComparison.ts`
+
+- Fetch full property details for compared properties
+- Transform data for comparison view
+- Calculate "best" values for highlighting
+
+### 7. Update SearchPage Layout
+
+**File**: `src/pages/SearchPage.tsx`
+
+- Wrap with ComparisonProvider
+- Include ComparisonTray component at bottom
+
+### 8. Update App.tsx
+
+**File**: `src/App.tsx`
+
+- Add ComparisonProvider to wrap relevant routes
+
+## File Structure
+
+```
+src/
+├── contexts/
+│   └── ComparisonContext.tsx (new)
+├── hooks/
+│   └── useComparison.ts (new)
+├── components/
+│   ├── comparison/
+│   │   ├── ComparisonTray.tsx (new)
+│   │   ├── ComparisonSheet.tsx (new)
+│   │   └── ComparisonTable.tsx (new)
+│   └── PropertyCard.tsx (modified)
+└── pages/
+    └── SearchPage.tsx (modified)
 ```
 
-### Filtering Logic
-- All filters combined with AND logic
-- Real-time filtering as user adjusts filters
-- "Clear All Filters" button to reset
+## Technical Considerations
 
-### URL Sync (Future-Ready)
-- Structure supports query parameter sync for shareable searches
-- Not implemented now but easily added later
+- **Maximum Properties**: Limited to 4 for optimal comparison UX
+- **State Persistence**: Use sessionStorage to maintain selections across page navigation
+- **Performance**: Fetch property details only when comparison sheet opens
+- **Responsive Design**: Table scrolls horizontally on mobile, fixed property headers
+- **Accessibility**: Proper ARIA labels for comparison controls
 
----
+## UI Components Used
 
-## Design Consistency
-
-- Warm blue color scheme maintained
-- Rounded corners on all filter cards
-- Soft shadows on filter sections
-- Consistent spacing using existing Tailwind classes
-- Animations for filter changes and results loading
-
----
-
-## Responsive Breakpoints
-
-| Screen | Behavior |
-|--------|----------|
-| Mobile (<768px) | Full-width results, sheet-based filters |
-| Tablet (768-1024px) | 2-column grid, collapsible sidebar |
-| Desktop (>1024px) | Fixed sidebar, 3-column grid |
-
+- Existing: Sheet, Button, Badge, Card, ScrollArea, Table, Checkbox
+- Icons: GitCompare, Scale, X, Eye, Trash2
