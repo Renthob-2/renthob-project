@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ComparisonProvider } from "@/contexts/ComparisonContext";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
@@ -32,7 +33,8 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
+          <ComparisonProvider>
+            <Routes>
             {/* Public Website Routes */}
             <Route element={<PublicLayout />}>
               <Route path="/" element={<LandingPage />} />
@@ -86,9 +88,10 @@ const App = () => (
               </ProtectedRoute>
             } />
             
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </ComparisonProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

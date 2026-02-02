@@ -1,24 +1,44 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, Bed, Bath, Square, MapPin } from "lucide-react";
+import { Heart, Bed, Bath, Square, MapPin, Scale } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { SearchProperty } from "@/hooks/useProperties";
+import { useComparisonContext } from "@/contexts/ComparisonContext";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface PropertyCardProps {
   property: SearchProperty;
   onSave?: (id: string) => void;
+  showCompareButton?: boolean;
 }
 
-export function PropertyCard({ property, onSave }: PropertyCardProps) {
+export function PropertyCard({ property, onSave, showCompareButton = true }: PropertyCardProps) {
   const [isSaved, setIsSaved] = useState(false);
   const navigate = useNavigate();
+  const { isInComparison, addToCompare, removeFromCompare, canAddMore } = useComparisonContext();
+  
+  const inComparison = isInComparison(property.id);
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsSaved(!isSaved);
     onSave?.(property.id);
+  };
+
+  const handleCompareToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (inComparison) {
+      removeFromCompare(property.id);
+      toast.info("Removed from comparison");
+    } else if (canAddMore) {
+      addToCompare(property.id);
+      toast.success("Added to comparison");
+    } else {
+      toast.warning("Maximum 4 properties can be compared");
+    }
   };
 
   const handleViewDetails = () => {
@@ -52,18 +72,36 @@ export function PropertyCard({ property, onSave }: PropertyCardProps) {
           </Badge>
         </div>
 
-        {/* Save Button */}
-        <button
-          onClick={handleSave}
-          className="absolute top-3 right-3 h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-background"
-          aria-label={isSaved ? "Remove from saved" : "Save property"}
-        >
-          <Heart
-            className={`h-5 w-5 transition-colors ${
-              isSaved ? "fill-destructive text-destructive" : "text-muted-foreground"
-            }`}
-          />
-        </button>
+        {/* Action Buttons */}
+        <div className="absolute top-3 right-3 flex flex-col gap-2">
+          <button
+            onClick={handleSave}
+            className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-background"
+            aria-label={isSaved ? "Remove from saved" : "Save property"}
+          >
+            <Heart
+              className={cn(
+                "h-5 w-5 transition-colors",
+                isSaved ? "fill-destructive text-destructive" : "text-muted-foreground"
+              )}
+            />
+          </button>
+
+          {showCompareButton && (
+            <button
+              onClick={handleCompareToggle}
+              className={cn(
+                "h-9 w-9 rounded-full backdrop-blur-sm flex items-center justify-center transition-colors",
+                inComparison 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-background/90 hover:bg-background text-muted-foreground"
+              )}
+              aria-label={inComparison ? "Remove from comparison" : "Add to comparison"}
+            >
+              <Scale className="h-5 w-5" />
+            </button>
+          )}
+        </div>
       </div>
 
       <CardContent className="p-4">
