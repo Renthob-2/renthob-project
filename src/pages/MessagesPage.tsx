@@ -4,11 +4,13 @@ import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMessages, Message } from "@/hooks/useMessages";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -31,25 +33,30 @@ import {
   ArrowLeft,
   Inbox,
   Send,
-  Mail,
-  MailOpen,
   Trash2,
   Home,
   User,
+  Reply,
+  Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function MessagesPage() {
   const { user } = useAuth();
-  const { messages, loading, markAsRead, deleteMessage } = useMessages();
+  const { messages, loading, markAsRead, deleteMessage, sendMessage } = useMessages();
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [tab, setTab] = useState<"inbox" | "sent">("inbox");
+  const [showReplyForm, setShowReplyForm] = useState(false);
+  const [replyMessage, setReplyMessage] = useState("");
+  const [sending, setSending] = useState(false);
 
   const inboxMessages = messages.filter((m) => m.recipient_id === user?.id);
   const sentMessages = messages.filter((m) => m.sender_id === user?.id);
 
   const handleOpenMessage = async (message: Message) => {
     setSelectedMessage(message);
+    setShowReplyForm(false);
+    setReplyMessage("");
     if (message.recipient_id === user?.id && !message.is_read) {
       try {
         await markAsRead(message.id);
@@ -66,6 +73,39 @@ export default function MessagesPage() {
       toast.success("Message deleted");
     } catch (error: any) {
       toast.error(error.message || "Failed to delete message");
+    }
+  };
+
+  const handleReply = async () => {
+    if (!selectedMessage || !replyMessage.trim()) {
+      toast.error("Please enter a reply message");
+      return;
+    }
+
+    const recipientId = tab === "inbox" 
+      ? selectedMessage.sender_id 
+      : selectedMessage.recipient_id;
+    
+    const replySubject = selectedMessage.subject.startsWith("Re: ")
+      ? selectedMessage.subject
+      : `Re: ${selectedMessage.subject}`;
+
+    try {
+      setSending(true);
+      await sendMessage(
+        recipientId,
+        replySubject,
+        replyMessage,
+        selectedMessage.property_id || undefined
+      );
+      toast.success("Reply sent successfully!");
+      setReplyMessage("");
+      setShowReplyForm(false);
+      setSelectedMessage(null);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send reply");
+    } finally {
+      setSending(false);
     }
   };
 
@@ -247,30 +287,77 @@ export default function MessagesPage() {
                 <p className="text-foreground whitespace-pre-wrap">{selectedMessage.message}</p>
               </div>
 
-              <div className="flex justify-end gap-2">
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
+              {/* Reply Form */}
+              {showReplyForm ? (
+                <div className="space-y-4 border-t pt-4">
+                  <Label htmlFor="reply">Your Reply</Label>
+                  <Textarea
+                    id="reply"
+                    value={replyMessage}
+                    onChange={(e) => setReplyMessage(e.target.value)}
+                    placeholder="Write your reply..."
+                    rows={4}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setShowReplyForm(false);
+                        setReplyMessage("");
+                      }}
+                    >
+                      Cancel
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Delete this message?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. The message will be permanently deleted.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleDeleteMessage(selectedMessage.id)}>
+                    <Button size="sm" onClick={handleReply} disabled={sending}>
+                      {sending ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4 mr-2" />
+                          Send Reply
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowReplyForm(true)}
+                  >
+                    <Reply className="h-4 w-4 mr-2" />
+                    Reply
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="sm">
+                        <Trash2 className="h-4 w-4 mr-2" />
                         Delete
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete this message?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. The message will be permanently deleted.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDeleteMessage(selectedMessage.id)}>
+                          Delete
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              )}
             </>
           )}
         </DialogContent>
