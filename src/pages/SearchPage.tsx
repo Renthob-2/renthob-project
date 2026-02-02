@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
 import { MobileFiltersSheet } from "@/components/search/MobileFiltersSheet";
+import { ComparisonTray } from "@/components/comparison/ComparisonTray";
 import { useProperties, useFilteredProperties } from "@/hooks/useProperties";
 import { FilterState, SortOption, DEFAULT_FILTERS } from "@/types/filters";
 
@@ -102,6 +103,9 @@ export default function SearchPage() {
           </main>
         </div>
       </div>
+
+      {/* Comparison Tray */}
+      <ComparisonTray />
     </div>
   );
 }
