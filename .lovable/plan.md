@@ -1,135 +1,54 @@
 
-# Property Comparison Feature
+# Add Agent Section to Homepage
 
 ## Overview
-Add a side-by-side property comparison feature that allows tenants to select multiple properties (up to 4) and view them in a detailed comparison table highlighting key differences in price, size, amenities, and features.
+Add a third CTA card on the homepage for Agents, alongside the existing Renter and Landlord sections. This will provide visibility and a clear signup path for real estate agents who want to use the platform to manage listings on behalf of landlords.
 
-## User Experience Flow
+## Current State
+The homepage has a CTA section with two cards:
+- **For Renters**: Encouraging users to search and apply for properties
+- **For Landlords**: Encouraging property owners to list their properties
 
-1. **Selecting Properties**: Users browse the search page and click a "Compare" button on property cards to add them to a comparison list
-2. **Comparison Tray**: A floating tray appears at the bottom of the screen showing selected properties (thumbnails) with a "Compare Now" button
-3. **Comparison View**: Opens a full-screen sheet/drawer displaying properties side-by-side with rows for each attribute
-4. **Actions**: Users can remove properties from comparison, clear all, or navigate to individual property details
+## Changes Required
 
-## Implementation Details
+### File: `src/pages/LandingPage.tsx`
 
-### 1. Create Comparison Context (State Management)
+1. **Import an Agent-appropriate icon**
+   - Add `Briefcase` or `UserCheck` from lucide-react for the Agent card
 
-**File**: `src/contexts/ComparisonContext.tsx`
+2. **Update the CTA grid layout**
+   - Change from `lg:grid-cols-2` to `lg:grid-cols-3` for the three-card layout
 
-- Create a React Context to manage comparison state globally
-- Store array of selected property IDs (max 4)
-- Provide functions: `addToCompare`, `removeFromCompare`, `clearComparison`, `isInComparison`
-- Persist selection in sessionStorage so it survives navigation
+3. **Add Agent CTA Card**
+   - Position after the Landlord card
+   - Use a distinct gradient (e.g., purple-themed to match the agent badge color used elsewhere)
+   - Include relevant Agent benefits:
+     - Manage multiple client properties
+     - Track leads and inquiries
+     - Professional dashboard tools
+     - Earn commissions efficiently
 
-### 2. Update PropertyCard Component
+### Design Consistency
+- The Agent card will follow the same visual structure as Renter and Landlord cards
+- Uses gradient background, icon header, benefit list with checkmarks, and CTA button
+- Links to `/signup?role=agent`
 
-**File**: `src/components/PropertyCard.tsx`
+## Visual Layout
 
-- Add a "Compare" toggle button (using a checkbox-style icon like `GitCompare` or `Scale`)
-- Display visual indicator when property is in comparison list
-- Connect to ComparisonContext
-- New prop: `showCompareButton?: boolean` (default: true)
+```text
+Before (2 columns):
+┌─────────────────┐  ┌─────────────────┐
+│   For Renters   │  │  For Landlords  │
+└─────────────────┘  └─────────────────┘
 
-### 3. Create Comparison Tray Component
-
-**File**: `src/components/comparison/ComparisonTray.tsx`
-
-- Fixed position at bottom of viewport
-- Shows only when 1+ properties are selected
-- Displays:
-  - Property thumbnails (small circular images)
-  - Property count badge ("2 of 4")
-  - "Compare Now" button (enabled when 2+ selected)
-  - "Clear All" button
-- Animated slide-up appearance
-
-### 4. Create Comparison Sheet Component
-
-**File**: `src/components/comparison/ComparisonSheet.tsx`
-
-- Full-screen sheet (slides from right) using existing Sheet UI component
-- Header with title and close button
-- Content: Scrollable comparison table
-
-**Comparison Table Structure**:
-```
-| Attribute      | Property 1  | Property 2  | Property 3  | Property 4  |
-|----------------|-------------|-------------|-------------|-------------|
-| Image          | [thumbnail] | [thumbnail] | [thumbnail] | [thumbnail] |
-| Title          | ...         | ...         | ...         | ...         |
-| Price          | ₦2.5M/yr    | ₦1.8M/yr    | ...         | ...         |
-| Location       | ...         | ...         | ...         | ...         |
-| Bedrooms       | 3           | 2           | ...         | ...         |
-| Bathrooms      | 2           | 2           | ...         | ...         |
-| Square Feet    | 1,500       | 1,200       | ...         | ...         |
-| Property Type  | Apartment   | Duplex      | ...         | ...         |
-| Amenities      | [list]      | [list]      | ...         | ...         |
+After (3 columns):
+┌────────────┐  ┌────────────┐  ┌────────────┐
+│ For Renters│  │For Landlords│ │ For Agents │
+└────────────┘  └────────────┘  └────────────┘
 ```
 
-- Highlight best values (lowest price, most bedrooms, etc.)
-- Each column has "Remove" and "View Details" buttons
-
-### 5. Create Comparison Table Component
-
-**File**: `src/components/comparison/ComparisonTable.tsx`
-
-- Responsive table layout
-- Row-based comparison with clear labels
-- Visual highlighting for:
-  - Lowest price (green)
-  - Most bedrooms/bathrooms (highlighted)
-  - Common vs unique amenities
-- Mobile-friendly horizontal scroll
-
-### 6. Custom Hook for Comparison Data
-
-**File**: `src/hooks/useComparison.ts`
-
-- Fetch full property details for compared properties
-- Transform data for comparison view
-- Calculate "best" values for highlighting
-
-### 7. Update SearchPage Layout
-
-**File**: `src/pages/SearchPage.tsx`
-
-- Wrap with ComparisonProvider
-- Include ComparisonTray component at bottom
-
-### 8. Update App.tsx
-
-**File**: `src/App.tsx`
-
-- Add ComparisonProvider to wrap relevant routes
-
-## File Structure
-
-```
-src/
-├── contexts/
-│   └── ComparisonContext.tsx (new)
-├── hooks/
-│   └── useComparison.ts (new)
-├── components/
-│   ├── comparison/
-│   │   ├── ComparisonTray.tsx (new)
-│   │   ├── ComparisonSheet.tsx (new)
-│   │   └── ComparisonTable.tsx (new)
-│   └── PropertyCard.tsx (modified)
-└── pages/
-    └── SearchPage.tsx (modified)
-```
-
-## Technical Considerations
-
-- **Maximum Properties**: Limited to 4 for optimal comparison UX
-- **State Persistence**: Use sessionStorage to maintain selections across page navigation
-- **Performance**: Fetch property details only when comparison sheet opens
-- **Responsive Design**: Table scrolls horizontally on mobile, fixed property headers
-- **Accessibility**: Proper ARIA labels for comparison controls
-
-## UI Components Used
-
-- Existing: Sheet, Button, Badge, Card, ScrollArea, Table, Checkbox
-- Icons: GitCompare, Scale, X, Eye, Trash2
+## Implementation Summary
+- Modify 1 file: `src/pages/LandingPage.tsx`
+- Add Briefcase icon import
+- Update grid to 3 columns
+- Add Agent card with benefits list and signup CTA
