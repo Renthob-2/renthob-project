@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   Home, 
   Heart, 
@@ -13,11 +13,13 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Calendar
+  Calendar,
+  ArrowLeft
 } from "lucide-react";
 
 export default function TenantDashboard() {
   const { profile } = useAuth();
+  const navigate = useNavigate();
 
   // Mock data for demonstration
   const savedProperties = [
@@ -48,6 +50,17 @@ export default function TenantDashboard() {
   return (
     <div className="min-h-screen bg-muted/30">
       <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate(-1)}
+          className="mb-4 -ml-2"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+
         {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">
