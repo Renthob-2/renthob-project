@@ -14,6 +14,7 @@ import {
   ArrowRight,
   CheckCircle2,
   Loader2,
+  Briefcase,
 } from "lucide-react";
 
 const stats = [
@@ -173,10 +174,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section for Renters & Landlords */}
+      {/* CTA Section for Renters, Landlords & Agents */}
       <section className="py-16 md:py-20">
         <div className="container">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* For Renters */}
             <div className="bg-gradient-to-br from-accent to-secondary rounded-3xl p-8 md:p-10">
               <div className="flex items-center gap-3 mb-4">
@@ -238,6 +239,38 @@ export default function LandingPage() {
               </ul>
               <Button asChild size="lg">
                 <Link to="/signup?role=landlord">List Your Property</Link>
+              </Button>
+            </div>
+
+            {/* For Agents */}
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/20 rounded-3xl p-8 md:p-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-12 w-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
+                  <Briefcase className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h3 className="font-display text-2xl font-bold text-foreground">
+                  For Agents
+                </h3>
+              </div>
+              <p className="text-muted-foreground mb-6">
+                Manage listings on behalf of landlords. Access professional tools 
+                to grow your real estate business.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {[
+                  "Manage multiple client properties",
+                  "Track leads and inquiries",
+                  "Professional dashboard tools",
+                  "Earn commissions efficiently",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-sm">
+                    <CheckCircle2 className="h-5 w-5 text-purple-600 dark:text-purple-400 shrink-0" />
+                    <span className="text-foreground">{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-700 text-white">
+                <Link to="/signup?role=agent">Join as Agent</Link>
               </Button>
             </div>
           </div>
