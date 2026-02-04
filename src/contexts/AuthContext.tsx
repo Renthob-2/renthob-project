@@ -11,6 +11,8 @@ interface Profile {
   email: string | null;
   avatar_url: string | null;
   phone: string | null;
+  display_name_preference: string | null;
+  agency_name: string | null;
 }
 
 interface AuthContextType {
