@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
+import { DisplayNameSettings } from "@/components/settings/DisplayNameSettings";
 import { 
   Home, 
   Plus, 
@@ -288,6 +289,9 @@ export default function LandlordDashboard() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Display Name Settings */}
+            <DisplayNameSettings />
 
             {/* Tips */}
             <Card className="bg-primary/5 border-primary/20">

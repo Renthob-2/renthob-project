@@ -15,20 +15,31 @@ import {
   Heart,
   Share2,
   Phone,
-  CheckCircle2
+  CheckCircle2,
+  Building2
 } from "lucide-react";
 import { PropertyImageGallery } from "@/components/property/PropertyImageGallery";
 import { ContactLandlordDialog } from "@/components/messaging/ContactLandlordDialog";
+import { ApplyNowDialog } from "@/components/property/ApplyNowDialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
 type DbProperty = Database["public"]["Tables"]["properties"]["Row"];
 
+interface OwnerProfile {
+  full_name: string | null;
+  email: string | null;
+  display_name_preference: string | null;
+  agency_name: string | null;
+}
+
+interface OwnerRole {
+  role: string;
+}
+
 interface PropertyWithOwner extends DbProperty {
-  owner_profile?: {
-    full_name: string | null;
-    email: string | null;
-  };
+  owner_profile?: OwnerProfile;
+  owner_role?: OwnerRole;
 }
 
 function formatPrice(price: number): string {
@@ -39,6 +50,16 @@ function formatPrice(price: number): string {
     return `₦${(price / 1000).toFixed(0)}K`;
   }
   return `₦${price.toLocaleString()}`;
+}
+
+function formatDisplayName(fullName: string, preference: string | null): string {
+  if (preference === "first_initial") {
+    const parts = fullName.split(" ");
+    if (parts.length > 1) {
+      return `${parts[0]} ${parts[parts.length - 1][0]}.`;
+    }
+  }
+  return fullName;
 }
 
 export default function PropertyDetailPage() {
@@ -63,16 +84,24 @@ export default function PropertyDetailPage() {
         if (error) throw error;
 
         if (data) {
-          // Fetch owner profile
+          // Fetch owner profile with display preferences
           const { data: profile } = await supabase
             .from("profiles")
-            .select("full_name, email")
+            .select("full_name, email, display_name_preference, agency_name")
+            .eq("user_id", data.owner_id)
+            .maybeSingle();
+
+          // Fetch owner role
+          const { data: roleData } = await supabase
+            .from("user_roles")
+            .select("role")
             .eq("user_id", data.owner_id)
             .maybeSingle();
 
           setProperty({
             ...data,
             owner_profile: profile || undefined,
+            owner_role: roleData || undefined,
           });
         }
       } catch (err) {
@@ -134,8 +163,13 @@ export default function PropertyDetailPage() {
   const daysSinceCreated = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
   const isNew = daysSinceCreated <= 7;
 
-  const ownerName = property.owner_profile?.full_name || "Property Owner";
-  const ownerInitials = ownerName
+  const rawOwnerName = property.owner_profile?.full_name || "Property Owner";
+  const displayPreference = property.owner_profile?.display_name_preference;
+  const ownerName = formatDisplayName(rawOwnerName, displayPreference);
+  const agencyName = property.owner_profile?.agency_name;
+  const isAgent = property.owner_role?.role === "agent";
+  
+  const ownerInitials = rawOwnerName
     .split(" ")
     .map((n) => n[0])
     .join("")
@@ -323,9 +357,11 @@ export default function PropertyDetailPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <Button className="w-full" size="lg">
-                    Apply Now
-                  </Button>
+                  <ApplyNowDialog
+                    propertyId={property.id}
+                    propertyTitle={property.title}
+                    landlordId={property.owner_id}
+                  />
                   <Button variant="outline" className="w-full" size="lg">
                     <Phone className="h-4 w-4 mr-2" />
                     Schedule a Tour
@@ -344,9 +380,17 @@ export default function PropertyDetailPage() {
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="text-primary font-semibold">{ownerInitials}</span>
                     </div>
-                    <div>
+                    <div className="flex-1">
+                      {isAgent && agencyName && (
+                        <div className="flex items-center gap-1 text-sm text-primary font-medium mb-0.5">
+                          <Building2 className="h-3 w-3" />
+                          <span>{agencyName}</span>
+                        </div>
+                      )}
                       <p className="font-medium text-foreground">{ownerName}</p>
-                      <p className="text-sm text-muted-foreground">Property Owner</p>
+                      <p className="text-sm text-muted-foreground">
+                        {isAgent ? "Real Estate Agent" : "Property Owner"}
+                      </p>
                     </div>
                   </div>
 

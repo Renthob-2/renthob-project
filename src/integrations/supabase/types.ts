@@ -57,8 +57,10 @@ export type Database = {
       }
       profiles: {
         Row: {
+          agency_name: string | null
           avatar_url: string | null
           created_at: string
+          display_name_preference: string
           email: string | null
           full_name: string | null
           id: string
@@ -67,8 +69,10 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          agency_name?: string | null
           avatar_url?: string | null
           created_at?: string
+          display_name_preference?: string
           email?: string | null
           full_name?: string | null
           id?: string
@@ -77,8 +81,10 @@ export type Database = {
           user_id: string
         }
         Update: {
+          agency_name?: string | null
           avatar_url?: string | null
           created_at?: string
+          display_name_preference?: string
           email?: string | null
           full_name?: string | null
           id?: string
@@ -156,6 +162,65 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      rental_applications: {
+        Row: {
+          applicant_id: string
+          created_at: string
+          email: string
+          employment_status: string
+          full_name: string
+          id: string
+          landlord_id: string
+          message: string | null
+          monthly_income: string | null
+          move_in_date: string
+          phone: string
+          property_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          created_at?: string
+          email: string
+          employment_status: string
+          full_name: string
+          id?: string
+          landlord_id: string
+          message?: string | null
+          monthly_income?: string | null
+          move_in_date: string
+          phone: string
+          property_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          created_at?: string
+          email?: string
+          employment_status?: string
+          full_name?: string
+          id?: string
+          landlord_id?: string
+          message?: string | null
+          monthly_income?: string | null
+          move_in_date?: string
+          phone?: string
+          property_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rental_applications_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
