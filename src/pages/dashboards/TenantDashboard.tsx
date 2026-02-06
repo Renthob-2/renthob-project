@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTenantProfile } from "@/hooks/useTenantProfile";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Home, 
@@ -14,11 +15,14 @@ import {
   CheckCircle,
   XCircle,
   Calendar,
-  ArrowLeft
+  ArrowLeft,
+  UserCircle,
+  Sparkles
 } from "lucide-react";
 
 export default function TenantDashboard() {
   const { profile } = useAuth();
+  const { isComplete, isLoading: profileLoading } = useTenantProfile();
   const navigate = useNavigate();
 
   // Mock data for demonstration
@@ -70,6 +74,29 @@ export default function TenantDashboard() {
             Find your perfect home and manage your rental journey
           </p>
         </div>
+
+        {/* Profile Completion Banner */}
+        {!profileLoading && !isComplete && (
+          <Card className="mb-8 border-primary/30 bg-primary/5">
+            <CardContent className="flex flex-col sm:flex-row items-center gap-4 py-5">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <Sparkles className="h-6 w-6 text-primary" />
+              </div>
+              <div className="flex-1 text-center sm:text-left">
+                <h3 className="font-semibold">Complete your profile for AI-powered matches</h3>
+                <p className="text-sm text-muted-foreground">
+                  Tell us about your lifestyle, budget, and preferences — our AI will match you to the perfect property and neighborhood.
+                </p>
+              </div>
+              <Button asChild>
+                <Link to="/profile/setup">
+                  <UserCircle className="h-4 w-4 mr-2" />
+                  Complete Profile
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

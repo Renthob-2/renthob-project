@@ -16,6 +16,7 @@ import PropertyDetailPage from "./pages/PropertyDetailPage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import TenantDashboard from "./pages/dashboards/TenantDashboard";
+import TenantProfileSetup from "./pages/TenantProfileSetup";
 import LandlordDashboard from "./pages/dashboards/LandlordDashboard";
 import AgentDashboard from "./pages/dashboards/AgentDashboard";
 import CreateListingPage from "./pages/CreateListingPage";
@@ -53,6 +54,11 @@ const App = () => (
             <Route path="/dashboard/tenant" element={
               <ProtectedRoute allowedRoles={["tenant"]}>
                 <TenantDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile/setup" element={
+              <ProtectedRoute allowedRoles={["tenant"]}>
+                <TenantProfileSetup />
               </ProtectedRoute>
             } />
             <Route path="/dashboard/landlord" element={
