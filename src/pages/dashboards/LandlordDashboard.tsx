@@ -4,10 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { DisplayNameSettings } from "@/components/settings/DisplayNameSettings";
+import { RentalApplicationsList } from "@/components/dashboard/RentalApplicationsList";
 import { 
   Home, 
   Plus, 
-  Users, 
   MessageSquare, 
   TrendingUp,
   Eye,
@@ -29,12 +29,6 @@ export default function LandlordDashboard() {
     { id: 3, title: "Cozy Studio", location: "Victoria Island", status: "pending", views: 0, inquiries: 0, price: "₦1.2M/year" },
   ];
 
-  const recentApplications = [
-    { id: 1, tenant: "John Doe", property: "Modern 2BR Apartment", date: "2026-01-27", status: "new" },
-    { id: 2, tenant: "Jane Smith", property: "Spacious 3BR Flat", date: "2026-01-26", status: "reviewing" },
-    { id: 3, tenant: "Mike Johnson", property: "Modern 2BR Apartment", date: "2026-01-25", status: "approved" },
-  ];
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
@@ -43,19 +37,6 @@ export default function LandlordDashboard() {
         return <Badge className="bg-yellow-100 text-yellow-800">Pending Review</Badge>;
       case "inactive":
         return <Badge variant="secondary">Inactive</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
-
-  const getApplicationBadge = (status: string) => {
-    switch (status) {
-      case "new":
-        return <Badge className="bg-blue-100 text-blue-800">New</Badge>;
-      case "reviewing":
-        return <Badge className="bg-yellow-100 text-yellow-800">Reviewing</Badge>;
-      case "approved":
-        return <Badge className="bg-green-100 text-green-800">Approved</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -194,44 +175,8 @@ export default function LandlordDashboard() {
               </CardContent>
             </Card>
 
-            {/* Recent Applications */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-primary" />
-                    Tenant Applications
-                  </CardTitle>
-                  <CardDescription>Review and manage tenant requests</CardDescription>
-                </div>
-                <Button variant="ghost" size="sm">View All</Button>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {recentApplications.map((app) => (
-                    <div key={app.id} className="flex items-center justify-between p-3 rounded-lg border">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <span className="text-sm font-medium text-primary">
-                            {app.tenant.split(' ').map(n => n[0]).join('')}
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="font-medium">{app.tenant}</h4>
-                          <p className="text-sm text-muted-foreground">{app.property}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(app.date).toLocaleDateString()}
-                        </span>
-                        {getApplicationBadge(app.status)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Rental Applications - Real Data */}
+            <RentalApplicationsList />
           </div>
 
           {/* Sidebar */}

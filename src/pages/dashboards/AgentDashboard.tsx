@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { DisplayNameSettings } from "@/components/settings/DisplayNameSettings";
+import { RentalApplicationsList } from "@/components/dashboard/RentalApplicationsList";
 import { 
   Home, 
   Plus, 
@@ -256,6 +257,9 @@ export default function AgentDashboard() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Rental Applications - Real Data */}
+            <RentalApplicationsList />
           </div>
 
           {/* Sidebar */}
