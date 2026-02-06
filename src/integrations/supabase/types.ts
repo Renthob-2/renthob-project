@@ -222,6 +222,111 @@ export type Database = {
           },
         ]
       }
+      tenant_profiles: {
+        Row: {
+          about_me: string | null
+          cleanliness_level: string | null
+          commute_method: string | null
+          cooking_frequency: string | null
+          created_at: string
+          dealbreakers: string | null
+          employer_name: string | null
+          employment_type: string | null
+          exercise_frequency: string | null
+          guest_frequency: string | null
+          has_pets: boolean | null
+          hobbies: string[] | null
+          id: string
+          ideal_neighborhood: string | null
+          income_stability: string | null
+          is_complete: boolean | null
+          job_title: string | null
+          max_commute_minutes: number | null
+          max_monthly_rent: number | null
+          monthly_income_range: string | null
+          must_have_amenities: string[] | null
+          noise_tolerance: string | null
+          pet_details: string | null
+          preferred_locations: string[] | null
+          sleep_schedule: string | null
+          smoking: boolean | null
+          social_lifestyle: string | null
+          updated_at: string
+          user_id: string
+          utilities_budget: number | null
+          willing_advance_months: number | null
+          work_from_home: string | null
+        }
+        Insert: {
+          about_me?: string | null
+          cleanliness_level?: string | null
+          commute_method?: string | null
+          cooking_frequency?: string | null
+          created_at?: string
+          dealbreakers?: string | null
+          employer_name?: string | null
+          employment_type?: string | null
+          exercise_frequency?: string | null
+          guest_frequency?: string | null
+          has_pets?: boolean | null
+          hobbies?: string[] | null
+          id?: string
+          ideal_neighborhood?: string | null
+          income_stability?: string | null
+          is_complete?: boolean | null
+          job_title?: string | null
+          max_commute_minutes?: number | null
+          max_monthly_rent?: number | null
+          monthly_income_range?: string | null
+          must_have_amenities?: string[] | null
+          noise_tolerance?: string | null
+          pet_details?: string | null
+          preferred_locations?: string[] | null
+          sleep_schedule?: string | null
+          smoking?: boolean | null
+          social_lifestyle?: string | null
+          updated_at?: string
+          user_id: string
+          utilities_budget?: number | null
+          willing_advance_months?: number | null
+          work_from_home?: string | null
+        }
+        Update: {
+          about_me?: string | null
+          cleanliness_level?: string | null
+          commute_method?: string | null
+          cooking_frequency?: string | null
+          created_at?: string
+          dealbreakers?: string | null
+          employer_name?: string | null
+          employment_type?: string | null
+          exercise_frequency?: string | null
+          guest_frequency?: string | null
+          has_pets?: boolean | null
+          hobbies?: string[] | null
+          id?: string
+          ideal_neighborhood?: string | null
+          income_stability?: string | null
+          is_complete?: boolean | null
+          job_title?: string | null
+          max_commute_minutes?: number | null
+          max_monthly_rent?: number | null
+          monthly_income_range?: string | null
+          must_have_amenities?: string[] | null
+          noise_tolerance?: string | null
+          pet_details?: string | null
+          preferred_locations?: string[] | null
+          sleep_schedule?: string | null
+          smoking?: boolean | null
+          social_lifestyle?: string | null
+          updated_at?: string
+          user_id?: string
+          utilities_budget?: number | null
+          willing_advance_months?: number | null
+          work_from_home?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
