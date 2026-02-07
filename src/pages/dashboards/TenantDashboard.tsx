@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTenantProfile } from "@/hooks/useTenantProfile";
 import { Link, useNavigate } from "react-router-dom";
@@ -22,7 +23,7 @@ import {
 
 export default function TenantDashboard() {
   const { profile } = useAuth();
-  const { isComplete, isLoading: profileLoading } = useTenantProfile();
+  const { isComplete, isLoading: profileLoading, completenessPercentage } = useTenantProfile();
   const navigate = useNavigate();
 
   // Mock data for demonstration
@@ -192,6 +193,47 @@ export default function TenantDashboard() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Profile Completeness */}
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <UserCircle className="h-5 w-5 text-primary" />
+                  Profile Completeness
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-primary">{completenessPercentage}%</span>
+                    {completenessPercentage === 100 ? (
+                      <Badge className="bg-primary/10 text-primary border-0">
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                        Complete
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary">
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        In Progress
+                      </Badge>
+                    )}
+                  </div>
+                  <Progress value={completenessPercentage} className="h-2" />
+                  <p className="text-xs text-muted-foreground">
+                    {completenessPercentage === 100 
+                      ? "Your profile is complete! AI matching is active."
+                      : "Complete your profile to unlock AI-powered property matching."}
+                  </p>
+                  {completenessPercentage < 100 && (
+                    <Button asChild size="sm" className="w-full mt-2">
+                      <Link to="/profile/setup">
+                        Complete Profile
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Notifications */}
             <Card>
               <CardHeader>

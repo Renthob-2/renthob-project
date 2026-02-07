@@ -38,6 +38,44 @@ export interface TenantProfile {
   updated_at: string;
 }
 
+// Fields that count towards profile completeness
+const PROFILE_FIELDS: (keyof TenantProfile)[] = [
+  "has_pets",
+  "smoking",
+  "work_from_home",
+  "exercise_frequency",
+  "social_lifestyle",
+  "hobbies",
+  "employment_type",
+  "monthly_income_range",
+  "income_stability",
+  "max_monthly_rent",
+  "utilities_budget",
+  "willing_advance_months",
+  "noise_tolerance",
+  "cleanliness_level",
+  "guest_frequency",
+  "sleep_schedule",
+  "cooking_frequency",
+  "about_me",
+  "ideal_neighborhood",
+];
+
+function calculateCompleteness(profile: TenantProfile | null): number {
+  if (!profile) return 0;
+  
+  let filledCount = 0;
+  for (const field of PROFILE_FIELDS) {
+    const value = profile[field];
+    if (value !== null && value !== undefined && value !== "" && 
+        !(Array.isArray(value) && value.length === 0)) {
+      filledCount++;
+    }
+  }
+  
+  return Math.round((filledCount / PROFILE_FIELDS.length) * 100);
+}
+
 export function useTenantProfile() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -86,10 +124,13 @@ export function useTenantProfile() {
     },
   });
 
+  const completenessPercentage = calculateCompleteness(profileQuery.data);
+
   return {
     tenantProfile: profileQuery.data,
     isLoading: profileQuery.isLoading,
     isComplete: profileQuery.data?.is_complete ?? false,
+    completenessPercentage,
     upsertProfile: upsertProfile.mutate,
     isSaving: upsertProfile.isPending,
   };
