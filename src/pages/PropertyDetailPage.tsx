@@ -14,13 +14,13 @@ import {
   Calendar,
   Heart,
   Share2,
-  Phone,
   CheckCircle2,
   Building2
 } from "lucide-react";
 import { PropertyImageGallery } from "@/components/property/PropertyImageGallery";
 import { ContactLandlordDialog } from "@/components/messaging/ContactLandlordDialog";
 import { ApplyNowDialog } from "@/components/property/ApplyNowDialog";
+import { ScheduleTourDialog } from "@/components/property/ScheduleTourDialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 
@@ -362,10 +362,11 @@ export default function PropertyDetailPage() {
                     propertyTitle={property.title}
                     landlordId={property.owner_id}
                   />
-                  <Button variant="outline" className="w-full" size="lg">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Schedule a Tour
-                  </Button>
+                  <ScheduleTourDialog
+                    propertyId={property.id}
+                    propertyTitle={property.title}
+                    landlordId={property.owner_id}
+                  />
                   <ContactLandlordDialog
                     propertyId={property.id}
                     propertyTitle={property.title}
