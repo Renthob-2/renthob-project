@@ -4,21 +4,18 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTenantProfile } from "@/hooks/useTenantProfile";
+import { TenantActivityList } from "@/components/dashboard/TenantActivityList";
 import { Link, useNavigate } from "react-router-dom";
 import { 
-  Home, 
   Heart, 
   FileText, 
   MessageSquare, 
   Bell, 
   Search,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Calendar,
   ArrowLeft,
   UserCircle,
-  Sparkles
+  Sparkles,
+  CheckCircle
 } from "lucide-react";
 
 export default function TenantDashboard() {
@@ -33,24 +30,7 @@ export default function TenantDashboard() {
     { id: 3, title: "Cozy Studio", location: "Victoria Island", price: "₦1.2M/year", image: "/placeholder.svg" },
   ];
 
-  const applications = [
-    { id: 1, property: "Modern 2BR Apartment", status: "pending", date: "2026-01-25" },
-    { id: 2, property: "Luxury Penthouse", status: "approved", date: "2026-01-20" },
-    { id: 3, property: "Garden View Flat", status: "rejected", date: "2026-01-15" },
-  ];
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "pending":
-        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
-      case "approved":
-        return <Badge variant="secondary" className="bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" />Approved</Badge>;
-      case "rejected":
-        return <Badge variant="secondary" className="bg-red-100 text-red-800"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -163,32 +143,8 @@ export default function TenantDashboard() {
               </CardContent>
             </Card>
 
-            {/* Application Status */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-primary" />
-                  My Applications
-                </CardTitle>
-                <CardDescription>Track your rental applications</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {applications.map((app) => (
-                    <div key={app.id} className="flex items-center justify-between p-3 rounded-lg border">
-                      <div>
-                        <h4 className="font-medium">{app.property}</h4>
-                        <p className="text-sm text-muted-foreground flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          Applied: {new Date(app.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      {getStatusBadge(app.status)}
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Applications & Tour Requests - Real Data */}
+            <TenantActivityList />
           </div>
 
           {/* Sidebar */}
