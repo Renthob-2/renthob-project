@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { DisplayNameSettings } from "@/components/settings/DisplayNameSettings";
 import { RentalApplicationsList } from "@/components/dashboard/RentalApplicationsList";
+import { TourRequestsList } from "@/components/dashboard/TourRequestsList";
 import { 
   Home, 
   Plus, 
@@ -177,6 +178,9 @@ export default function LandlordDashboard() {
 
             {/* Rental Applications - Real Data */}
             <RentalApplicationsList />
+
+            {/* Tour Requests - Real Data */}
+            <TourRequestsList />
           </div>
 
           {/* Sidebar */}
