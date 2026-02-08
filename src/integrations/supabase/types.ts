@@ -327,6 +327,53 @@ export type Database = {
         }
         Relationships: []
       }
+      tour_requests: {
+        Row: {
+          created_at: string
+          id: string
+          landlord_id: string
+          message: string | null
+          preferred_date: string
+          preferred_time: string
+          property_id: string
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          landlord_id: string
+          message?: string | null
+          preferred_date: string
+          preferred_time: string
+          property_id: string
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          landlord_id?: string
+          message?: string | null
+          preferred_date?: string
+          preferred_time?: string
+          property_id?: string
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tour_requests_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
