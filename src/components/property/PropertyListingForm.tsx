@@ -13,19 +13,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { X, Upload, Loader2, ImagePlus, Save } from "lucide-react";
 import type { Database } from "@/integrations/supabase/types";
 
 type Property = Database["public"]["Tables"]["properties"]["Row"];
 
 const AMENITIES_OPTIONS = [
+  { id: "borehole", label: "Running Water (Borehole)" },
+  { id: "prepaid_meter", label: "Prepaid Meter" },
+  { id: "generator", label: "Generator" },
+  { id: "inverter", label: "Inverter" },
+  { id: "solar", label: "Solar Power" },
+  { id: "hybrid_power", label: "Hybrid Power" },
+  { id: "parking", label: "Parking Space" },
+  { id: "security_gate", label: "Security Gate" },
+  { id: "fenced", label: "Fenced Compound" },
+  { id: "floored_compound", label: "Floored Compound" },
+  { id: "ensuite", label: "Fully Ensuite" },
   { id: "wifi", label: "WiFi" },
-  { id: "parking", label: "Parking" },
   { id: "gym", label: "Gym" },
   { id: "pool", label: "Swimming Pool" },
   { id: "security", label: "24/7 Security" },
-  { id: "generator", label: "Generator" },
-  { id: "water", label: "Running Water" },
   { id: "ac", label: "Air Conditioning" },
   { id: "furnished", label: "Furnished" },
   { id: "balcony", label: "Balcony" },
@@ -44,6 +53,27 @@ const PROPERTY_TYPES = [
   { value: "shop", label: "Shop" },
 ];
 
+const LISTING_PURPOSES = [
+  { value: "rent", label: "Rent" },
+  { value: "shortlet", label: "Short-let" },
+  { value: "sale", label: "Sale" },
+  { value: "lease", label: "Lease" },
+];
+
+const PROPERTY_CONDITIONS = [
+  { value: "new", label: "New" },
+  { value: "fairly_used", label: "Fairly Used" },
+  { value: "renovated", label: "Renovated" },
+  { value: "old", label: "Old" },
+];
+
+const BEST_SUITED_OPTIONS = [
+  { id: "working_professionals", label: "Working Professionals" },
+  { id: "families", label: "Families" },
+  { id: "students", label: "Students" },
+  { id: "shortlet_guests", label: "Short-let Guests" },
+];
+
 const NIGERIAN_STATES = [
   "Abia", "Adamawa", "Akwa Ibom", "Anambra", "Bauchi", "Bayelsa", "Benue", "Borno",
   "Cross River", "Delta", "Ebonyi", "Edo", "Ekiti", "Enugu", "FCT", "Gombe", "Imo",
@@ -52,10 +82,14 @@ const NIGERIAN_STATES = [
   "Yobe", "Zamfara"
 ];
 
+const DESCRIPTION_PLACEHOLDER = `A newly built 2-bedroom apartment in a gated estate in Ajah with 24-hour power support, borehole water, and secure parking. Ideal for young professionals or small families seeking quiet living with easy access to Lekki-Epe Expressway.`;
+
 const formSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").max(100, "Title must be less than 100 characters"),
   description: z.string().min(20, "Description must be at least 20 characters").max(2000, "Description must be less than 2000 characters"),
   property_type: z.enum(["apartment", "house", "duplex", "studio", "penthouse", "villa", "office", "shop"]),
+  listing_purpose: z.string().default("rent"),
+  property_condition: z.string().default("new"),
   price: z.string().refine((val) => !isNaN(Number(val)) && Number(val) > 0, "Price must be a positive number"),
   price_period: z.enum(["month", "year"]),
   location: z.string().min(3, "Location is required"),
@@ -66,6 +100,10 @@ const formSchema = z.object({
   bathrooms: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Must be a valid number"),
   square_feet: z.string().optional(),
   amenities: z.array(z.string()).default([]),
+  best_suited_for: z.array(z.string()).default([]),
+  work_from_home_friendly: z.boolean().default(false),
+  car_dependent_area: z.boolean().default(false),
+  walkable_area: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -92,6 +130,8 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
       title: "",
       description: "",
       property_type: "apartment",
+      listing_purpose: "rent",
+      property_condition: "new",
       price: "",
       price_period: "year",
       location: "",
@@ -102,16 +142,21 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
       bathrooms: "1",
       square_feet: "",
       amenities: [],
+      best_suited_for: [],
+      work_from_home_friendly: false,
+      car_dependent_area: false,
+      walkable_area: false,
     },
   });
 
-  // Populate form with existing property data when editing
   useEffect(() => {
     if (isEditing && property) {
       form.reset({
         title: property.title,
         description: property.description || "",
         property_type: property.property_type,
+        listing_purpose: (property as any).listing_purpose || "rent",
+        property_condition: (property as any).property_condition || "new",
         price: property.price.toString(),
         price_period: property.price_period as "month" | "year",
         location: property.location,
@@ -122,6 +167,10 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
         bathrooms: property.bathrooms.toString(),
         square_feet: property.square_feet?.toString() || "",
         amenities: property.amenities || [],
+        best_suited_for: (property as any).best_suited_for || [],
+        work_from_home_friendly: (property as any).work_from_home_friendly || false,
+        car_dependent_area: (property as any).car_dependent_area || false,
+        walkable_area: (property as any).walkable_area || false,
       });
       setExistingImages(property.images || []);
     }
@@ -225,21 +274,19 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
     setIsSubmitting(true);
 
     try {
-      // Delete removed images first (for edit mode)
       if (isEditing) {
         await deleteRemovedImages();
       }
 
-      // Upload new images
       const newImageUrls = await uploadImages();
-
-      // Combine existing images with new uploads
       const allImages = isEditing ? [...existingImages, ...newImageUrls] : newImageUrls;
 
       const propertyData = {
         title: values.title,
         description: values.description,
         property_type: values.property_type,
+        listing_purpose: values.listing_purpose,
+        property_condition: values.property_condition,
         price: parseFloat(values.price),
         price_period: values.price_period,
         location: values.location,
@@ -251,10 +298,13 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
         square_feet: values.square_feet ? parseInt(values.square_feet) : null,
         amenities: values.amenities,
         images: allImages,
+        best_suited_for: values.best_suited_for,
+        work_from_home_friendly: values.work_from_home_friendly,
+        car_dependent_area: values.car_dependent_area,
+        walkable_area: values.walkable_area,
       };
 
       if (isEditing && property) {
-        // Update existing property
         const { error } = await supabase
           .from("properties")
           .update(propertyData)
@@ -265,7 +315,6 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
 
         toast({ title: "Success!", description: "Your property listing has been updated." });
       } else {
-        // Insert new property
         const { error } = await supabase.from("properties").insert({
           ...propertyData,
           owner_id: user.id,
@@ -307,9 +356,10 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                {/* Basic Information */}
+                {/* Property Identity */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Basic Information</h3>
+                  <h3 className="text-lg font-semibold">Property Identity</h3>
+                  <p className="text-sm text-muted-foreground">This defines what is being listed. No ambiguity.</p>
                   
                   <FormField
                     control={form.control}
@@ -325,26 +375,7 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
                     )}
                   />
 
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            placeholder="Describe your property in detail..." 
-                            className="min-h-[120px]"
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormDescription>Include key features, nearby landmarks, and what makes it special.</FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-3 gap-4">
                     <FormField
                       control={form.control}
                       name="property_type"
@@ -370,6 +401,58 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
                       )}
                     />
 
+                    <FormField
+                      control={form.control}
+                      name="listing_purpose"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Listing Purpose</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select purpose" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {LISTING_PURPOSES.map((p) => (
+                                <SelectItem key={p.value} value={p.value}>
+                                  {p.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="property_condition"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Property Condition</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select condition" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {PROPERTY_CONDITIONS.map((c) => (
+                                <SelectItem key={c.value} value={c.value}>
+                                  {c.label}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-4">
                     <div className="grid grid-cols-2 gap-2">
                       <FormField
                         control={form.control}
@@ -407,6 +490,33 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* Description Summary */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Description Summary</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Summarize in 3–5 lines. Avoid hype words. Focus on facts + benefits. Match Nigerian context.
+                  </p>
+
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder={DESCRIPTION_PLACEHOLDER}
+                            className="min-h-[120px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription>Include key features, nearby landmarks, and what makes it special.</FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
 
                 {/* Location */}
@@ -532,9 +642,10 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
                   </div>
                 </div>
 
-                {/* Amenities */}
+                {/* Amenities & Neighborhood */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Amenities</h3>
+                  <h3 className="text-lg font-semibold">Amenities & Neighborhood</h3>
+                  <p className="text-sm text-muted-foreground">Select all that apply to the building or estate.</p>
                   <FormField
                     control={form.control}
                     name="amenities"
@@ -575,6 +686,99 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
                   />
                 </div>
 
+                {/* Lifestyle Fit */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Lifestyle Fit</h3>
+                  <p className="text-sm text-muted-foreground">Help tenants understand if this property matches their lifestyle.</p>
+
+                  <FormField
+                    control={form.control}
+                    name="best_suited_for"
+                    render={() => (
+                      <FormItem>
+                        <FormLabel>Best Suited For</FormLabel>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+                          {BEST_SUITED_OPTIONS.map((option) => (
+                            <FormField
+                              key={option.id}
+                              control={form.control}
+                              name="best_suited_for"
+                              render={({ field }) => (
+                                <FormItem
+                                  key={option.id}
+                                  className="flex flex-row items-start space-x-3 space-y-0"
+                                >
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(option.id)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([...field.value, option.id])
+                                          : field.onChange(field.value?.filter((v) => v !== option.id));
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    {option.label}
+                                  </FormLabel>
+                                </FormItem>
+                              )}
+                            />
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="grid md:grid-cols-3 gap-6 pt-2">
+                    <FormField
+                      control={form.control}
+                      name="work_from_home_friendly"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                          <div className="space-y-0.5">
+                            <FormLabel>Work-From-Home Friendly</FormLabel>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="car_dependent_area"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                          <div className="space-y-0.5">
+                            <FormLabel>Car-Dependent Area</FormLabel>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="walkable_area"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                          <div className="space-y-0.5">
+                            <FormLabel>Walkable Area</FormLabel>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+
                 {/* Images */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Property Images</h3>
@@ -583,7 +787,6 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
                   </FormDescription>
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {/* Existing Images (for editing) */}
                     {existingImages.map((url, index) => (
                       <div key={`existing-${index}`} className="relative aspect-square rounded-lg overflow-hidden border bg-muted">
                         <img src={url} alt={`Property ${index + 1}`} className="w-full h-full object-cover" />
@@ -602,7 +805,6 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
                       </div>
                     ))}
 
-                    {/* New Image Previews */}
                     {imagePreviews.map((preview, index) => (
                       <div key={`new-${index}`} className="relative aspect-square rounded-lg overflow-hidden border bg-muted">
                         <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />

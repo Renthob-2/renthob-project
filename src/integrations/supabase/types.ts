@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      id_verifications: {
+        Row: {
+          document_type: string
+          document_url: string
+          id: string
+          reviewed_at: string | null
+          status: string
+          submitted_at: string
+          user_id: string
+        }
+        Insert: {
+          document_type: string
+          document_url: string
+          id?: string
+          reviewed_at?: string | null
+          status?: string
+          submitted_at?: string
+          user_id: string
+        }
+        Update: {
+          document_type?: string
+          document_url?: string
+          id?: string
+          reviewed_at?: string | null
+          status?: string
+          submitted_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           created_at: string
@@ -100,66 +130,84 @@ export type Database = {
           amenities: string[] | null
           bathrooms: number
           bedrooms: number
+          best_suited_for: string[] | null
+          car_dependent_area: boolean | null
           city: string
           created_at: string
           description: string | null
           id: string
           images: string[] | null
           is_featured: boolean | null
+          listing_purpose: string
           location: string
           owner_id: string
           price: number
           price_period: string
+          property_condition: string
           property_type: Database["public"]["Enums"]["property_type"]
           square_feet: number | null
           state: string
           status: Database["public"]["Enums"]["property_status"]
           title: string
           updated_at: string
+          walkable_area: boolean | null
+          work_from_home_friendly: boolean | null
         }
         Insert: {
           address?: string | null
           amenities?: string[] | null
           bathrooms?: number
           bedrooms?: number
+          best_suited_for?: string[] | null
+          car_dependent_area?: boolean | null
           city: string
           created_at?: string
           description?: string | null
           id?: string
           images?: string[] | null
           is_featured?: boolean | null
+          listing_purpose?: string
           location: string
           owner_id: string
           price: number
           price_period?: string
+          property_condition?: string
           property_type?: Database["public"]["Enums"]["property_type"]
           square_feet?: number | null
           state: string
           status?: Database["public"]["Enums"]["property_status"]
           title: string
           updated_at?: string
+          walkable_area?: boolean | null
+          work_from_home_friendly?: boolean | null
         }
         Update: {
           address?: string | null
           amenities?: string[] | null
           bathrooms?: number
           bedrooms?: number
+          best_suited_for?: string[] | null
+          car_dependent_area?: boolean | null
           city?: string
           created_at?: string
           description?: string | null
           id?: string
           images?: string[] | null
           is_featured?: boolean | null
+          listing_purpose?: string
           location?: string
           owner_id?: string
           price?: number
           price_period?: string
+          property_condition?: string
           property_type?: Database["public"]["Enums"]["property_type"]
           square_feet?: number | null
           state?: string
           status?: Database["public"]["Enums"]["property_status"]
           title?: string
           updated_at?: string
+          walkable_area?: boolean | null
+          work_from_home_friendly?: boolean | null
         }
         Relationships: []
       }

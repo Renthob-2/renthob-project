@@ -92,6 +92,18 @@ export function ScheduleTourDialog({
 
       if (error) throw error;
 
+      // Also send as a message to the landlord/agent
+      const tourSubject = `Tour Request: ${propertyTitle}`;
+      const tourMessage = `Hi, I'd like to schedule a tour for "${propertyTitle}".\n\nPreferred Date: ${format(date, "PPP")}\nPreferred Time: ${time}${message.trim() ? `\n\nMessage: ${message.trim()}` : ""}\n\nPlease confirm or suggest an alternative time. Thank you!`;
+
+      await supabase.from("messages").insert({
+        sender_id: user.id,
+        recipient_id: landlordId,
+        property_id: propertyId,
+        subject: tourSubject,
+        message: tourMessage,
+      });
+
       toast.success("Tour request submitted! The property owner will respond soon.");
       setOpen(false);
       setDate(undefined);
