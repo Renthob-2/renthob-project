@@ -1,12 +1,13 @@
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Search, ChevronDown, X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { useState } from "react";
+import { LocationAutocomplete } from "@/components/search/LocationAutocomplete";
 import {
   FilterState,
   PRICE_PRESETS,
@@ -86,15 +87,10 @@ export function SearchFilters({
         isOpen={openSections.includes("location")}
         onToggle={() => toggleSection("location")}
       >
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by city, area..."
-            value={filters.location}
-            onChange={(e) => updateFilter("location", e.target.value)}
-            className="pl-9"
-          />
-        </div>
+        <LocationAutocomplete
+          value={filters.location}
+          onChange={(val) => updateFilter("location", val)}
+        />
       </FilterSection>
 
       {/* Price Range */}

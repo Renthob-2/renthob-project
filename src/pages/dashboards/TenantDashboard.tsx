@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTenantProfile } from "@/hooks/useTenantProfile";
 import { TenantActivityList } from "@/components/dashboard/TenantActivityList";
+import { IDVerificationDialog } from "@/components/verification/IDVerificationDialog";
 import { Link, useNavigate } from "react-router-dom";
 import { 
   Heart, 
@@ -54,6 +55,9 @@ export default function TenantDashboard() {
           <p className="text-muted-foreground mt-1">
             Find your perfect home and manage your rental journey
           </p>
+          <div className="mt-2">
+            <IDVerificationDialog />
+          </div>
         </div>
 
         {/* Profile Completion Banner */}

@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { DisplayNameSettings } from "@/components/settings/DisplayNameSettings";
 import { RentalApplicationsList } from "@/components/dashboard/RentalApplicationsList";
 import { TourRequestsList } from "@/components/dashboard/TourRequestsList";
+import { IDVerificationDialog } from "@/components/verification/IDVerificationDialog";
 import { 
   Home, 
   Plus, 
@@ -63,9 +64,12 @@ export default function LandlordDashboard() {
             <h1 className="text-3xl font-bold text-foreground">
               Welcome back, {profile?.full_name || "Landlord"}! 🏠
             </h1>
-            <p className="text-muted-foreground mt-1">
-              Manage your properties and connect with potential tenants
-            </p>
+             <p className="text-muted-foreground mt-1">
+               Manage your properties and connect with potential tenants
+             </p>
+             <div className="mt-2">
+               <IDVerificationDialog />
+             </div>
           </div>
           <Button className="mt-4 md:mt-0" size="lg" asChild>
             <Link to="/property/create">
