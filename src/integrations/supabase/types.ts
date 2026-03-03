@@ -461,7 +461,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "tenant" | "landlord" | "agent"
+      app_role: "tenant" | "landlord" | "agent" | "admin"
       property_status: "draft" | "pending" | "active" | "rented" | "inactive"
       property_type:
         | "apartment"
@@ -599,7 +599,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["tenant", "landlord", "agent"],
+      app_role: ["tenant", "landlord", "agent", "admin"],
       property_status: ["draft", "pending", "active", "rented", "inactive"],
       property_type: [
         "apartment",
