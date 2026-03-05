@@ -64,6 +64,8 @@ export function Header() {
         return "/dashboard/landlord";
       case "agent":
         return "/dashboard/agent";
+      case "admin":
+        return "/dashboard/admin";
       default:
         return "/";
     }
