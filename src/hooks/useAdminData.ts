@@ -199,7 +199,10 @@ export function useAdminData() {
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
   const updatePropertyStatus = async (id: string, status: string) => {
-    const { error } = await supabase.from("properties").update({ status }).eq("id", id);
+    const { error } = await supabase
+      .from("properties")
+      .update({ status: status as "active" | "draft" | "inactive" | "pending" | "rented" })
+      .eq("id", id);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {

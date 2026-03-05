@@ -28,6 +28,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     // Redirect to their appropriate dashboard
     const dashboardPath = role === "tenant" ? "/dashboard/tenant" 
       : role === "landlord" ? "/dashboard/landlord" 
+      : role === "admin" ? "/dashboard/admin"
       : "/dashboard/agent";
     return <Navigate to={dashboardPath} replace />;
   }
