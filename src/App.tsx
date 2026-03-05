@@ -73,6 +73,11 @@ const App = () => (
                   <AgentDashboard />
                 </ProtectedRoute>
               } />
+              <Route path="/dashboard/admin" element={
+                <ProtectedRoute allowedRoles={["admin"]}>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } />
               
               {/* Property Management Routes */}
               <Route path="/property/create" element={
