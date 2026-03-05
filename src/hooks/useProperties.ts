@@ -34,6 +34,8 @@ function transformProperty(dbProperty: DbProperty): SearchProperty {
     title: dbProperty.title,
     address: dbProperty.address || `${dbProperty.location}, ${dbProperty.city}`,
     neighborhood: dbProperty.location,
+    city: dbProperty.city,
+    state: dbProperty.state,
     price: Number(dbProperty.price),
     pricePeriod: dbProperty.price_period,
     bedrooms: dbProperty.bedrooms,
