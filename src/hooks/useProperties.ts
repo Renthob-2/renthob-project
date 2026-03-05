@@ -10,6 +10,8 @@ export interface SearchProperty {
   title: string;
   address: string;
   neighborhood: string;
+  city: string;
+  state: string;
   price: number;
   pricePeriod: string;
   bedrooms: number;
