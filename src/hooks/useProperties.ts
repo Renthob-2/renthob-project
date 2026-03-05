@@ -95,7 +95,9 @@ export function useFilteredProperties(
         const matchesLocation =
           property.neighborhood.toLowerCase().includes(searchTerm) ||
           property.address.toLowerCase().includes(searchTerm) ||
-          property.title.toLowerCase().includes(searchTerm);
+          property.title.toLowerCase().includes(searchTerm) ||
+          property.city.toLowerCase().includes(searchTerm) ||
+          property.state.toLowerCase().includes(searchTerm);
         if (!matchesLocation) return false;
       }
 
