@@ -10,6 +10,8 @@ export interface SearchProperty {
   title: string;
   address: string;
   neighborhood: string;
+  city: string;
+  state: string;
   price: number;
   pricePeriod: string;
   bedrooms: number;
@@ -32,6 +34,8 @@ function transformProperty(dbProperty: DbProperty): SearchProperty {
     title: dbProperty.title,
     address: dbProperty.address || `${dbProperty.location}, ${dbProperty.city}`,
     neighborhood: dbProperty.location,
+    city: dbProperty.city,
+    state: dbProperty.state,
     price: Number(dbProperty.price),
     pricePeriod: dbProperty.price_period,
     bedrooms: dbProperty.bedrooms,
@@ -91,7 +95,9 @@ export function useFilteredProperties(
         const matchesLocation =
           property.neighborhood.toLowerCase().includes(searchTerm) ||
           property.address.toLowerCase().includes(searchTerm) ||
-          property.title.toLowerCase().includes(searchTerm);
+          property.title.toLowerCase().includes(searchTerm) ||
+          property.city.toLowerCase().includes(searchTerm) ||
+          property.state.toLowerCase().includes(searchTerm);
         if (!matchesLocation) return false;
       }
 

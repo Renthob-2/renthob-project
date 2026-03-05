@@ -50,49 +50,51 @@ const App = () => (
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage />} />
             
-            {/* Protected Dashboard Routes */}
-            <Route path="/dashboard/tenant" element={
-              <ProtectedRoute allowedRoles={["tenant"]}>
-                <TenantDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile/setup" element={
-              <ProtectedRoute allowedRoles={["tenant"]}>
-                <TenantProfileSetup />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/landlord" element={
-              <ProtectedRoute allowedRoles={["landlord"]}>
-                <LandlordDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/agent" element={
-              <ProtectedRoute allowedRoles={["agent"]}>
-                <AgentDashboard />
-              </ProtectedRoute>
-            } />
-            
-            {/* Property Management Routes */}
-            <Route path="/property/create" element={
-              <ProtectedRoute allowedRoles={["landlord", "agent"]}>
-                <CreateListingPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/property/:id/edit" element={
-              <ProtectedRoute allowedRoles={["landlord", "agent"]}>
-                <EditPropertyPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/my-properties" element={
-              <ProtectedRoute allowedRoles={["landlord", "agent"]}>
-                <MyPropertiesPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/messages" element={
-              <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
-                <MessagesPage />
-              </ProtectedRoute>
-            } />
+            {/* Protected Dashboard Routes - with header/footer */}
+            <Route element={<PublicLayout />}>
+              <Route path="/dashboard/tenant" element={
+                <ProtectedRoute allowedRoles={["tenant"]}>
+                  <TenantDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile/setup" element={
+                <ProtectedRoute allowedRoles={["tenant"]}>
+                  <TenantProfileSetup />
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/landlord" element={
+                <ProtectedRoute allowedRoles={["landlord"]}>
+                  <LandlordDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/agent" element={
+                <ProtectedRoute allowedRoles={["agent"]}>
+                  <AgentDashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Property Management Routes */}
+              <Route path="/property/create" element={
+                <ProtectedRoute allowedRoles={["landlord", "agent"]}>
+                  <CreateListingPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/property/:id/edit" element={
+                <ProtectedRoute allowedRoles={["landlord", "agent"]}>
+                  <EditPropertyPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/my-properties" element={
+                <ProtectedRoute allowedRoles={["landlord", "agent"]}>
+                  <MyPropertiesPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/messages" element={
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
+                  <MessagesPage />
+                </ProtectedRoute>
+              } />
+            </Route>
             
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
