@@ -224,6 +224,12 @@ export function Header() {
                       )}
                     </Link>
                   </Button>
+                  <Button variant="ghost" asChild className="w-full justify-start">
+                    <Link to="/settings/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Profile Settings
+                    </Link>
+                  </Button>
                   <Button 
                     variant="ghost" 
                     className="w-full justify-start text-destructive hover:text-destructive"
