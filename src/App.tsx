@@ -101,6 +101,11 @@ const App = () => (
                   <MessagesPage />
                 </ProtectedRoute>
               } />
+              <Route path="/settings/profile" element={
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin"]}>
+                  <ProfileSettingsPage />
+                </ProtectedRoute>
+              } />
             </Route>
             
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
