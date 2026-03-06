@@ -24,6 +24,7 @@ import CreateListingPage from "./pages/CreateListingPage";
 import EditPropertyPage from "./pages/EditPropertyPage";
 import MyPropertiesPage from "./pages/MyPropertiesPage";
 import MessagesPage from "./pages/MessagesPage";
+import ProfileSettingsPage from "./pages/ProfileSettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
