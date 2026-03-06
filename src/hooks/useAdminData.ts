@@ -9,6 +9,8 @@ export interface AdminUser {
   phone: string | null;
   role: string;
   created_at: string;
+  is_suspended: boolean;
+  suspension_reason: string | null;
 }
 
 export interface AdminProperty {
