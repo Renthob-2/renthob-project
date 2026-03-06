@@ -7,6 +7,8 @@ import { AdminUsersTab } from "@/components/admin/AdminUsersTab";
 import { AdminPropertiesTab } from "@/components/admin/AdminPropertiesTab";
 import { AdminVerificationsTab } from "@/components/admin/AdminVerificationsTab";
 import { AdminApplicationsTab } from "@/components/admin/AdminApplicationsTab";
+import { AdminActivityLogTab } from "@/components/admin/AdminActivityLogTab";
+import { BackButton } from "@/components/BackButton";
 import { RefreshCw, Shield } from "lucide-react";
 
 export default function AdminDashboard() {
@@ -28,16 +30,14 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-muted/30">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        <BackButton />
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Shield className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">
-                Admin Dashboard
-              </h1>
+              <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
               <p className="text-muted-foreground">
                 Welcome, {profile?.full_name || "Admin"} — manage the entire platform
               </p>
@@ -49,14 +49,12 @@ export default function AdminDashboard() {
           </Button>
         </div>
 
-        {/* Stats */}
         <div className="mb-8">
           <AdminStatsCards stats={stats} />
         </div>
 
-        {/* Tabs */}
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="properties">
               Properties
@@ -82,20 +80,18 @@ export default function AdminDashboard() {
                 </span>
               )}
             </TabsTrigger>
+            <TabsTrigger value="activity">Activity Log</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
-            <AdminUsersTab users={users} />
+            <AdminUsersTab users={users} onRefresh={refetch} />
           </TabsContent>
-
           <TabsContent value="properties">
             <AdminPropertiesTab properties={properties} onUpdateStatus={updatePropertyStatus} />
           </TabsContent>
-
           <TabsContent value="verifications">
             <AdminVerificationsTab verifications={verifications} onUpdateStatus={updateVerificationStatus} />
           </TabsContent>
-
           <TabsContent value="applications">
             <AdminApplicationsTab
               applications={applications}
@@ -103,6 +99,9 @@ export default function AdminDashboard() {
               onUpdateAppStatus={updateApplicationStatus}
               onUpdateTourStatus={updateTourStatus}
             />
+          </TabsContent>
+          <TabsContent value="activity">
+            <AdminActivityLogTab />
           </TabsContent>
         </Tabs>
       </div>

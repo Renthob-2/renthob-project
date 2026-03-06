@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_activity_log: {
+        Row: {
+          action: string
+          admin_id: string
+          created_at: string
+          details: string | null
+          id: string
+          target_id: string
+          target_type: string
+        }
+        Insert: {
+          action: string
+          admin_id: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          target_id: string
+          target_type: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string
+          created_at?: string
+          details?: string | null
+          id?: string
+          target_id?: string
+          target_type?: string
+        }
+        Relationships: []
+      }
       id_verifications: {
         Row: {
           document_type: string
@@ -94,7 +124,9 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          is_suspended: boolean
           phone: string | null
+          suspension_reason: string | null
           updated_at: string
           user_id: string
         }
@@ -106,7 +138,9 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_suspended?: boolean
           phone?: string | null
+          suspension_reason?: string | null
           updated_at?: string
           user_id: string
         }
@@ -118,7 +152,9 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_suspended?: boolean
           phone?: string | null
+          suspension_reason?: string | null
           updated_at?: string
           user_id?: string
         }

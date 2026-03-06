@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BackButton } from "@/components/BackButton";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
@@ -210,10 +211,7 @@ export default function MessagesPage() {
       {/* Header */}
       <div className="bg-gradient-hero py-8">
         <div className="container">
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Link>
+          <BackButton />
           <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
             Messages
           </h1>

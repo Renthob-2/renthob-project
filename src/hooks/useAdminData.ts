@@ -9,6 +9,8 @@ export interface AdminUser {
   phone: string | null;
   role: string;
   created_at: string;
+  is_suspended: boolean;
+  suspension_reason: string | null;
 }
 
 export interface AdminProperty {
@@ -111,6 +113,8 @@ export function useAdminData() {
         phone: p.phone,
         role: roleMap.get(p.user_id) || "unknown",
         created_at: p.created_at,
+        is_suspended: (p as any).is_suspended || false,
+        suspension_reason: (p as any).suspension_reason || null,
       }));
       setUsers(adminUsers);
 

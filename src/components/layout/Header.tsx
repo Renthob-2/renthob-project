@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Home, Menu, X, LogOut, User, Mail } from "lucide-react";
+import { Home, Menu, X, LogOut, User, Mail, Settings } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMessages } from "@/hooks/useMessages";
@@ -140,6 +140,12 @@ export function Header() {
                     )}
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/settings/profile" className="flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    Profile Settings
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
                   <LogOut className="h-4 w-4 mr-2" />
@@ -216,6 +222,12 @@ export function Header() {
                           {unreadCount}
                         </Badge>
                       )}
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" asChild className="w-full justify-start">
+                    <Link to="/settings/profile" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Settings className="h-4 w-4 mr-2" />
+                      Profile Settings
                     </Link>
                   </Button>
                   <Button 
