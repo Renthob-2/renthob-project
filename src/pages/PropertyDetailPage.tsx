@@ -319,6 +319,27 @@ export default function PropertyDetailPage() {
               </>
             )}
 
+            {(property as any).neighborhood_features && (property as any).neighborhood_features.length > 0 && (
+              <>
+                <Separator />
+                {/* Neighborhood Features */}
+                <div>
+                  <h2 className="text-xl font-semibold text-foreground mb-4">Neighborhood Features</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {((property as any).neighborhood_features as string[]).map((feature) => (
+                      <div
+                        key={feature}
+                        className="flex items-center gap-2 p-3 rounded-lg bg-muted/50"
+                      >
+                        <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="text-sm text-foreground">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
             <Separator />
 
             {/* Location */}

@@ -67,6 +67,23 @@ const PROPERTY_CONDITIONS = [
   { value: "old", label: "Old" },
 ];
 
+const NEIGHBORHOOD_FEATURES_OPTIONS = [
+  { id: "gated_estate", label: "Gated Estate" },
+  { id: "tiled_estate", label: "Tiled Estate" },
+  { id: "estate_security", label: "Estate Security" },
+  { id: "close_to_main_road", label: "Close to Main Road" },
+  { id: "close_to_market", label: "Close to Market" },
+  { id: "close_to_school", label: "Close to School" },
+  { id: "close_to_hospital", label: "Close to Hospital" },
+  { id: "close_to_church_mosque", label: "Close to Church/Mosque" },
+  { id: "close_to_bus_stop", label: "Close to Bus Stop" },
+  { id: "tarred_road", label: "Tarred Road Access" },
+  { id: "flood_free", label: "Flood-Free Area" },
+  { id: "quiet_neighborhood", label: "Quiet Neighborhood" },
+  { id: "commercial_area", label: "Commercial Area" },
+  { id: "residential_area", label: "Residential Area" },
+];
+
 const BEST_SUITED_OPTIONS = [
   { id: "working_professionals", label: "Working Professionals" },
   { id: "families", label: "Families" },
@@ -100,6 +117,7 @@ const formSchema = z.object({
   bathrooms: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Must be a valid number"),
   square_feet: z.string().optional(),
   amenities: z.array(z.string()).default([]),
+  neighborhood_features: z.array(z.string()).default([]),
   best_suited_for: z.array(z.string()).default([]),
   work_from_home_friendly: z.boolean().default(false),
   car_dependent_area: z.boolean().default(false),
@@ -142,6 +160,7 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
       bathrooms: "1",
       square_feet: "",
       amenities: [],
+      neighborhood_features: [],
       best_suited_for: [],
       work_from_home_friendly: false,
       car_dependent_area: false,
@@ -167,6 +186,7 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
         bathrooms: property.bathrooms.toString(),
         square_feet: property.square_feet?.toString() || "",
         amenities: property.amenities || [],
+        neighborhood_features: (property as any).neighborhood_features || [],
         best_suited_for: (property as any).best_suited_for || [],
         work_from_home_friendly: (property as any).work_from_home_friendly || false,
         car_dependent_area: (property as any).car_dependent_area || false,
@@ -297,6 +317,7 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
         bathrooms: parseInt(values.bathrooms),
         square_feet: values.square_feet ? parseInt(values.square_feet) : null,
         amenities: values.amenities,
+        neighborhood_features: values.neighborhood_features,
         images: allImages,
         best_suited_for: values.best_suited_for,
         work_from_home_friendly: values.work_from_home_friendly,
@@ -674,6 +695,50 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
                                   </FormControl>
                                   <FormLabel className="font-normal cursor-pointer">
                                     {amenity.label}
+                                  </FormLabel>
+                                </FormItem>
+                              )}
+                            />
+                          ))}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Neighborhood Features */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Neighborhood Features</h3>
+                  <p className="text-sm text-muted-foreground">Describe the neighborhood and surroundings of the property.</p>
+                  <FormField
+                    control={form.control}
+                    name="neighborhood_features"
+                    render={() => (
+                      <FormItem>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                          {NEIGHBORHOOD_FEATURES_OPTIONS.map((feature) => (
+                            <FormField
+                              key={feature.id}
+                              control={form.control}
+                              name="neighborhood_features"
+                              render={({ field }) => (
+                                <FormItem
+                                  key={feature.id}
+                                  className="flex flex-row items-start space-x-3 space-y-0"
+                                >
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(feature.id)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([...field.value, feature.id])
+                                          : field.onChange(field.value?.filter((v) => v !== feature.id));
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    {feature.label}
                                   </FormLabel>
                                 </FormItem>
                               )}
