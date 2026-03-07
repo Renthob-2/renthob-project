@@ -186,6 +186,7 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
         bathrooms: property.bathrooms.toString(),
         square_feet: property.square_feet?.toString() || "",
         amenities: property.amenities || [],
+        neighborhood_features: (property as any).neighborhood_features || [],
         best_suited_for: (property as any).best_suited_for || [],
         work_from_home_friendly: (property as any).work_from_home_friendly || false,
         car_dependent_area: (property as any).car_dependent_area || false,
