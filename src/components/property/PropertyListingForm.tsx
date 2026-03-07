@@ -67,6 +67,23 @@ const PROPERTY_CONDITIONS = [
   { value: "old", label: "Old" },
 ];
 
+const NEIGHBORHOOD_FEATURES_OPTIONS = [
+  { id: "gated_estate", label: "Gated Estate" },
+  { id: "tiled_estate", label: "Tiled Estate" },
+  { id: "estate_security", label: "Estate Security" },
+  { id: "close_to_main_road", label: "Close to Main Road" },
+  { id: "close_to_market", label: "Close to Market" },
+  { id: "close_to_school", label: "Close to School" },
+  { id: "close_to_hospital", label: "Close to Hospital" },
+  { id: "close_to_church_mosque", label: "Close to Church/Mosque" },
+  { id: "close_to_bus_stop", label: "Close to Bus Stop" },
+  { id: "tarred_road", label: "Tarred Road Access" },
+  { id: "flood_free", label: "Flood-Free Area" },
+  { id: "quiet_neighborhood", label: "Quiet Neighborhood" },
+  { id: "commercial_area", label: "Commercial Area" },
+  { id: "residential_area", label: "Residential Area" },
+];
+
 const BEST_SUITED_OPTIONS = [
   { id: "working_professionals", label: "Working Professionals" },
   { id: "families", label: "Families" },
