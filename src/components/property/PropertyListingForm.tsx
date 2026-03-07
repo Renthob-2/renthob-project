@@ -317,6 +317,7 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
         bathrooms: parseInt(values.bathrooms),
         square_feet: values.square_feet ? parseInt(values.square_feet) : null,
         amenities: values.amenities,
+        neighborhood_features: values.neighborhood_features,
         images: allImages,
         best_suited_for: values.best_suited_for,
         work_from_home_friendly: values.work_from_home_friendly,
