@@ -117,6 +117,7 @@ const formSchema = z.object({
   bathrooms: z.string().refine((val) => !isNaN(Number(val)) && Number(val) >= 0, "Must be a valid number"),
   square_feet: z.string().optional(),
   amenities: z.array(z.string()).default([]),
+  neighborhood_features: z.array(z.string()).default([]),
   best_suited_for: z.array(z.string()).default([]),
   work_from_home_friendly: z.boolean().default(false),
   car_dependent_area: z.boolean().default(false),
