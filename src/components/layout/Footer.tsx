@@ -6,7 +6,7 @@ const footerLinks = {
     { href: "/how-it-works", label: "How It Works" },
     { href: "/features", label: "Features" },
     { href: "/faqs", label: "FAQs" },
-    { href: "/about", label: "About Us" },
+    { href: "/faqs#general", label: "About Us" },
   ],
   forRenters: [
     { href: "/search", label: "Search Properties" },
@@ -18,15 +18,20 @@ const footerLinks = {
     { href: "/features#landlords", label: "Landlord Features" },
     { href: "/faqs#landlords", label: "Landlord FAQ" },
   ],
+  forAgencies: [
+    { href: "/signup?role=agent", label: "Join as Agency" },
+    { href: "/features#agencies", label: "Agency Features" },
+    { href: "/faqs#agencies", label: "Agency FAQ" },
+  ],
 };
 
 export function Footer() {
   return (
     <footer className="border-t border-border bg-secondary/30">
       <div className="container py-12 md:py-16">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand Section */}
-          <div className="space-y-4">
+          <div className="space-y-4 lg:col-span-2">
             <Link to="/" className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
                 <Home className="h-5 w-5 text-primary-foreground" />
@@ -50,7 +55,7 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                <span>San Francisco, CA</span>
+                <span>Lagos, Nigeria</span>
               </div>
             </div>
           </div>
@@ -91,15 +96,31 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
 
-          {/* For Landlords */}
-          <div>
-            <h3 className="font-display font-semibold text-foreground mb-4">
+            <h3 className="font-display font-semibold text-foreground mb-4 mt-8">
               For Landlords
             </h3>
             <ul className="space-y-3">
               {footerLinks.forLandlords.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    to={link.href}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* For Agencies */}
+          <div>
+            <h3 className="font-display font-semibold text-foreground mb-4">
+              For Agencies
+            </h3>
+            <ul className="space-y-3">
+              {footerLinks.forAgencies.map((link) => (
                 <li key={link.href}>
                   <Link
                     to={link.href}

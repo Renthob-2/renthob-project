@@ -6,104 +6,153 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Link } from "react-router-dom";
-import { Home, Building2, HelpCircle } from "lucide-react";
-
-const renterFaqs = [
-  {
-    question: "How do I search for properties?",
-    answer:
-      "Use our search bar on the homepage or visit the Search page. You can filter by location, price range, number of bedrooms, amenities, and more. Save your favorite listings to compare them later.",
-  },
-  {
-    question: "Is it free to use Renthob as a renter?",
-    answer:
-      "Yes! Creating an account, searching for properties, saving listings, and applying to rentals is completely free for renters.",
-  },
-  {
-    question: "How do I apply for a rental property?",
-    answer:
-      "Once you find a property you like, click 'Apply' on the listing page. You'll need to complete your renter profile with basic information and any required documents. Your application will be sent directly to the landlord.",
-  },
-  {
-    question: "Can I message landlords before applying?",
-    answer:
-      "Yes! You can send messages to landlords through our secure messaging system to ask questions about the property before submitting an application.",
-  },
-  {
-    question: "How do I track my rental applications?",
-    answer:
-      "All your applications are tracked in your renter dashboard. You can see the status of each application (pending, approved, rejected) and receive notifications when there are updates.",
-  },
-  {
-    question: "What documents do I need to apply?",
-    answer:
-      "Common documents include proof of income, government ID, and references. Each landlord may have different requirements, which will be listed on the property page.",
-  },
-];
-
-const landlordFaqs = [
-  {
-    question: "How do I list my property?",
-    answer:
-      "After creating a landlord account, go to your dashboard and click 'Add Property'. Fill in the property details, upload photos, set your price, and publish. Your listing will be visible to renters immediately.",
-  },
-  {
-    question: "What does it cost to list a property?",
-    answer:
-      "Basic listings are free! We also offer premium features for enhanced visibility and advanced management tools. Check our pricing page for more details.",
-  },
-  {
-    question: "How do I review rental applications?",
-    answer:
-      "All applications appear in your landlord dashboard. You can view each applicant's profile, documents, and message history. Approve or reject applications with a single click.",
-  },
-  {
-    question: "Can I manage multiple properties?",
-    answer:
-      "Absolutely! Our platform is designed for both individual landlords and agencies. Manage unlimited properties from a single dashboard.",
-  },
-  {
-    question: "How do I track rent payments?",
-    answer:
-      "Our payment tracking feature lets you record rent payments, view payment history, and identify overdue payments. You can also set up reminders for tenants.",
-  },
-  {
-    question: "Is my data secure?",
-    answer:
-      "Yes, we take security seriously. All data is encrypted, and we follow industry best practices to protect your information and your tenants' data.",
-  },
-];
+import { Home, Building2, HelpCircle, Briefcase } from "lucide-react";
 
 const generalFaqs = [
   {
     question: "What is Renthob?",
     answer:
-      "Renthob is a modern rental platform that connects renters with landlords and agencies. We make it easy to search for properties, apply for rentals, manage listings, and communicate—all in one place.",
+      "Renthob is a digital platform that connects renters with landlords and property agencies to make renting homes easier and more transparent.",
   },
   {
-    question: "How do I create an account?",
+    question: "Is Renthob free for renters?",
     answer:
-      "Click 'Get Started' or 'Sign Up' and choose whether you're a renter or landlord. Fill in your email and password, verify your email, and you're ready to go!",
+      "Yes. Searching for properties and contacting landlords is free for renters.",
   },
   {
-    question: "Can I use Renthob on my phone?",
+    question: "Are listings verified?",
     answer:
-      "Yes! Renthob is fully responsive and works great on all devices—phones, tablets, and desktops. We're also working on dedicated mobile apps coming soon.",
+      "We encourage landlords and agencies to verify their listings to ensure reliability and transparency.",
   },
   {
-    question: "How do I contact support?",
+    question: "Can I list properties if I'm not an agency?",
     answer:
-      "You can reach our support team at hello@renthob.com or through the contact form in your account settings. We typically respond within 24 hours.",
+      "Yes. Individual landlords can list properties directly on Renthob.",
   },
   {
-    question: "What cities does Renthob cover?",
+    question: "Does Renthob handle rental payments?",
     answer:
-      "We're currently available in major metropolitan areas across the United States and expanding to new cities regularly. Enter your city in the search to see available listings.",
+      "Currently Renthob focuses on property discovery and connections between renters and property owners.",
+  },
+];
+
+const renterFaqs = [
+  {
+    question: "How do I find a property on Renthob?",
+    answer:
+      "Simply search by location, price range, and property type to see available listings.",
   },
   {
-    question: "Do you verify listings?",
+    question: "Do I need to create an account to search?",
     answer:
-      "Yes, we verify all listings to ensure authenticity and quality. Our team reviews property details and photos to protect renters from scams.",
+      "You can browse listings without an account, but creating an account allows you to contact landlords and save properties.",
+  },
+  {
+    question: "How do I contact a landlord?",
+    answer:
+      "Click the contact or message button on the property listing to send a message directly.",
+  },
+  {
+    question: "Can I schedule property inspections?",
+    answer:
+      "Yes. Renters can coordinate inspections directly with the landlord or agent.",
+  },
+  {
+    question: "Are the listings verified?",
+    answer:
+      "Renthob works to ensure listings are legitimate and encourages landlord verification.",
+  },
+  {
+    question: "Does Renthob charge renters?",
+    answer:
+      "No. Renters can browse and contact property owners for free.",
+  },
+];
+
+const landlordFaqs = [
+  {
+    question: "Who can list a property on Renthob?",
+    answer:
+      "Any verified property owner can list rental properties on Renthob.",
+  },
+  {
+    question: "How much does it cost to list a property?",
+    answer:
+      "Basic property listing may be free, while premium listing options may offer greater visibility.",
+  },
+  {
+    question: "How do renters contact me?",
+    answer:
+      "Renters can message you directly through the Renthob platform.",
+  },
+  {
+    question: "Can I list multiple properties?",
+    answer:
+      "Yes. Landlords with multiple properties can manage all listings from one dashboard.",
+  },
+  {
+    question: "Can I remove my listing anytime?",
+    answer:
+      "Yes. You can edit or remove your property listing whenever you want.",
+  },
+];
+
+const agencyFaqs = [
+  {
+    question: "Who can create an agency account?",
+    answer:
+      "Registered real estate agencies and property managers can create an agency account.",
+  },
+  {
+    question: "Can agencies manage multiple agents?",
+    answer:
+      "Yes. Agencies can manage listings and property inquiries from multiple agents.",
+  },
+  {
+    question: "How do renters contact agencies?",
+    answer:
+      "Renters can send direct messages through each property listing.",
+  },
+  {
+    question: "Can agencies update property availability?",
+    answer:
+      "Yes. Agencies can edit listings, update pricing, or mark properties as rented.",
+  },
+  {
+    question: "Is there a cost for agencies?",
+    answer:
+      "Basic listings may be free while premium visibility tools may be available for agencies.",
+  },
+];
+
+const faqSections = [
+  {
+    id: "general",
+    label: "General Questions",
+    icon: HelpCircle,
+    iconClassName: "bg-muted text-muted-foreground",
+    faqs: generalFaqs,
+  },
+  {
+    id: "renters",
+    label: "For Renters",
+    icon: Home,
+    iconClassName: "bg-accent text-accent-foreground",
+    faqs: renterFaqs,
+  },
+  {
+    id: "landlords",
+    label: "For Landlords",
+    icon: Building2,
+    iconClassName: "bg-accent text-primary",
+    faqs: landlordFaqs,
+  },
+  {
+    id: "agencies",
+    label: "For Agencies",
+    icon: Briefcase,
+    iconClassName: "bg-purple-50 dark:bg-purple-950/30 text-purple-600 dark:text-purple-400",
+    faqs: agencyFaqs,
   },
 ];
 
@@ -117,8 +166,7 @@ export default function FAQsPage() {
             Frequently Asked Questions
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Find answers to common questions about using Renthob. Can't find
-            what you're looking for? Contact us!
+            Find answers to common questions about using Renthob. Can't find what you're looking for? Contact us!
           </p>
         </div>
       </section>
@@ -126,101 +174,65 @@ export default function FAQsPage() {
       {/* FAQ Categories */}
       <section className="py-16 md:py-20">
         <div className="container max-w-4xl">
-          {/* Renter FAQs */}
-          <div id="renters" className="mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="h-10 w-10 rounded-xl bg-accent flex items-center justify-center">
-                <Home className="h-5 w-5 text-accent-foreground" />
+          {faqSections.map((section) => (
+            <div key={section.id} id={section.id} className="mb-12">
+              <div className="flex items-center gap-3 mb-6">
+                <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${section.iconClassName}`}>
+                  <section.icon className="h-5 w-5" />
+                </div>
+                <h2 className="font-display text-2xl font-bold text-foreground">
+                  {section.label}
+                </h2>
               </div>
-              <h2 className="font-display text-2xl font-bold text-foreground">
-                For Renters
-              </h2>
+              <Accordion type="single" collapsible className="space-y-3">
+                {section.faqs.map((faq, index) => (
+                  <AccordionItem
+                    key={index}
+                    value={`${section.id}-${index}`}
+                    className="bg-card rounded-xl border border-border/50 px-6 shadow-sm"
+                  >
+                    <AccordionTrigger className="text-left font-medium text-foreground hover:no-underline py-5">
+                      {faq.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground pb-5">
+                      {faq.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
-            <Accordion type="single" collapsible className="space-y-3">
-              {renterFaqs.map((faq, index) => (
-                <AccordionItem
-                  key={index}
-                  value={`renter-${index}`}
-                  className="bg-card rounded-xl border border-border/50 px-6 shadow-sm"
-                >
-                  <AccordionTrigger className="text-left font-medium text-foreground hover:no-underline py-5">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pb-5">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
+          ))}
+        </div>
+      </section>
 
-          {/* Landlord FAQs */}
-          <div id="landlords" className="mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="h-10 w-10 rounded-xl bg-renthob-blue-50 flex items-center justify-center">
-                <Building2 className="h-5 w-5 text-primary" />
-              </div>
-              <h2 className="font-display text-2xl font-bold text-foreground">
-                For Landlords
-              </h2>
-            </div>
-            <Accordion type="single" collapsible className="space-y-3">
-              {landlordFaqs.map((faq, index) => (
-                <AccordionItem
-                  key={index}
-                  value={`landlord-${index}`}
-                  className="bg-card rounded-xl border border-border/50 px-6 shadow-sm"
-                >
-                  <AccordionTrigger className="text-left font-medium text-foreground hover:no-underline py-5">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pb-5">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-
-          {/* General FAQs */}
-          <div id="general">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center">
-                <HelpCircle className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <h2 className="font-display text-2xl font-bold text-foreground">
-                General Questions
-              </h2>
-            </div>
-            <Accordion type="single" collapsible className="space-y-3">
-              {generalFaqs.map((faq, index) => (
-                <AccordionItem
-                  key={index}
-                  value={`general-${index}`}
-                  className="bg-card rounded-xl border border-border/50 px-6 shadow-sm"
-                >
-                  <AccordionTrigger className="text-left font-medium text-foreground hover:no-underline py-5">
-                    {faq.question}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground pb-5">
-                    {faq.answer}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+      {/* About Us Section */}
+      <section className="py-16 md:py-20 bg-secondary/30">
+        <div className="container max-w-3xl text-center">
+          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-6">
+            About Us
+          </h2>
+          <div className="space-y-4 text-muted-foreground text-lg">
+            <p>
+              Renthob was created to simplify the rental experience in Nigeria and other emerging markets.
+            </p>
+            <p>
+              Finding a home should not involve stress, hidden fees, or unreliable listings. Our mission is to build a trusted digital marketplace where renters can easily discover homes while landlords and agencies can efficiently reach the right tenants.
+            </p>
+            <p>
+              We believe technology can make renting faster, safer, and more transparent for everyone involved.
+            </p>
           </div>
         </div>
       </section>
 
       {/* Contact CTA */}
-      <section className="py-16 md:py-20 bg-secondary/30">
+      <section className="py-16 md:py-20">
         <div className="container text-center">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-4">
             Still Have Questions?
           </h2>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Our support team is here to help. Reach out and we'll get back to
-            you within 24 hours.
+            Our support team is here to help. Reach out and we'll get back to you within 24 hours.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg">

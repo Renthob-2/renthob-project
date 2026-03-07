@@ -3,128 +3,113 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import {
   Search,
-  Heart,
-  FileText,
-  MessageSquare,
   Shield,
-  CreditCard,
+  MessageSquare,
   Building2,
-  Users,
-  BarChart3,
-  FolderOpen,
-  Sparkles,
-  Brain,
-  TrendingUp,
   MapPin,
   ArrowRight,
+  ClipboardList,
+  Users,
+  Eye,
+  BarChart3,
+  CheckCircle2,
+  Briefcase,
+  Zap,
+  TrendingUp,
+  Megaphone,
 } from "lucide-react";
 
-const renterFeatures = [
+const coreFeatures = [
   {
     icon: Search,
-    title: "Advanced Property Search",
-    description:
-      "Filter by location, price, bedrooms, amenities, and more. Find exactly what you need.",
-  },
-  {
-    icon: Heart,
-    title: "Save & Compare",
-    description:
-      "Bookmark your favorite properties and compare them side by side to make the best choice.",
-  },
-  {
-    icon: FileText,
-    title: "One-Click Applications",
-    description:
-      "Apply to multiple properties with a single profile. Track all your applications in one place.",
-  },
-  {
-    icon: MessageSquare,
-    title: "Direct Messaging",
-    description:
-      "Communicate directly with landlords through our secure in-app messaging system.",
+    title: "Smart Property Search",
+    description: "Filter listings by price, location, property type, and amenities.",
   },
   {
     icon: Shield,
     title: "Verified Listings",
-    description:
-      "All properties are verified for authenticity. Rent with confidence and peace of mind.",
+    description: "We work to ensure listings are authentic to reduce scams.",
   },
   {
-    icon: CreditCard,
-    title: "Payment Tracking",
-    description:
-      "Keep track of your rent payments and maintain a complete payment history.",
+    icon: MessageSquare,
+    title: "Direct Communication",
+    description: "Renters can contact landlords or agencies directly through the platform.",
+  },
+  {
+    icon: Building2,
+    title: "Property Management Tools",
+    description: "Landlords and agencies can manage listings, track inquiries, and update property availability.",
+  },
+  {
+    icon: MapPin,
+    title: "Neighborhood Insights",
+    description: "View information about the area including amenities, accessibility, and nearby facilities.",
   },
 ];
 
 const landlordFeatures = [
   {
-    icon: Building2,
-    title: "Easy Listing Management",
-    description:
-      "Create, edit, and manage your property listings with our intuitive dashboard.",
-  },
-  {
-    icon: Users,
-    title: "Application Management",
-    description:
-      "Review applications, view renter profiles, and approve or reject with a single click.",
-  },
-  {
-    icon: BarChart3,
-    title: "Performance Analytics",
-    description:
-      "Track views, inquiries, and applications for each of your listings.",
-  },
-  {
-    icon: FolderOpen,
-    title: "Document Storage",
-    description:
-      "Store and manage lease agreements, tenant documents, and property records securely.",
-  },
-  {
-    icon: CreditCard,
-    title: "Rent Collection",
-    description:
-      "Track rent payments, send reminders, and maintain complete financial records.",
+    icon: ClipboardList,
+    title: "Easy Property Listing",
+    description: "List your rental property in minutes with photos, pricing, and detailed descriptions.",
   },
   {
     icon: MessageSquare,
-    title: "Tenant Communication",
-    description:
-      "Stay connected with tenants through our built-in messaging system.",
+    title: "Tenant Inquiries",
+    description: "Receive messages from interested renters directly through the platform.",
+  },
+  {
+    icon: Building2,
+    title: "Listing Management",
+    description: "Edit property details, update pricing, or mark properties as rented anytime.",
+  },
+  {
+    icon: Eye,
+    title: "Increased Visibility",
+    description: "Your property is exposed to thousands of renters actively searching for homes.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Verified Landlord Profile",
+    description: "Build credibility with renters by verifying your profile.",
+  },
+  {
+    icon: BarChart3,
+    title: "Property Performance Insights",
+    description: "Track how many renters view or inquire about your property.",
   },
 ];
 
-const aiFeatures = [
+const agencyFeatures = [
   {
-    icon: Sparkles,
-    title: "Smart Recommendations",
-    description:
-      "AI-powered suggestions based on your preferences and search history.",
-    status: "Coming Soon",
+    icon: Building2,
+    title: "Manage Multiple Listings",
+    description: "Agencies can upload and manage multiple properties from a single dashboard.",
   },
   {
-    icon: TrendingUp,
-    title: "Pricing Insights",
-    description:
-      "Get AI-generated pricing recommendations based on market data and trends.",
-    status: "Coming Soon",
+    icon: Users,
+    title: "Lead Generation",
+    description: "Receive inquiries from renters searching for properties.",
   },
   {
-    icon: MapPin,
-    title: "Neighborhood Analysis",
-    description:
-      "Detailed insights about neighborhoods including safety, amenities, and lifestyle fit.",
-    status: "Coming Soon",
+    icon: CheckCircle2,
+    title: "Professional Agency Profile",
+    description: "Build credibility with a verified agency profile.",
   },
   {
-    icon: Brain,
-    title: "Smart Matching",
-    description:
-      "Automatically match renters with properties that best fit their criteria.",
-    status: "Coming Soon",
+    icon: BarChart3,
+    title: "Property Analytics",
+    description: "Track listing views and renter interest.",
+  },
+  {
+    icon: Zap,
+    title: "Faster Deal Closures",
+    description: "Connect directly with serious renters actively searching for homes.",
+  },
+  {
+    icon: Megaphone,
+    title: "Brand Visibility",
+    description: "Promote your agency and expand your reach in the rental market.",
   },
 ];
 
@@ -138,28 +123,25 @@ export default function FeaturesPage() {
             Powerful Features for Everyone
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From searching properties to managing tenants, Renthob has
-            everything you need for a seamless rental experience.
+            Renthob provides powerful tools for renters, landlords, and agencies.
           </p>
         </div>
       </section>
 
-      {/* Renter Features */}
-      <section id="renters" className="py-16 md:py-20">
+      {/* Core Features */}
+      <section className="py-16 md:py-20">
         <div className="container">
           <div className="text-center mb-12">
-            <Badge className="mb-4">For Renters</Badge>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Find Your Perfect Home
+              Platform Features
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Tools designed to make your rental search quick, easy, and
-              successful.
+              Tools designed to make renting simple, secure, and transparent for everyone.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {renterFeatures.map((feature) => (
+            {coreFeatures.map((feature) => (
               <div
                 key={feature.title}
                 className="bg-card rounded-2xl p-6 shadow-card border border-border/50 hover:shadow-soft transition-shadow"
@@ -176,15 +158,6 @@ export default function FeaturesPage() {
               </div>
             ))}
           </div>
-
-          <div className="text-center mt-10">
-            <Button asChild size="lg">
-              <Link to="/signup?role=renter" className="gap-2">
-                Start Searching
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
         </div>
       </section>
 
@@ -196,11 +169,10 @@ export default function FeaturesPage() {
               For Landlords
             </Badge>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Manage Properties with Ease
+              Landlord Features
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Everything you need to list, manage, and grow your rental
-              portfolio.
+              Everything you need to list, manage, and grow your rental portfolio.
             </p>
           </div>
 
@@ -210,7 +182,7 @@ export default function FeaturesPage() {
                 key={feature.title}
                 className="bg-card rounded-2xl p-6 shadow-card border border-border/50 hover:shadow-soft transition-shadow"
               >
-                <div className="h-12 w-12 rounded-xl bg-renthob-blue-50 flex items-center justify-center mb-4">
+                <div className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center mb-4">
                   <feature.icon className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-display text-lg font-semibold text-foreground mb-2">
@@ -234,38 +206,30 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* AI Features - Coming Soon */}
-      <section className="py-16 md:py-20">
+      {/* Agency Features */}
+      <section id="agencies" className="py-16 md:py-20">
         <div className="container">
           <div className="text-center mb-12">
-            <Badge variant="outline" className="mb-4 border-primary text-primary">
-              <Sparkles className="h-3 w-3 mr-1" />
-              AI-Powered
+            <Badge variant="outline" className="mb-4 border-purple-500 text-purple-600 dark:text-purple-400">
+              <Briefcase className="h-3 w-3 mr-1" />
+              For Agencies
             </Badge>
             <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Smart Features Coming Soon
+              Agency Features
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              We're building AI-powered tools to make your rental experience
-              even better. Stay tuned!
+              Professional tools to manage multiple listings and grow your agency.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {aiFeatures.map((feature) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {agencyFeatures.map((feature) => (
               <div
                 key={feature.title}
-                className="bg-muted/30 rounded-2xl p-6 border border-border/50 relative overflow-hidden"
+                className="bg-card rounded-2xl p-6 shadow-card border border-border/50 hover:shadow-soft transition-shadow"
               >
-                {/* Coming Soon Ribbon */}
-                <div className="absolute top-4 right-4">
-                  <Badge variant="secondary" className="text-xs">
-                    {feature.status}
-                  </Badge>
-                </div>
-
-                <div className="h-12 w-12 rounded-xl bg-muted flex items-center justify-center mb-4">
-                  <feature.icon className="h-6 w-6 text-muted-foreground" />
+                <div className="h-12 w-12 rounded-xl bg-purple-50 dark:bg-purple-950/30 flex items-center justify-center mb-4">
+                  <feature.icon className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                 </div>
                 <h3 className="font-display text-lg font-semibold text-foreground mb-2">
                   {feature.title}
@@ -275,6 +239,15 @@ export default function FeaturesPage() {
                 </p>
               </div>
             ))}
+          </div>
+
+          <div className="text-center mt-10">
+            <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-700 text-white">
+              <Link to="/signup?role=agent" className="gap-2">
+                Join as Agency
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
@@ -286,8 +259,7 @@ export default function FeaturesPage() {
             Ready to Experience These Features?
           </h2>
           <p className="text-primary-foreground/80 mb-8 max-w-lg mx-auto">
-            Create your free account today and start exploring everything
-            Renthob has to offer.
+            Create your free account today and start exploring everything Renthob has to offer.
           </p>
           <Button
             size="lg"
