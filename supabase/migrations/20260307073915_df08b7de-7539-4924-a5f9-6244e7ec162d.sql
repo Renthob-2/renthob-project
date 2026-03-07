@@ -1,0 +1,1 @@
+ALTER TABLE public.properties ADD COLUMN neighborhood_features text[] DEFAULT '{}'::text[];

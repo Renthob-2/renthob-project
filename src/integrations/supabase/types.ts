@@ -176,6 +176,7 @@ export type Database = {
           is_featured: boolean | null
           listing_purpose: string
           location: string
+          neighborhood_features: string[] | null
           owner_id: string
           price: number
           price_period: string
@@ -204,6 +205,7 @@ export type Database = {
           is_featured?: boolean | null
           listing_purpose?: string
           location: string
+          neighborhood_features?: string[] | null
           owner_id: string
           price: number
           price_period?: string
@@ -232,6 +234,7 @@ export type Database = {
           is_featured?: boolean | null
           listing_purpose?: string
           location?: string
+          neighborhood_features?: string[] | null
           owner_id?: string
           price?: number
           price_period?: string
