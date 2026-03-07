@@ -160,6 +160,7 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
       bathrooms: "1",
       square_feet: "",
       amenities: [],
+      neighborhood_features: [],
       best_suited_for: [],
       work_from_home_friendly: false,
       car_dependent_area: false,
