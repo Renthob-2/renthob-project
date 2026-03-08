@@ -13,6 +13,7 @@ interface Profile {
   phone: string | null;
   display_name_preference: string | null;
   agency_name: string | null;
+  username: string | null;
 }
 
 interface AuthContextType {
