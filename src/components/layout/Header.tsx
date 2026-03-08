@@ -243,6 +243,7 @@ export function Header() {
                       <Heart className="h-4 w-4 mr-2" />
                       Saved Properties
                     </Link>
+                  </Button>
                   <Button variant="ghost" asChild className="w-full justify-start">
                     <Link to="/chat-rooms" onClick={() => setIsMobileMenuOpen(false)}>
                       <Users className="h-4 w-4 mr-2" />
