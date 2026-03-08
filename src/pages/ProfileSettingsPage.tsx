@@ -41,11 +41,7 @@ export default function ProfileSettingsPage() {
     if (value === profile?.username) { setUsernameError(""); return; }
     setCheckingUsername(true);
     const { data } = await supabase
-      .from("profiles")
-      .select("user_id")
-      .eq("username", value.trim().toLowerCase())
-      .neq("user_id", user?.id || "")
-      .maybeSingle();
+      .rpc("is_username_taken", { check_username: value.trim().toLowerCase(), current_user_id: user?.id || "" });
     setCheckingUsername(false);
     if (data) {
       setUsernameError("This username is already taken.");
