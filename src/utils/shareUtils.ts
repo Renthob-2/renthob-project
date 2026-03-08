@@ -54,20 +54,6 @@ export async function shareProperty(
   // Try native Web Share API first (mobile-friendly, supports images)
   if (navigator.share) {
     try {
-      // Try sharing the property image directly as a file
-      // WhatsApp Status requires files-only sharing (no url/text alongside)
-      if (options?.imageUrl && navigator.canShare) {
-        const imageFile = await fetchImageAsFile(options.imageUrl, `${propertyTitle}.jpg`);
-        if (imageFile) {
-          const fileShareData: ShareData = { files: [imageFile] };
-          if (navigator.canShare(fileShareData)) {
-            await navigator.share(fileShareData);
-            return;
-          }
-        }
-      }
-
-      // Fallback: share as text + URL (works for WhatsApp chat but not Status images)
       await navigator.share({
         title: propertyTitle,
         text: buildShareText(propertyTitle, options?.price, options?.location),
