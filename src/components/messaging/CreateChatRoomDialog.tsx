@@ -151,7 +151,7 @@ export function CreateChatRoomDialog() {
                     <SelectValue placeholder="Select a property" />
                   </SelectTrigger>
                   <SelectContent>
-                    {properties.map((p) => (
+                    {myProperties.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
                         {p.title} — {p.location}
                       </SelectItem>
