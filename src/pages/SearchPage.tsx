@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
 import { MobileFiltersSheet } from "@/components/search/MobileFiltersSheet";
@@ -9,11 +10,25 @@ import { FilterState, SortOption, DEFAULT_FILTERS } from "@/types/filters";
 const RESULTS_PER_PAGE = 6;
 
 export default function SearchPage() {
+  const [searchParams] = useSearchParams();
+  const locationParam = searchParams.get("location") || "";
+  
   const { properties, loading } = useProperties();
-  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<FilterState>({
+    ...DEFAULT_FILTERS,
+    location: locationParam,
+  });
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  // Sync location param on URL change
+  useEffect(() => {
+    if (locationParam) {
+      setFilters((prev) => ({ ...prev, location: locationParam }));
+      setCurrentPage(1);
+    }
+  }, [locationParam]);
 
   // Calculate active filter count
   const activeFilterCount = useMemo(() => {
@@ -28,10 +43,16 @@ export default function SearchPage() {
     return count;
   }, [filters]);
 
-  // Filter and sort properties using the hook
+  // Filter and sort properties
   const filteredProperties = useFilteredProperties(properties, filters, sortBy);
+  const filtersWithoutLocation = useMemo(() => ({ ...filters, location: "" }), [filters]);
+  const allFilteredProperties = useFilteredProperties(properties, filtersWithoutLocation, sortBy);
+  
+  // If location filter yields no results, fall back to showing all available properties
+  const noLocationMatches = !!filters.location && filteredProperties.length === 0 && properties.length > 0 && !loading;
+  const displayProperties = noLocationMatches ? allFilteredProperties : filteredProperties;
 
-  const totalPages = Math.ceil(filteredProperties.length / RESULTS_PER_PAGE);
+  const totalPages = Math.ceil(displayProperties.length / RESULTS_PER_PAGE);
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
@@ -90,8 +111,14 @@ export default function SearchPage() {
               />
             </div>
 
+            {noLocationMatches && (
+              <div className="mb-4 rounded-lg border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
+                No properties found in "<span className="font-medium text-foreground">{filters.location}</span>". Showing other available properties nearby.
+              </div>
+            )}
+
             <SearchResults
-              properties={filteredProperties}
+              properties={displayProperties}
               isLoading={loading}
               sortBy={sortBy}
               onSortChange={setSortBy}
