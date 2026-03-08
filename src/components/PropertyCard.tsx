@@ -6,6 +6,7 @@ import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { SearchProperty } from "@/hooks/useProperties";
 import { useComparisonContext } from "@/contexts/ComparisonContext";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
