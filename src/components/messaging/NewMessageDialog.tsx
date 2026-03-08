@@ -146,7 +146,7 @@ export function NewMessageDialog() {
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name or email..."
+                placeholder="Search by name, email, or username..."
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 className="flex-1"
               />
