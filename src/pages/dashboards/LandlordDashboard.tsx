@@ -64,11 +64,20 @@ export default function LandlordDashboard() {
                <IDVerificationDialog />
              </div>
           </div>
-          <Button className="mt-4 md:mt-0" size="lg" asChild>
-            <Link to="/property/create">
-              <Plus className="h-5 w-5 mr-2" />
-              List New Property
-            </Link>
+          <div className="flex gap-2 mt-4 md:mt-0">
+            <AddClientDialog
+              trigger={
+                <Button variant="outline" size="lg">
+                  <Users className="h-5 w-5 mr-2" />
+                  Find Agent
+                </Button>
+              }
+            />
+            <Button size="lg" asChild>
+              <Link to="/property/create">
+                <Plus className="h-5 w-5 mr-2" />
+                List New Property
+              </Link>
           </Button>
         </div>
 
