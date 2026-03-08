@@ -24,6 +24,9 @@ export default function ProfileSettingsPage() {
 
   const [fullName, setFullName] = useState(profile?.full_name || "");
   const [phone, setPhone] = useState(profile?.phone || "");
+  const [username, setUsername] = useState(profile?.username || "");
+  const [usernameError, setUsernameError] = useState("");
+  const [checkingUsername, setCheckingUsername] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
 
   const [newEmail, setNewEmail] = useState("");
@@ -33,15 +36,45 @@ export default function ProfileSettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
 
+  const checkUsernameAvailability = async (value: string) => {
+    if (!value.trim()) { setUsernameError(""); return; }
+    if (value === profile?.username) { setUsernameError(""); return; }
+    setCheckingUsername(true);
+    const { data } = await supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("username", value.trim().toLowerCase())
+      .neq("user_id", user?.id || "")
+      .maybeSingle();
+    setCheckingUsername(false);
+    if (data) {
+      setUsernameError("This username is already taken.");
+    } else {
+      setUsernameError("");
+    }
+  };
+
   const handleSaveProfile = async () => {
     if (!user) return;
+    if (usernameError) return;
     setSavingProfile(true);
     try {
+      const updateData: Record<string, any> = {
+        full_name: fullName.trim(),
+        phone: phone.trim() || null,
+        username: username.trim().toLowerCase() || null,
+      };
       const { error } = await supabase
         .from("profiles")
-        .update({ full_name: fullName.trim(), phone: phone.trim() || null })
+        .update(updateData)
         .eq("user_id", user.id);
-      if (error) throw error;
+      if (error) {
+        if (error.message?.includes("unique") || error.code === "23505") {
+          setUsernameError("This username is already taken.");
+          throw new Error("Username is already taken.");
+        }
+        throw error;
+      }
       toast({ title: "Profile updated", description: "Your profile has been saved." });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
