@@ -241,6 +241,11 @@ export function Header() {
                     <Link to="/chat-rooms" onClick={() => setIsMobileMenuOpen(false)}>
                       <Users className="h-4 w-4 mr-2" />
                       Group Chats
+                      {pendingInvites.length > 0 && (
+                        <Badge variant="destructive" className="ml-2 h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                          {pendingInvites.length}
+                        </Badge>
+                      )}
                     </Link>
                   </Button>
                   <Button variant="ghost" asChild className="w-full justify-start">
