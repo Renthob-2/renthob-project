@@ -7,11 +7,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Loader2, Save, User, Lock, Phone } from "lucide-react";
+import { Loader2, Save, User, Lock, Phone, Shield } from "lucide-react";
+
+const roleMeta: Record<string, { label: string; className: string }> = {
+  tenant: { label: "Tenant", className: "bg-blue-100 text-blue-700" },
+  landlord: { label: "Landlord", className: "bg-green-100 text-green-700" },
+  agent: { label: "Agent", className: "bg-purple-100 text-purple-700" },
+  admin: { label: "Admin", className: "bg-red-100 text-red-700" },
+};
 
 export default function ProfileSettingsPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, role } = useAuth();
   const { toast } = useToast();
 
   const [fullName, setFullName] = useState(profile?.full_name || "");
@@ -21,7 +29,6 @@ export default function ProfileSettingsPage() {
   const [newEmail, setNewEmail] = useState("");
   const [savingEmail, setSavingEmail] = useState(false);
 
-  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPassword, setSavingPassword] = useState(false);
@@ -49,10 +56,7 @@ export default function ProfileSettingsPage() {
     try {
       const { error } = await supabase.auth.updateUser({ email: newEmail.trim() });
       if (error) throw error;
-      toast({
-        title: "Verification sent",
-        description: "Check your new email for a confirmation link.",
-      });
+      toast({ title: "Verification sent", description: "Check your new email for a confirmation link." });
       setNewEmail("");
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -75,7 +79,6 @@ export default function ProfileSettingsPage() {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
       toast({ title: "Password updated", description: "Your password has been changed." });
-      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err: any) {
@@ -85,6 +88,8 @@ export default function ProfileSettingsPage() {
     }
   };
 
+  const meta = role ? roleMeta[role] : null;
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <BackButton />
@@ -92,6 +97,34 @@ export default function ProfileSettingsPage() {
       <p className="text-muted-foreground mb-8">Manage your account details</p>
 
       <div className="space-y-6">
+        {/* Account Role */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-primary" />
+              Account Type
+            </CardTitle>
+            <CardDescription>Your role on Renthob</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-3">
+              {meta ? (
+                <Badge className={meta.className + " text-sm px-3 py-1"}>
+                  {meta.label}
+                </Badge>
+              ) : (
+                <Badge variant="secondary" className="text-sm px-3 py-1">Unknown</Badge>
+              )}
+              <span className="text-sm text-muted-foreground">
+                {role === "tenant" && "You can browse, save, and apply for rental properties."}
+                {role === "landlord" && "You can list and manage your rental properties."}
+                {role === "agent" && "You can manage listings and connect renters with landlords."}
+                {role === "admin" && "You have full platform management access."}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Personal Info */}
         <Card>
           <CardHeader>
