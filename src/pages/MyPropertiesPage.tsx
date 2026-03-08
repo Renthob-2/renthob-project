@@ -239,7 +239,8 @@ export default function MyPropertiesPage() {
                     price: formatPrice(p.price, p.price_period),
                     location: `${p.location}, ${p.city}`,
                   }));
-                  shareCatalogToWhatsApp("My", catalog);
+                  const ownerName = user?.user_metadata?.full_name || "My";
+                  shareCatalogToWhatsApp(ownerName, catalog);
                 }}
               >
                 <MessageCircle className="h-5 w-5 mr-2" />
