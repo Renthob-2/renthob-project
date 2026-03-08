@@ -17,10 +17,10 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, onSave, showCompareButton = true }: PropertyCardProps) {
-  const [isSaved, setIsSaved] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { isInComparison, addToCompare, removeFromCompare, canAddMore } = useComparisonContext();
+  const { isSaved, toggleSave } = useSavedProperties();
   
   const inComparison = isInComparison(property.id);
   const images = property.images;
