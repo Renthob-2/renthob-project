@@ -106,6 +106,11 @@ const App = () => (
                   <MessagesPage />
                 </ProtectedRoute>
               } />
+              <Route path="/chat-rooms" element={
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
+                  <ChatRoomsPage />
+                </ProtectedRoute>
+              } />
               <Route path="/settings/profile" element={
                 <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin"]}>
                   <ProfileSettingsPage />
