@@ -45,8 +45,11 @@ const AMENITIES_OPTIONS = [
 
 const PROPERTY_TYPES = [
   { value: "apartment", label: "Apartment" },
+  { value: "flat", label: "Flat" },
   { value: "house", label: "House" },
+  { value: "bungalow", label: "Bungalow" },
   { value: "duplex", label: "Duplex" },
+  { value: "terrace", label: "Terrace" },
   { value: "studio", label: "Studio" },
   { value: "penthouse", label: "Penthouse" },
   { value: "villa", label: "Villa" },
@@ -198,7 +201,7 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
       form.reset({
         title: property.title,
         description: property.description || "",
-        property_type: property.property_type,
+        property_type: property.property_type as any,
         listing_purpose: (property as any).listing_purpose || "rent",
         property_condition: (property as any).property_condition || "new",
         price: property.price.toString(),
