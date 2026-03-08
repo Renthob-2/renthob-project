@@ -133,8 +133,9 @@ export async function shareProperty(
     imageUrl?: string;
   }
 ): Promise<void> {
-  const url = getPropertyUrl(propertyId);
-  const text = buildShareText(propertyTitle, options?.price, options?.location, url);
+  // Use the OG-enabled URL so WhatsApp/Facebook crawlers can read the image meta tags
+  const ogUrl = getPropertyShareUrl(propertyId);
+  const text = buildShareText(propertyTitle, options?.price, options?.location, ogUrl);
 
   // Try native Web Share API first (mobile-friendly, supports images)
   if (navigator.share) {
@@ -142,7 +143,7 @@ export async function shareProperty(
       const shareData: ShareData = {
         title: propertyTitle,
         text: buildShareText(propertyTitle, options?.price, options?.location),
-        url,
+        url: ogUrl,
       };
 
       // Generate an attractive share card image
