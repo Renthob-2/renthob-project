@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { DisplayNameSettings } from "@/components/settings/DisplayNameSettings";
 import { RentalApplicationsList } from "@/components/dashboard/RentalApplicationsList";
+import { AddClientDialog } from "@/components/messaging/AddClientDialog";
 import { 
   Home, 
   Plus, 
@@ -89,10 +90,7 @@ export default function AgentDashboard() {
             </p>
           </div>
           <div className="flex gap-2 mt-4 md:mt-0">
-            <Button variant="outline" size="lg">
-              <UserPlus className="h-5 w-5 mr-2" />
-              Add Client
-            </Button>
+            <AddClientDialog />
             <Button size="lg" asChild>
               <Link to="/property/create">
                 <Plus className="h-5 w-5 mr-2" />
@@ -333,10 +331,14 @@ export default function AgentDashboard() {
                     Add New Listing
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Add New Client
-                </Button>
+                <AddClientDialog
+                  trigger={
+                    <Button variant="outline" className="w-full justify-start">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add New Client
+                    </Button>
+                  }
+                />
                 <Button variant="outline" className="w-full justify-start">
                   <BarChart3 className="h-4 w-4 mr-2" />
                   View Reports
