@@ -79,6 +79,54 @@ export default function PropertyDetailPage() {
   const [loading, setLoading] = useState(true);
   const [isSaved, setIsSaved] = useState(false);
 
+  // Update OG meta tags dynamically when property loads
+  useEffect(() => {
+    if (!property) return;
+
+    const price = `₦${Number(property.price).toLocaleString()}/${property.price_period}`;
+    const locationStr = `${property.location}, ${property.city}, ${property.state}`;
+    const ogTitle = `${property.title} - ${price}`;
+    const ogDesc = property.description
+      ? property.description.substring(0, 160)
+      : `${property.bedrooms} bed, ${property.bathrooms} bath in ${locationStr}`;
+    const ogImage = property.images?.[0] || "";
+
+    const setMeta = (property: string, content: string) => {
+      let el = document.querySelector(`meta[property="${property}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute("property", property);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+
+    const setMetaName = (name: string, content: string) => {
+      let el = document.querySelector(`meta[name="${name}"]`) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute("name", name);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+
+    document.title = `${ogTitle} | Renthob`;
+    setMeta("og:title", ogTitle);
+    setMeta("og:description", ogDesc);
+    setMeta("og:image", ogImage);
+    setMeta("og:type", "website");
+    setMeta("og:url", window.location.href);
+    setMetaName("twitter:title", ogTitle);
+    setMetaName("twitter:description", ogDesc);
+    setMetaName("twitter:image", ogImage);
+    setMetaName("twitter:card", "summary_large_image");
+
+    return () => {
+      document.title = "Renthob - Find Your Perfect Rental Home";
+    };
+  }, [property]);
+
   useEffect(() => {
     async function fetchProperty() {
       if (!id) return;
