@@ -48,40 +48,33 @@ export async function shareProperty(
     imageUrl?: string;
   }
 ): Promise<void> {
-  // Use the OG-enabled URL so WhatsApp/Facebook crawlers can read the image meta tags
   const ogUrl = getPropertyShareUrl(propertyId);
   const text = buildShareText(propertyTitle, options?.price, options?.location, ogUrl);
 
   // Try native Web Share API first (mobile-friendly, supports images)
   if (navigator.share) {
     try {
-      const shareData: ShareData = {
-        title: propertyTitle,
-        text: buildShareText(propertyTitle, options?.price, options?.location),
-        url: ogUrl,
-      };
-
-      // Generate an attractive share card image
+      // Try sharing the property image directly as a file
+      // WhatsApp Status requires files-only sharing (no url/text alongside)
       if (options?.imageUrl && navigator.canShare) {
-        const cardFile = await generateShareCard(
-          options.imageUrl,
-          propertyTitle,
-          options.price,
-          options.location
-        );
-        if (cardFile) {
-          const dataWithFile = { ...shareData, files: [cardFile] };
-          if (navigator.canShare(dataWithFile)) {
-            await navigator.share(dataWithFile);
+        const imageFile = await fetchImageAsFile(options.imageUrl, `${propertyTitle}.jpg`);
+        if (imageFile) {
+          const fileShareData: ShareData = { files: [imageFile] };
+          if (navigator.canShare(fileShareData)) {
+            await navigator.share(fileShareData);
             return;
           }
         }
       }
 
-      await navigator.share(shareData);
+      // Fallback: share as text + URL (works for WhatsApp chat but not Status images)
+      await navigator.share({
+        title: propertyTitle,
+        text: buildShareText(propertyTitle, options?.price, options?.location),
+        url: ogUrl,
+      });
       return;
     } catch (err: any) {
-      // User cancelled or share failed – fall through to WhatsApp
       if (err?.name === "AbortError") return;
     }
   }
