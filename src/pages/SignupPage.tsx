@@ -177,6 +177,11 @@ export default function SignupPage() {
 
             <p className="text-xs text-muted-foreground text-center mb-6">
               {roles.find((r) => r.value === selectedRole)?.description}
+              {selectedRole !== "tenant" && (
+                <span className="block mt-1 text-primary/80">
+                  Landlord and Agent accounts require admin approval after signup.
+                </span>
+              )}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">

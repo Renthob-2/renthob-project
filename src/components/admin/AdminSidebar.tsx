@@ -7,6 +7,7 @@ import {
   ClipboardList,
   Megaphone,
   UserCheck,
+  Shield,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -29,6 +30,7 @@ interface AdminSidebarProps {
     pendingVerifications?: number;
     pendingApplications?: number;
     pendingApprovals?: number;
+    pendingRoleRequests?: number;
   };
 }
 
@@ -36,6 +38,7 @@ const navItems = [
   { title: "Overview", url: "/admin", icon: LayoutDashboard },
   { title: "Users", url: "/admin/users", icon: Users },
   { title: "Approvals", url: "/admin/approvals", icon: UserCheck },
+  { title: "Role Requests", url: "/admin/role-requests", icon: Shield },
   { title: "Properties", url: "/admin/properties", icon: Building2 },
   { title: "Verifications", url: "/admin/verifications", icon: ShieldCheck },
   { title: "Applications", url: "/admin/applications", icon: FileText },
@@ -52,6 +55,7 @@ export function AdminSidebar({ stats }: AdminSidebarProps) {
     if (!stats) return 0;
     switch (url) {
       case "/admin/approvals": return stats.pendingApprovals || 0;
+      case "/admin/role-requests": return stats.pendingRoleRequests || 0;
       case "/admin/properties": return stats.pendingProperties || 0;
       case "/admin/verifications": return stats.pendingVerifications || 0;
       case "/admin/applications": return stats.pendingApplications || 0;

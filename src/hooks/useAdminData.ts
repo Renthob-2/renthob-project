@@ -78,6 +78,7 @@ export interface AdminStats {
   pendingVerifications: number;
   pendingApplications: number;
   pendingTours: number;
+  pendingRoleRequests: number;
 }
 
 export function useAdminData() {
@@ -90,6 +91,7 @@ export function useAdminData() {
     totalUsers: 0, totalTenants: 0, totalLandlords: 0, totalAgents: 0,
     totalProperties: 0, activeProperties: 0, pendingProperties: 0,
     pendingVerifications: 0, pendingApplications: 0, pendingTours: 0,
+    pendingRoleRequests: 0,
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -181,6 +183,12 @@ export function useAdminData() {
       });
       setTourRequests(adminTours);
 
+      // Fetch pending role requests count
+      const { count: roleReqCount } = await supabase
+        .from("role_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending");
+
       // Calculate stats
       setStats({
         totalUsers: adminUsers.length,
@@ -193,6 +201,7 @@ export function useAdminData() {
         pendingVerifications: adminVerifs.filter(v => v.status === "pending").length,
         pendingApplications: adminApps.filter(a => a.status === "pending").length,
         pendingTours: adminTours.filter(t => t.status === "pending").length,
+        pendingRoleRequests: roleReqCount || 0,
       });
     } catch (err) {
       console.error("Admin data fetch error:", err);

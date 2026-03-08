@@ -37,6 +37,7 @@ import AdminVerificationsPage from "./pages/admin/AdminVerificationsPage";
 import AdminApplicationsPage from "./pages/admin/AdminApplicationsPage";
 import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
 import AdminActivityPage from "./pages/admin/AdminActivityPage";
+import AdminRoleRequestsPage from "./pages/admin/AdminRoleRequestsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -136,6 +137,7 @@ const App = () => (
               <Route index element={<AdminOverviewPage />} />
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="approvals" element={<AdminApprovalsPage />} />
+              <Route path="role-requests" element={<AdminRoleRequestsPage />} />
               <Route path="properties" element={<AdminPropertiesPage />} />
               <Route path="verifications" element={<AdminVerificationsPage />} />
               <Route path="applications" element={<AdminApplicationsPage />} />

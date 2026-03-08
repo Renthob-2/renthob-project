@@ -78,9 +78,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 .maybeSingle();
               
               if (!existingRole) {
+                // Always insert tenant role first (RLS only allows tenant self-assignment)
                 await supabase
                   .from("user_roles")
-                  .insert({ user_id: userId, role: appRole });
+                  .insert({ user_id: userId, role: "tenant" });
+                
+                // If they requested landlord/agent, create a role upgrade request
+                if (appRole === "landlord" || appRole === "agent") {
+                  await supabase
+                    .from("role_requests")
+                    .insert({ user_id: userId, requested_role: appRole } as any);
+                }
               }
             }
           }
