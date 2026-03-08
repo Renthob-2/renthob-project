@@ -10,14 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { Home, Building2, Users, Eye, EyeOff, Loader2, ArrowLeft } from "lucide-react";
+import { Home, Building2, Users, Eye, EyeOff, Loader2, ArrowLeft, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 type Role = "tenant" | "landlord" | "agent";
@@ -39,9 +33,7 @@ export default function SignupPage() {
   const [selectedRole, setSelectedRole] = useState<Role>(initialRole);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showOTP, setShowOTP] = useState(false);
-  const [otpValue, setOtpValue] = useState("");
-  const [verifyingOTP, setVerifyingOTP] = useState(false);
+  const [showEmailSent, setShowEmailSent] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -81,71 +73,14 @@ export default function SignupPage() {
       return;
     }
 
-    // Show OTP verification step
-    setShowOTP(true);
+    setShowEmailSent(true);
     toast({
-      title: "Verification code sent",
-      description: "Check your email for a 6-digit verification code.",
+      title: "Verification email sent",
+      description: "Check your email and click the verification link to activate your account.",
     });
   };
 
-  const handleVerifyOTP = async () => {
-    if (otpValue.length !== 6) {
-      toast({ title: "Invalid code", description: "Please enter the 6-digit code.", variant: "destructive" });
-      return;
-    }
-
-    setVerifyingOTP(true);
-
-    try {
-      const { data, error } = await supabase.auth.verifyOtp({
-        email: formData.email,
-        token: otpValue,
-        type: "signup",
-      });
-
-      if (error) throw error;
-
-      // Now the user is authenticated, insert their role
-      if (data.user) {
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({ user_id: data.user.id, role: selectedRole });
-
-        if (roleError) {
-          console.error("Role insert error:", roleError);
-        }
-      }
-
-      toast({
-        title: "Account verified!",
-        description: "Welcome to Renthob. You're now logged in.",
-      });
-
-      navigate("/");
-    } catch (err: any) {
-      toast({ title: "Verification failed", description: err.message, variant: "destructive" });
-    } finally {
-      setVerifyingOTP(false);
-    }
-  };
-
-  const handleResendOTP = async () => {
-    setIsLoading(true);
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email: formData.email,
-    });
-    setIsLoading(false);
-
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-      return;
-    }
-    toast({ title: "Code resent", description: "Check your email for a new verification code." });
-  };
-
-  if (showOTP) {
+  if (showEmailSent) {
     return (
       <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-muted/30">
         <div className="w-full max-w-md">
@@ -162,61 +97,34 @@ export default function SignupPage() {
 
           <Card className="shadow-soft border-border/50">
             <CardHeader className="text-center">
-              <CardTitle className="font-display text-2xl">Verify Your Email</CardTitle>
+              <div className="flex justify-center mb-4">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                  <Mail className="h-8 w-8 text-primary" />
+                </div>
+              </div>
+              <CardTitle className="font-display text-2xl">Check Your Email</CardTitle>
               <CardDescription>
-                We sent a 6-digit code to <strong>{formData.email}</strong>
+                We sent a verification link to <strong>{formData.email}</strong>. Click the link in the email to verify your account and get started.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="flex justify-center">
-                <InputOTP maxLength={6} value={otpValue} onChange={setOtpValue}>
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
+            <CardContent className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">
+                Didn't receive the email? Check your spam folder or try signing up again.
+              </p>
 
               <Button
-                onClick={handleVerifyOTP}
+                variant="outline"
                 className="w-full"
-                size="lg"
-                disabled={verifyingOTP || otpValue.length !== 6}
+                onClick={() => { setShowEmailSent(false); }}
               >
-                {verifyingOTP ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Verifying...
-                  </>
-                ) : (
-                  "Verify & Continue"
-                )}
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to signup
               </Button>
 
-              <div className="text-center space-y-2">
-                <p className="text-sm text-muted-foreground">Didn't receive the code?</p>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleResendOTP}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Sending..." : "Resend Code"}
-                </Button>
-              </div>
-
               <div className="text-center">
-                <button
-                  onClick={() => { setShowOTP(false); setOtpValue(""); }}
-                  className="text-sm text-primary font-medium hover:underline inline-flex items-center gap-1"
-                >
-                  <ArrowLeft className="h-3 w-3" />
-                  Back to signup
-                </button>
+                <Link to="/login" className="text-sm text-primary font-medium hover:underline">
+                  Already verified? Log in
+                </Link>
               </div>
             </CardContent>
           </Card>
