@@ -30,6 +30,7 @@ interface AdminSidebarProps {
     pendingVerifications?: number;
     pendingApplications?: number;
     pendingApprovals?: number;
+    pendingRoleRequests?: number;
   };
 }
 
