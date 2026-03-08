@@ -55,6 +55,7 @@ export function AdminSidebar({ stats }: AdminSidebarProps) {
     if (!stats) return 0;
     switch (url) {
       case "/admin/approvals": return stats.pendingApprovals || 0;
+      case "/admin/role-requests": return stats.pendingRoleRequests || 0;
       case "/admin/properties": return stats.pendingProperties || 0;
       case "/admin/verifications": return stats.pendingVerifications || 0;
       case "/admin/applications": return stats.pendingApplications || 0;
