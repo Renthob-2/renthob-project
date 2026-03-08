@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BackButton } from "@/components/BackButton";
+import { NewMessageDialog } from "@/components/messaging/NewMessageDialog";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
