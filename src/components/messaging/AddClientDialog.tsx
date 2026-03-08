@@ -147,7 +147,7 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
         <DialogHeader>
           <DialogTitle>Find a {targetLabel}</DialogTitle>
           <DialogDescription>
-            Search by email to connect with {targetLabel === "Landlord" ? "landlords" : "agents"} on
+            Search by email or username to connect with {targetLabel === "Landlord" ? "landlords" : "agents"} on
             Renthob
           </DialogDescription>
         </DialogHeader>
