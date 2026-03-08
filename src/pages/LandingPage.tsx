@@ -66,7 +66,7 @@ export default function LandingPage() {
             </p>
 
             {/* Search Bar */}
-            <div className="bg-card rounded-2xl p-4 shadow-soft animate-fade-in [animation-delay:200ms]">
+            <div className="bg-card rounded-2xl p-4 shadow-soft animate-fade-in [animation-delay:200ms] relative z-10">
               <div className="flex flex-col md:flex-row gap-3">
                 <div className="flex-1">
                   <LocationAutocomplete
