@@ -183,6 +183,12 @@ export function useAdminData() {
       });
       setTourRequests(adminTours);
 
+      // Fetch pending role requests count
+      const { count: roleReqCount } = await supabase
+        .from("role_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending");
+
       // Calculate stats
       setStats({
         totalUsers: adminUsers.length,
@@ -195,6 +201,7 @@ export function useAdminData() {
         pendingVerifications: adminVerifs.filter(v => v.status === "pending").length,
         pendingApplications: adminApps.filter(a => a.status === "pending").length,
         pendingTours: adminTours.filter(t => t.status === "pending").length,
+        pendingRoleRequests: roleReqCount || 0,
       });
     } catch (err) {
       console.error("Admin data fetch error:", err);
