@@ -103,19 +103,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           emailRedirectTo: window.location.origin,
           data: {
             full_name: fullName,
+            app_role: role,
           },
         },
       });
 
       if (error) throw error;
 
-      // Insert the user's role after signup
-      if (data.user) {
-        const { error: roleError } = await supabase
-          .from("user_roles")
-          .insert({ user_id: data.user.id, role });
-
-        if (roleError) throw roleError;
+      // Check if user already exists (Supabase returns a fake user with no identities)
+      if (data.user && data.user.identities && data.user.identities.length === 0) {
+        throw new Error("An account with this email already exists. Please log in instead.");
       }
 
       return { error: null };
