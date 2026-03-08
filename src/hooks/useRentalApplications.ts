@@ -55,10 +55,12 @@ export function useRentalApplications() {
       applicationId: string;
       newStatus: string;
     }) => {
+      if (!user) throw new Error("Not authenticated");
       const { error } = await supabase
         .from("rental_applications")
         .update({ status: newStatus })
-        .eq("id", applicationId);
+        .eq("id", applicationId)
+        .eq("landlord_id", user.id);
 
       if (error) throw error;
     },

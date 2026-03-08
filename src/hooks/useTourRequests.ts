@@ -78,10 +78,12 @@ export function useTourRequests() {
       requestId: string;
       newStatus: string;
     }) => {
+      if (!user) throw new Error("Not authenticated");
       const { error } = await supabase
         .from("tour_requests")
         .update({ status: newStatus })
-        .eq("id", requestId);
+        .eq("id", requestId)
+        .eq("landlord_id", user.id);
 
       if (error) throw error;
     },
