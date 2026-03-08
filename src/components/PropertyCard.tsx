@@ -1,7 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Heart, Bed, Bath, Square, MapPin, Scale, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Bed, Bath, Square, MapPin, Scale, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
+import { shareToWhatsApp } from "@/utils/shareUtils";
 import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { SearchProperty } from "@/hooks/useProperties";
