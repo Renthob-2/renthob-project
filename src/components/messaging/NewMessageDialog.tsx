@@ -174,7 +174,9 @@ export function NewMessageDialog() {
                         </div>
                         <div>
                           <p className="font-medium text-sm">{r.full_name || "Unknown"}</p>
-                          <p className="text-xs text-muted-foreground">{r.email}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {r.username ? `@${r.username} · ` : ""}{r.email}
+                          </p>
                         </div>
                       </div>
                       {r.role && (
