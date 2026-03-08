@@ -53,6 +53,8 @@ const App = () => (
             {/* Auth Routes (no header/footer) */}
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             
             {/* Protected Dashboard Routes - with header/footer */}
             <Route element={<PublicLayout />}>
