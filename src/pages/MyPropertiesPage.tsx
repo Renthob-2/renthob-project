@@ -45,7 +45,7 @@ import {
   Copy,
   Share2
 } from "lucide-react";
-import { shareToWhatsApp, copyPropertyLink } from "@/utils/shareUtils";
+import { shareToWhatsApp, copyPropertyLink, shareCatalogToWhatsApp } from "@/utils/shareUtils";
 
 type PropertyStatus = "draft" | "pending" | "active" | "rented" | "inactive";
 
@@ -226,12 +226,34 @@ export default function MyPropertiesPage() {
               Manage and track all your property listings
             </p>
           </div>
-          <Button className="mt-4 md:mt-0" size="lg" asChild>
-            <Link to="/property/create">
-              <Plus className="h-5 w-5 mr-2" />
-              Add New Property
-            </Link>
-          </Button>
+          <div className="flex gap-3 mt-4 md:mt-0">
+            {properties.filter(p => p.status === "active").length > 0 && (
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => {
+                  const activeProps = properties.filter(p => p.status === "active");
+                  const catalog = activeProps.map(p => ({
+                    id: p.id,
+                    title: p.title,
+                    price: formatPrice(p.price, p.price_period),
+                    location: `${p.location}, ${p.city}`,
+                  }));
+                  const ownerName = user?.user_metadata?.full_name || "My";
+                  shareCatalogToWhatsApp(ownerName, catalog);
+                }}
+              >
+                <MessageCircle className="h-5 w-5 mr-2" />
+                Share All Listings
+              </Button>
+            )}
+            <Button className="" size="lg" asChild>
+              <Link to="/property/create">
+                <Plus className="h-5 w-5 mr-2" />
+                Add New Property
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Status Filters */}
