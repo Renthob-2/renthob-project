@@ -1,225 +1,191 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { BackButton } from "@/components/BackButton";
 import { NewMessageDialog } from "@/components/messaging/NewMessageDialog";
 import { Link } from "react-router-dom";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format, isToday, isYesterday } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMessages, Message } from "@/hooks/useMessages";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  ArrowLeft,
   Inbox,
   Send,
-  Trash2,
   Home,
   User,
-  Reply,
   Loader2,
+  ArrowLeft,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 
+interface Conversation {
+  participantId: string;
+  participantName: string;
+  participantEmail: string | null;
+  lastMessage: Message;
+  unreadCount: number;
+  messages: Message[];
+}
+
+function getConversationKey(msg: Message, userId: string): string {
+  const otherId = msg.sender_id === userId ? msg.recipient_id : msg.sender_id;
+  return otherId;
+}
+
+function formatMessageTime(dateStr: string) {
+  const date = new Date(dateStr);
+  if (isToday(date)) return format(date, "h:mm a");
+  if (isYesterday(date)) return "Yesterday";
+  return format(date, "MMM d");
+}
+
+function formatChatTimestamp(dateStr: string) {
+  const date = new Date(dateStr);
+  if (isToday(date)) return format(date, "h:mm a");
+  if (isYesterday(date)) return `Yesterday, ${format(date, "h:mm a")}`;
+  return format(date, "MMM d, h:mm a");
+}
+
 export default function MessagesPage() {
   const { user } = useAuth();
-  const { messages, loading, markAsRead, deleteMessage, sendMessage } = useMessages();
-  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-  const [tab, setTab] = useState<"inbox" | "sent">("inbox");
-  const [showReplyForm, setShowReplyForm] = useState(false);
-  const [replyMessage, setReplyMessage] = useState("");
+  const { messages, loading, markAsRead, sendMessage } = useMessages();
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
   const [sending, setSending] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const inboxMessages = messages.filter((m) => m.recipient_id === user?.id);
-  const sentMessages = messages.filter((m) => m.sender_id === user?.id);
+  // Group messages into conversations by the other participant
+  const conversations = useMemo(() => {
+    if (!user) return [];
 
-  const handleOpenMessage = async (message: Message) => {
-    setSelectedMessage(message);
-    setShowReplyForm(false);
-    setReplyMessage("");
-    if (message.recipient_id === user?.id && !message.is_read) {
-      try {
-        await markAsRead(message.id);
-      } catch (error) {
-        console.error("Error marking message as read:", error);
+    const convMap = new Map<string, Conversation>();
+
+    for (const msg of messages) {
+      const key = getConversationKey(msg, user.id);
+      const isIncoming = msg.recipient_id === user.id;
+      const otherProfile = isIncoming ? msg.sender_profile : msg.recipient_profile;
+
+      if (!convMap.has(key)) {
+        convMap.set(key, {
+          participantId: key,
+          participantName: otherProfile?.full_name || otherProfile?.email || "Unknown User",
+          participantEmail: otherProfile?.email || null,
+          lastMessage: msg,
+          unreadCount: 0,
+          messages: [],
+        });
+      }
+
+      const conv = convMap.get(key)!;
+      conv.messages.push(msg);
+
+      // Update last message if newer
+      if (new Date(msg.created_at) > new Date(conv.lastMessage.created_at)) {
+        conv.lastMessage = msg;
+        conv.participantName = otherProfile?.full_name || otherProfile?.email || "Unknown User";
+        conv.participantEmail = otherProfile?.email || null;
+      }
+
+      if (isIncoming && !msg.is_read) {
+        conv.unreadCount++;
       }
     }
-  };
 
-  const handleDeleteMessage = async (messageId: string) => {
-    try {
-      await deleteMessage(messageId);
-      setSelectedMessage(null);
-      toast.success("Message deleted");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to delete message");
-    }
-  };
-
-  const handleReply = async () => {
-    if (!selectedMessage || !replyMessage.trim()) {
-      toast.error("Please enter a reply message");
-      return;
+    // Sort messages within each conversation (oldest first)
+    for (const conv of convMap.values()) {
+      conv.messages.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
     }
 
-    const recipientId = tab === "inbox" 
-      ? selectedMessage.sender_id 
-      : selectedMessage.recipient_id;
-    
-    const replySubject = selectedMessage.subject.startsWith("Re: ")
-      ? selectedMessage.subject
-      : `Re: ${selectedMessage.subject}`;
+    // Sort conversations by last message (newest first)
+    return Array.from(convMap.values()).sort(
+      (a, b) => new Date(b.lastMessage.created_at).getTime() - new Date(a.lastMessage.created_at).getTime()
+    );
+  }, [messages, user]);
 
+  const selectedConversation = conversations.find((c) => c.participantId === selectedConversationId) || null;
+
+  // Auto-scroll to bottom when conversation changes or new messages
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [selectedConversation?.messages.length, selectedConversationId]);
+
+  // Mark unread messages as read when opening a conversation
+  useEffect(() => {
+    if (!selectedConversation || !user) return;
+    const unreadMessages = selectedConversation.messages.filter(
+      (m) => m.recipient_id === user.id && !m.is_read
+    );
+    unreadMessages.forEach((m) => markAsRead(m.id).catch(console.error));
+  }, [selectedConversationId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSendReply = async () => {
+    if (!replyText.trim() || !selectedConversation || !user) return;
+
+    // Determine subject from last message in thread
+    const lastMsg = selectedConversation.messages[selectedConversation.messages.length - 1];
+    const subject = lastMsg.subject.startsWith("Re: ") ? lastMsg.subject : `Re: ${lastMsg.subject}`;
+
+    setSending(true);
     try {
-      setSending(true);
       await sendMessage(
-        recipientId,
-        replySubject,
-        replyMessage,
-        selectedMessage.property_id || undefined
+        selectedConversation.participantId,
+        subject,
+        replyText.trim(),
+        lastMsg.property_id || undefined
       );
-      toast.success("Reply sent successfully!");
-      setReplyMessage("");
-      setShowReplyForm(false);
-      setSelectedMessage(null);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send reply");
+      setReplyText("");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to send message");
     } finally {
       setSending(false);
     }
   };
 
-  const MessageCard = ({ message, isInbox }: { message: Message; isInbox: boolean }) => {
-    const otherPerson = isInbox ? message.sender_profile : message.recipient_profile;
-    const personName = otherPerson?.full_name || otherPerson?.email || "Unknown User";
-
-    return (
-      <Card
-        className={`cursor-pointer transition-all hover:shadow-md ${
-          isInbox && !message.is_read ? "border-primary bg-primary/5" : ""
-        }`}
-        onClick={() => handleOpenMessage(message)}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <User className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between gap-2 mb-1">
-                <div className="flex items-center gap-2">
-                  <p className="font-medium text-foreground truncate">{personName}</p>
-                  {isInbox && !message.is_read && (
-                    <Badge variant="default" className="text-xs">New</Badge>
-                  )}
-                </div>
-                <span className="text-xs text-muted-foreground flex-shrink-0">
-                  {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                </span>
-              </div>
-              <p className="font-medium text-sm text-foreground truncate">{message.subject}</p>
-              <p className="text-sm text-muted-foreground truncate">{message.message}</p>
-              {message.property && (
-                <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
-                  <Home className="h-3 w-3" />
-                  <span className="truncate">{message.property.title}</span>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendReply();
+    }
   };
 
-  const MessageList = ({ messages, isInbox }: { messages: Message[]; isInbox: boolean }) => {
-    if (loading) {
-      return (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-4">
-                <div className="flex items-start gap-3">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-4 w-1/3" />
-                    <Skeleton className="h-4 w-2/3" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      );
-    }
-
-    if (messages.length === 0) {
-      return (
-        <Card className="border-dashed">
-          <CardContent className="py-12 text-center">
-            {isInbox ? (
-              <Inbox className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            ) : (
-              <Send className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            )}
-            <h3 className="font-semibold text-foreground mb-1">
-              {isInbox ? "No messages yet" : "No sent messages"}
-            </h3>
-            <p className="text-sm text-muted-foreground">
-              {isInbox
-                ? "Messages from landlords and agents will appear here"
-                : "Messages you send will appear here"}
-            </p>
-          </CardContent>
-        </Card>
-      );
-    }
-
-    return (
-      <div className="space-y-3">
-        {messages.map((message) => (
-          <MessageCard key={message.id} message={message} isInbox={isInbox} />
-        ))}
-      </div>
-    );
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   };
+
+  const totalUnread = conversations.reduce((sum, c) => sum + c.unreadCount, 0);
+
+  // Mobile: show either list or chat
+  const showChatOnMobile = !!selectedConversationId;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <div className="bg-gradient-hero py-8">
+      <div className="bg-gradient-hero py-6 shrink-0">
         <div className="container">
           <BackButton />
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
+              <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground mb-1">
                 Messages
+                {totalUnread > 0 && (
+                  <Badge variant="destructive" className="ml-2 text-xs">
+                    {totalUnread} new
+                  </Badge>
+                )}
               </h1>
-              <p className="text-muted-foreground">
-                Manage your conversations with landlords and tenants
+              <p className="text-sm text-muted-foreground">
+                Your conversations
               </p>
             </div>
             <NewMessageDialog />
@@ -227,145 +193,215 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      <div className="container py-8">
-        <Tabs value={tab} onValueChange={(v) => setTab(v as "inbox" | "sent")}>
-          <TabsList className="mb-6">
-            <TabsTrigger value="inbox" className="gap-2">
-              <Inbox className="h-4 w-4" />
-              Inbox
-              {inboxMessages.filter((m) => !m.is_read).length > 0 && (
-                <Badge variant="destructive" className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
-                  {inboxMessages.filter((m) => !m.is_read).length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="sent" className="gap-2">
-              <Send className="h-4 w-4" />
-              Sent
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="inbox">
-            <MessageList messages={inboxMessages} isInbox={true} />
-          </TabsContent>
-          <TabsContent value="sent">
-            <MessageList messages={sentMessages} isInbox={false} />
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* Message Detail Dialog */}
-      <Dialog open={!!selectedMessage} onOpenChange={() => setSelectedMessage(null)}>
-        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-          {selectedMessage && (
-            <>
-              <DialogHeader>
-                <DialogTitle>{selectedMessage.subject}</DialogTitle>
-                <DialogDescription>
-                  {tab === "inbox" ? (
-                    <>From: {selectedMessage.sender_profile?.full_name || selectedMessage.sender_profile?.email || "Unknown"}</>
-                  ) : (
-                    <>To: {selectedMessage.recipient_profile?.full_name || selectedMessage.recipient_profile?.email || "Unknown"}</>
-                  )}
-                  {" • "}
-                  {formatDistanceToNow(new Date(selectedMessage.created_at), { addSuffix: true })}
-                </DialogDescription>
-              </DialogHeader>
-              
-              {selectedMessage.property && (
-                <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 text-sm">
-                  <Home className="h-4 w-4 text-muted-foreground" />
-                  <span>Property: </span>
-                  <Link
-                    to={`/property/${selectedMessage.property_id}`}
-                    className="text-primary hover:underline font-medium"
-                  >
-                    {selectedMessage.property.title}
-                  </Link>
+      {/* Main content */}
+      <div className="container py-4 flex-1 min-h-0">
+        <div className="border rounded-xl overflow-hidden flex h-[calc(100vh-220px)] bg-card">
+          {/* Conversation List */}
+          <div
+            className={`w-full md:w-[360px] md:min-w-[300px] border-r flex flex-col ${
+              showChatOnMobile ? "hidden md:flex" : "flex"
+            }`}
+          >
+            <div className="p-3 border-b">
+              <p className="text-sm font-medium text-muted-foreground">
+                {conversations.length} conversation{conversations.length !== 1 ? "s" : ""}
+              </p>
+            </div>
+            <ScrollArea className="flex-1">
+              {loading ? (
+                <div className="p-3 space-y-3">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="flex items-center gap-3 p-3">
+                      <Skeleton className="h-11 w-11 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-2/3" />
+                        <Skeleton className="h-3 w-full" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : conversations.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                  <Inbox className="h-12 w-12 text-muted-foreground/30 mb-3" />
+                  <p className="font-medium text-foreground mb-1">No conversations yet</p>
+                  <p className="text-sm text-muted-foreground">
+                    Start a conversation using the New Message button
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  {conversations.map((conv) => (
+                    <button
+                      key={conv.participantId}
+                      onClick={() => setSelectedConversationId(conv.participantId)}
+                      className={`w-full text-left p-3 flex items-start gap-3 hover:bg-accent/50 transition-colors border-b last:border-b-0 ${
+                        selectedConversationId === conv.participantId
+                          ? "bg-accent"
+                          : ""
+                      }`}
+                    >
+                      <div className="h-11 w-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <span className="text-sm font-semibold text-primary">
+                          {getInitials(conv.participantName)}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className={`text-sm truncate ${conv.unreadCount > 0 ? "font-bold text-foreground" : "font-medium text-foreground"}`}>
+                            {conv.participantName}
+                          </p>
+                          <span className="text-xs text-muted-foreground shrink-0">
+                            {formatMessageTime(conv.lastMessage.created_at)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-2 mt-0.5">
+                          <p className={`text-xs truncate ${conv.unreadCount > 0 ? "font-medium text-foreground" : "text-muted-foreground"}`}>
+                            {conv.lastMessage.sender_id === user?.id ? "You: " : ""}
+                            {conv.lastMessage.message}
+                          </p>
+                          {conv.unreadCount > 0 && (
+                            <Badge variant="default" className="h-5 min-w-[20px] px-1.5 text-xs shrink-0">
+                              {conv.unreadCount}
+                            </Badge>
+                          )}
+                        </div>
+                        {conv.lastMessage.property && (
+                          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                            <Home className="h-3 w-3" />
+                            <span className="truncate">{conv.lastMessage.property.title}</span>
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  ))}
                 </div>
               )}
+            </ScrollArea>
+          </div>
 
-              <Separator />
+          {/* Chat View */}
+          <div
+            className={`flex-1 flex flex-col ${
+              !showChatOnMobile ? "hidden md:flex" : "flex"
+            }`}
+          >
+            {selectedConversation ? (
+              <>
+                {/* Chat Header */}
+                <div className="p-4 border-b flex items-center gap-3 shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden shrink-0"
+                    onClick={() => setSelectedConversationId(null)}
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                    <span className="text-sm font-semibold text-primary">
+                      {getInitials(selectedConversation.participantName)}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-foreground truncate">
+                      {selectedConversation.participantName}
+                    </p>
+                    {selectedConversation.participantEmail && (
+                      <p className="text-xs text-muted-foreground truncate">
+                        {selectedConversation.participantEmail}
+                      </p>
+                    )}
+                  </div>
+                </div>
 
-              <div className="py-4">
-                <p className="text-foreground whitespace-pre-wrap">{selectedMessage.message}</p>
-              </div>
+                {/* Chat Messages */}
+                <ScrollArea className="flex-1 p-4">
+                  <div className="space-y-4 max-w-2xl mx-auto">
+                    {selectedConversation.messages.map((msg) => {
+                      const isMine = msg.sender_id === user?.id;
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`flex ${isMine ? "justify-end" : "justify-start"}`}
+                        >
+                          <div
+                            className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
+                              isMine
+                                ? "bg-primary text-primary-foreground rounded-br-md"
+                                : "bg-muted text-foreground rounded-bl-md"
+                            }`}
+                          >
+                            {/* Show property context if present */}
+                            {msg.property && (
+                              <Link
+                                to={`/property/${msg.property_id}`}
+                                className={`flex items-center gap-1 text-xs mb-1.5 ${
+                                  isMine ? "text-primary-foreground/70" : "text-muted-foreground"
+                                } hover:underline`}
+                              >
+                                <Home className="h-3 w-3" />
+                                {msg.property.title}
+                              </Link>
+                            )}
+                            <p className="text-sm whitespace-pre-wrap break-words">
+                              {msg.message}
+                            </p>
+                            <p
+                              className={`text-[10px] mt-1 ${
+                                isMine ? "text-primary-foreground/60" : "text-muted-foreground"
+                              }`}
+                            >
+                              {formatChatTimestamp(msg.created_at)}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div ref={chatEndRef} />
+                  </div>
+                </ScrollArea>
 
-              {/* Reply Form */}
-              {showReplyForm ? (
-                <div className="space-y-4 border-t pt-4">
-                  <Label htmlFor="reply">Your Reply</Label>
-                  <Textarea
-                    id="reply"
-                    value={replyMessage}
-                    onChange={(e) => setReplyMessage(e.target.value)}
-                    placeholder="Write your reply..."
-                    rows={4}
-                  />
-                  <div className="flex justify-end gap-2">
+                {/* Reply Input */}
+                <div className="p-3 border-t shrink-0">
+                  <div className="flex gap-2 items-end max-w-2xl mx-auto">
+                    <Textarea
+                      value={replyText}
+                      onChange={(e) => setReplyText(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Type a message..."
+                      className="min-h-[44px] max-h-[120px] resize-none"
+                      rows={1}
+                      disabled={sending}
+                    />
                     <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setShowReplyForm(false);
-                        setReplyMessage("");
-                      }}
+                      onClick={handleSendReply}
+                      disabled={sending || !replyText.trim()}
+                      size="icon"
+                      className="shrink-0 h-[44px] w-[44px]"
                     >
-                      Cancel
-                    </Button>
-                    <Button size="sm" onClick={handleReply} disabled={sending}>
                       {sending ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Sending...
-                        </>
+                        <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <>
-                          <Send className="h-4 w-4 mr-2" />
-                          Send Reply
-                        </>
+                        <Send className="h-4 w-4" />
                       )}
                     </Button>
                   </div>
                 </div>
-              ) : (
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowReplyForm(true)}
-                  >
-                    <Reply className="h-4 w-4 mr-2" />
-                    Reply
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="sm">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete this message?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. The message will be permanently deleted.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDeleteMessage(selectedMessage.id)}>
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              )}
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+              </>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-center px-4">
+                <MessageSquare className="h-16 w-16 text-muted-foreground/20 mb-4" />
+                <h3 className="font-semibold text-foreground mb-1">
+                  Select a conversation
+                </h3>
+                <p className="text-sm text-muted-foreground max-w-xs">
+                  Choose a conversation from the list or start a new one
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
