@@ -37,6 +37,7 @@ import AdminVerificationsPage from "./pages/admin/AdminVerificationsPage";
 import AdminApplicationsPage from "./pages/admin/AdminApplicationsPage";
 import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
 import AdminActivityPage from "./pages/admin/AdminActivityPage";
+import AdminRoleRequestsPage from "./pages/admin/AdminRoleRequestsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
