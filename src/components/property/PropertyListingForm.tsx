@@ -14,7 +14,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
-import { X, Upload, Loader2, ImagePlus, Save } from "lucide-react";
+import { X, Upload, Loader2, ImagePlus, Save, Plus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import type { Database } from "@/integrations/supabase/types";
 
 type Property = Database["public"]["Tables"]["properties"]["Row"];
@@ -141,7 +142,31 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [customNeighborhoodInput, setCustomNeighborhoodInput] = useState("");
+  const [customNeighborhoodFeatures, setCustomNeighborhoodFeatures] = useState<string[]>(() => {
+    if (property?.neighborhood_features) {
+      const predefinedIds = NEIGHBORHOOD_FEATURES_OPTIONS.map(o => o.id);
+      return (property.neighborhood_features as string[]).filter(f => !predefinedIds.includes(f));
+    }
+    return [];
+  });
 
+  const addCustomNeighborhoodFeature = () => {
+    const value = customNeighborhoodInput.trim();
+    if (!value) return;
+    const current = form.getValues("neighborhood_features");
+    if (!current.includes(value) && !customNeighborhoodFeatures.includes(value)) {
+      form.setValue("neighborhood_features", [...current, value]);
+      setCustomNeighborhoodFeatures(prev => [...prev, value]);
+    }
+    setCustomNeighborhoodInput("");
+  };
+
+  const removeCustomNeighborhoodFeature = (feature: string) => {
+    const current = form.getValues("neighborhood_features");
+    form.setValue("neighborhood_features", current.filter(f => f !== feature));
+    setCustomNeighborhoodFeatures(prev => prev.filter(f => f !== feature));
+  };
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -749,6 +774,45 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
                       </FormItem>
                     )}
                   />
+
+                  {/* Custom Neighborhood Features */}
+                  <div className="space-y-2">
+                    <FormLabel>Add Custom Features</FormLabel>
+                    <p className="text-sm text-muted-foreground">Type a custom feature and press Enter or click Add.</p>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="e.g., Near University of Lagos"
+                        value={customNeighborhoodInput}
+                        onChange={(e) => setCustomNeighborhoodInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            addCustomNeighborhoodFeature();
+                          }
+                        }}
+                      />
+                      <Button type="button" variant="outline" size="sm" onClick={addCustomNeighborhoodFeature}>
+                        <Plus className="h-4 w-4 mr-1" /> Add
+                      </Button>
+                    </div>
+                    {/* Display custom features as removable badges */}
+                    {customNeighborhoodFeatures.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {customNeighborhoodFeatures.map((feature) => (
+                          <Badge key={feature} variant="secondary" className="flex items-center gap-1 px-3 py-1">
+                            {feature}
+                            <button
+                              type="button"
+                              onClick={() => removeCustomNeighborhoodFeature(feature)}
+                              className="ml-1 hover:text-destructive"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Lifestyle Fit */}
