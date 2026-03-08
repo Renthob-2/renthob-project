@@ -26,6 +26,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, profile, role, signOut, loading } = useAuth();
   const { unreadCount } = useMessages();
+  const { pendingInvites } = useChatRooms();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
