@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 export interface ChatRoom {
   id: string;
@@ -161,6 +162,42 @@ export function useChatRooms() {
   }, [user]);
 
   useEffect(() => { fetchCreatedRooms(); }, [fetchCreatedRooms]);
+
+  // Realtime subscription for new invite notifications
+  const prevInviteCountRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (prevInviteCountRef.current === null) {
+      prevInviteCountRef.current = pendingInvites.length;
+    } else if (pendingInvites.length > prevInviteCountRef.current) {
+      const newCount = pendingInvites.length - prevInviteCountRef.current;
+      toast({
+        title: "New Group Chat Invite",
+        description: `You have ${newCount} new group chat invitation${newCount > 1 ? "s" : ""}. Check your Group Chats to respond.`,
+      });
+      prevInviteCountRef.current = pendingInvites.length;
+    } else {
+      prevInviteCountRef.current = pendingInvites.length;
+    }
+  }, [pendingInvites.length]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel("chat-room-invites")
+      .on("postgres_changes", {
+        event: "INSERT",
+        schema: "public",
+        table: "chat_room_members",
+        filter: `user_id=eq.${user.id}`,
+      }, () => {
+        fetchRooms();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [user, fetchRooms]);
 
   const createRoom = async (propertyId: string, name: string) => {
     if (!user) throw new Error("Must be logged in");
