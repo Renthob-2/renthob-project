@@ -164,12 +164,12 @@ export function PropertyCard({ property, onSave, showCompareButton = true }: Pro
           <button
             onClick={handleSave}
             className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-background"
-            aria-label={isSaved ? "Remove from saved" : "Save property"}
+            aria-label={isSaved(property.id) ? "Remove from saved" : "Save property"}
           >
             <Heart
               className={cn(
                 "h-5 w-5 transition-colors",
-                isSaved ? "fill-destructive text-destructive" : "text-muted-foreground"
+                isSaved(property.id) ? "fill-destructive text-destructive" : "text-muted-foreground"
               )}
             />
           </button>
