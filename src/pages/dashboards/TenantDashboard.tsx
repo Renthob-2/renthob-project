@@ -1,3 +1,4 @@
+import { AnnouncementsBanner } from "@/components/dashboard/AnnouncementsBanner";
 import { BackButton } from "@/components/BackButton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ export default function TenantDashboard() {
     <div className="min-h-screen bg-muted/30">
       <div className="container mx-auto px-4 py-8">
         <BackButton />
+        <AnnouncementsBanner />
 
         {/* Welcome Header */}
         <div className="mb-8">
