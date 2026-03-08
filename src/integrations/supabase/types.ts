@@ -129,6 +129,7 @@ export type Database = {
           suspension_reason: string | null
           updated_at: string
           user_id: string
+          username: string | null
         }
         Insert: {
           agency_name?: string | null
@@ -143,6 +144,7 @@ export type Database = {
           suspension_reason?: string | null
           updated_at?: string
           user_id: string
+          username?: string | null
         }
         Update: {
           agency_name?: string | null
@@ -157,6 +159,7 @@ export type Database = {
           suspension_reason?: string | null
           updated_at?: string
           user_id?: string
+          username?: string | null
         }
         Relationships: []
       }

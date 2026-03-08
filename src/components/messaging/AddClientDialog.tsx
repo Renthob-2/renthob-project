@@ -48,11 +48,11 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
     setSearching(true);
     setHasSearched(true);
     try {
-      // Search profiles by email
+      // Search profiles by email or username
       const { data: profiles, error: profileError } = await supabase
         .from("profiles")
-        .select("user_id, full_name, email")
-        .ilike("email", `%${searchEmail.trim()}%`);
+        .select("user_id, full_name, email, username")
+        .or(`email.ilike.%${searchEmail.trim()}%,username.ilike.%${searchEmail.trim()}%`);
 
       if (profileError) throw profileError;
 
@@ -147,20 +147,20 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
         <DialogHeader>
           <DialogTitle>Find a {targetLabel}</DialogTitle>
           <DialogDescription>
-            Search by email to connect with {targetLabel === "Landlord" ? "landlords" : "agents"} on
+            Search by email or username to connect with {targetLabel === "Landlord" ? "landlords" : "agents"} on
             Renthob
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 pt-2">
           <div className="flex gap-2">
             <div className="flex-1 space-y-2">
-              <Label htmlFor="client-email">Email Address</Label>
+              <Label htmlFor="client-search">Email or Username</Label>
               <Input
                 id="client-email"
                 type="email"
                 value={searchEmail}
                 onChange={(e) => setSearchEmail(e.target.value)}
-                placeholder={`Search ${targetLabel.toLowerCase()} by email...`}
+                placeholder={`Search ${targetLabel.toLowerCase()} by email or username...`}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
             </div>

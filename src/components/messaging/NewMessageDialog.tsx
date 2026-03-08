@@ -22,6 +22,7 @@ interface FoundUser {
   user_id: string;
   full_name: string | null;
   email: string | null;
+  username: string | null;
 }
 
 const roleBadgeClass: Record<string, string> = {
@@ -63,8 +64,8 @@ export function NewMessageDialog() {
     try {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("user_id, full_name, email")
-        .or(`email.ilike.%${searchQuery.trim()}%,full_name.ilike.%${searchQuery.trim()}%`)
+        .select("user_id, full_name, email, username")
+        .or(`email.ilike.%${searchQuery.trim()}%,full_name.ilike.%${searchQuery.trim()}%,username.ilike.%${searchQuery.trim()}%`)
         .neq("user_id", user?.id || "")
         .limit(10);
 
@@ -146,7 +147,7 @@ export function NewMessageDialog() {
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search by name or email..."
+                placeholder="Search by name, email, or username..."
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 className="flex-1"
               />
@@ -174,7 +175,9 @@ export function NewMessageDialog() {
                         </div>
                         <div>
                           <p className="font-medium text-sm">{r.full_name || "Unknown"}</p>
-                          <p className="text-xs text-muted-foreground">{r.email}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {r.username ? `@${r.username} · ` : ""}{r.email}
+                          </p>
                         </div>
                       </div>
                       {r.role && (
