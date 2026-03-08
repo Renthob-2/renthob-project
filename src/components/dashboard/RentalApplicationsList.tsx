@@ -92,27 +92,43 @@ function ApplicationDetailDialog({
           {getStatusBadge(application.status)}
         </div>
 
-        {isPending && (
-          <div className="flex gap-3 pt-2">
-            <Button
-              onClick={onApprove}
-              disabled={isUpdating}
-              className="flex-1"
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              Approve
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={onReject}
-              disabled={isUpdating}
-              className="flex-1"
-            >
-              <XCircle className="h-4 w-4 mr-2" />
-              Reject
-            </Button>
-          </div>
-        )}
+        {/* Action Buttons */}
+        <div className="flex flex-wrap gap-3 pt-2">
+          {isPending && (
+            <>
+              <Button
+                onClick={onApprove}
+                disabled={isUpdating}
+                className="flex-1"
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                Approve
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={onReject}
+                disabled={isUpdating}
+                className="flex-1"
+              >
+                <XCircle className="h-4 w-4 mr-2" />
+                Reject
+              </Button>
+            </>
+          )}
+          <ComposeMessageDialog
+            recipientId={application.applicant_id}
+            recipientName={application.full_name}
+            propertyId={application.property_id}
+            propertyTitle={application.property?.title}
+            defaultSubject={`Regarding your application for ${application.property?.title || "property"}`}
+            trigger={
+              <Button variant="outline" className={isPending ? "w-full" : "flex-1"}>
+                <MessageSquare className="h-4 w-4 mr-2" />
+                Message Applicant
+              </Button>
+            }
+          />
+        </div>
       </div>
     </DialogContent>
   );
