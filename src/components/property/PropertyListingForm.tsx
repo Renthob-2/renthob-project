@@ -201,7 +201,7 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
       form.reset({
         title: property.title,
         description: property.description || "",
-        property_type: property.property_type,
+        property_type: property.property_type as any,
         listing_purpose: (property as any).listing_purpose || "rent",
         property_condition: (property as any).property_condition || "new",
         price: property.price.toString(),
