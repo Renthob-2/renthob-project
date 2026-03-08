@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Home, Menu, X, LogOut, User, Mail, Settings } from "lucide-react";
+import { Home, Menu, X, LogOut, User, Mail, Settings, Users } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMessages } from "@/hooks/useMessages";
@@ -141,6 +141,12 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/chat-rooms" className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Group Chats
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/settings/profile" className="flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     Profile Settings
@@ -222,6 +228,12 @@ export function Header() {
                           {unreadCount}
                         </Badge>
                       )}
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" asChild className="w-full justify-start">
+                    <Link to="/chat-rooms" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Users className="h-4 w-4 mr-2" />
+                      Group Chats
                     </Link>
                   </Button>
                   <Button variant="ghost" asChild className="w-full justify-start">

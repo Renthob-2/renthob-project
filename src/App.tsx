@@ -27,6 +27,7 @@ import MessagesPage from "./pages/MessagesPage";
 import ProfileSettingsPage from "./pages/ProfileSettingsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ChatRoomsPage from "./pages/ChatRoomsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -103,6 +104,11 @@ const App = () => (
               <Route path="/messages" element={
                 <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
                   <MessagesPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/chat-rooms" element={
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
+                  <ChatRoomsPage />
                 </ProtectedRoute>
               } />
               <Route path="/settings/profile" element={
