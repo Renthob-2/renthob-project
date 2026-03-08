@@ -1,1 +1,4 @@
 project_id = "njgecwxeuuazcgshkkmj"
+
+[functions.og-property]
+verify_jwt = false
