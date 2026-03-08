@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import { DisplayNameSettings } from "@/components/settings/DisplayNameSettings";
 import { RentalApplicationsList } from "@/components/dashboard/RentalApplicationsList";
+import { AddClientDialog } from "@/components/messaging/AddClientDialog";
 import { 
   Home, 
   Plus, 
