@@ -10,6 +10,7 @@ export interface AdminUser {
   role: string;
   created_at: string;
   is_suspended: boolean;
+  is_approved: boolean;
   suspension_reason: string | null;
 }
 
