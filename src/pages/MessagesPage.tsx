@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BackButton } from "@/components/BackButton";
+import { NewMessageDialog } from "@/components/messaging/NewMessageDialog";
 import { Link } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
@@ -212,12 +213,17 @@ export default function MessagesPage() {
       <div className="bg-gradient-hero py-8">
         <div className="container">
           <BackButton />
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
-            Messages
-          </h1>
-          <p className="text-muted-foreground">
-            Manage your conversations with landlords and tenants
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-2">
+                Messages
+              </h1>
+              <p className="text-muted-foreground">
+                Manage your conversations with landlords and tenants
+              </p>
+            </div>
+            <NewMessageDialog />
+          </div>
         </div>
       </div>
 
