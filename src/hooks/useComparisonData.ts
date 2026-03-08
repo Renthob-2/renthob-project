@@ -23,6 +23,7 @@ function transformProperty(dbProperty: DbProperty): SearchProperty {
     bathrooms: dbProperty.bathrooms,
     sqft: dbProperty.square_feet || 0,
     imageUrl: dbProperty.images?.[0] || "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=60",
+    images: dbProperty.images?.length ? dbProperty.images : ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=60"],
     propertyType: dbProperty.property_type.charAt(0).toUpperCase() + dbProperty.property_type.slice(1),
     amenities: dbProperty.amenities || [],
     isNew: daysSinceCreated <= 7,
