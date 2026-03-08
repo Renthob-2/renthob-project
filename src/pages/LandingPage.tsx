@@ -68,14 +68,14 @@ export default function LandingPage() {
             {/* Search Bar */}
             <div className="bg-card rounded-2xl p-4 shadow-soft animate-fade-in [animation-delay:200ms]">
               <div className="flex flex-col md:flex-row gap-3">
-                <div className="relative flex-1">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
+                <div className="flex-1">
+                  <LocationAutocomplete
+                    value={searchLocation}
+                    onChange={setSearchLocation}
                     placeholder="Enter city, neighborhood, or address"
-                    className="pl-10 h-12 border-border/50"
                   />
                 </div>
-                <Button size="lg" className="h-12 px-8 gap-2">
+                <Button size="lg" className="h-12 px-8 gap-2" onClick={() => navigate(`/search?location=${encodeURIComponent(searchLocation)}`)}>
                   <Search className="h-5 w-5" />
                   Search
                 </Button>
