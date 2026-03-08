@@ -43,14 +43,14 @@ export default function SearchPage() {
     return count;
   }, [filters]);
 
-  // Filter and sort properties using the hook
+  // Filter and sort properties
   const filteredProperties = useFilteredProperties(properties, filters, sortBy);
+  const filtersWithoutLocation = useMemo(() => ({ ...filters, location: "" }), [filters]);
+  const allFilteredProperties = useFilteredProperties(properties, filtersWithoutLocation, sortBy);
   
-  // If location filter yields no results but there are properties, show all as "nearest"
-  const noLocationMatches = filters.location && filteredProperties.length === 0 && properties.length > 0 && !loading;
-  const displayProperties = noLocationMatches
-    ? useFilteredProperties(properties, { ...filters, location: "" }, sortBy)
-    : filteredProperties;
+  // If location filter yields no results, fall back to showing all available properties
+  const noLocationMatches = !!filters.location && filteredProperties.length === 0 && properties.length > 0 && !loading;
+  const displayProperties = noLocationMatches ? allFilteredProperties : filteredProperties;
 
   const totalPages = Math.ceil(filteredProperties.length / RESULTS_PER_PAGE);
 
