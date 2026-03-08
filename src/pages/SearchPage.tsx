@@ -52,7 +52,7 @@ export default function SearchPage() {
   const noLocationMatches = !!filters.location && filteredProperties.length === 0 && properties.length > 0 && !loading;
   const displayProperties = noLocationMatches ? allFilteredProperties : filteredProperties;
 
-  const totalPages = Math.ceil(filteredProperties.length / RESULTS_PER_PAGE);
+  const totalPages = Math.ceil(displayProperties.length / RESULTS_PER_PAGE);
 
   const handleFiltersChange = (newFilters: FilterState) => {
     setFilters(newFilters);
