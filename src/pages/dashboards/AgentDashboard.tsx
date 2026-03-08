@@ -1,3 +1,4 @@
+import { AnnouncementsBanner } from "@/components/dashboard/AnnouncementsBanner";
 import { BackButton } from "@/components/BackButton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
