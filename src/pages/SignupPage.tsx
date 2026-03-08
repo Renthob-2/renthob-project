@@ -39,9 +39,7 @@ export default function SignupPage() {
   const [selectedRole, setSelectedRole] = useState<Role>(initialRole);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showOTP, setShowOTP] = useState(false);
-  const [otpValue, setOtpValue] = useState("");
-  const [verifyingOTP, setVerifyingOTP] = useState(false);
+  const [showEmailSent, setShowEmailSent] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
