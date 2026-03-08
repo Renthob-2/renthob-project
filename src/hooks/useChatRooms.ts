@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import { playNotificationSound, requestBrowserNotificationPermission, showBrowserNotification } from "@/utils/notificationSound";
 
 export interface ChatRoom {
   id: string;
@@ -166,15 +167,30 @@ export function useChatRooms() {
   // Realtime subscription for new invite notifications
   const prevInviteCountRef = useRef<number | null>(null);
 
+  // Request browser notification permission on mount
+  useEffect(() => {
+    if (user) requestBrowserNotificationPermission();
+  }, [user]);
+
   useEffect(() => {
     if (prevInviteCountRef.current === null) {
       prevInviteCountRef.current = pendingInvites.length;
     } else if (pendingInvites.length > prevInviteCountRef.current) {
       const newCount = pendingInvites.length - prevInviteCountRef.current;
+      const message = `You have ${newCount} new group chat invitation${newCount > 1 ? "s" : ""}. Check your Group Chats to respond.`;
+      
+      // In-app toast
       toast({
         title: "New Group Chat Invite",
-        description: `You have ${newCount} new group chat invitation${newCount > 1 ? "s" : ""}. Check your Group Chats to respond.`,
+        description: message,
       });
+      
+      // Sound effect
+      playNotificationSound();
+      
+      // Browser notification (when tab is in background)
+      showBrowserNotification("New Group Chat Invite", message);
+      
       prevInviteCountRef.current = pendingInvites.length;
     } else {
       prevInviteCountRef.current = pendingInvites.length;
