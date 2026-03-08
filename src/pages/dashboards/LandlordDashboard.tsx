@@ -10,6 +10,7 @@ import { TourRequestsList } from "@/components/dashboard/TourRequestsList";
 import { IDVerificationDialog } from "@/components/verification/IDVerificationDialog";
 import { AddClientDialog } from "@/components/messaging/AddClientDialog";
 import { 
+  Users,
   Home, 
   Plus, 
   MessageSquare, 
