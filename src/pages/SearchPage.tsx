@@ -111,8 +111,14 @@ export default function SearchPage() {
               />
             </div>
 
+            {noLocationMatches && (
+              <div className="mb-4 rounded-lg border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
+                No properties found in "<span className="font-medium text-foreground">{filters.location}</span>". Showing other available properties nearby.
+              </div>
+            )}
+
             <SearchResults
-              properties={filteredProperties}
+              properties={displayProperties}
               isLoading={loading}
               sortBy={sortBy}
               onSortChange={setSortBy}
