@@ -23,8 +23,8 @@ interface SimpleProperty {
 
 export function CreateChatRoomDialog() {
   const { user } = useAuth();
-  const { properties } = useProperties();
   const { createRoom, inviteMember } = useChatRooms();
+  const [myProperties, setMyProperties] = useState<SimpleProperty[]>([]);
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"details" | "invite">("details");
   const [name, setName] = useState("");
