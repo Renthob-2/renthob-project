@@ -25,6 +25,8 @@ import EditPropertyPage from "./pages/EditPropertyPage";
 import MyPropertiesPage from "./pages/MyPropertiesPage";
 import MessagesPage from "./pages/MessagesPage";
 import ProfileSettingsPage from "./pages/ProfileSettingsPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +53,8 @@ const App = () => (
             {/* Auth Routes (no header/footer) */}
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             
             {/* Protected Dashboard Routes - with header/footer */}
             <Route element={<PublicLayout />}>
