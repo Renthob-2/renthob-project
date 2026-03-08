@@ -85,13 +85,8 @@ export default function SignupPage() {
       <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-muted/30">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <Link to="/" className="inline-flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-                <Home className="h-6 w-6 text-primary-foreground" />
-              </div>
-              <span className="font-display text-2xl font-bold text-foreground">
-                Renthob
-              </span>
+            <Link to="/" className="inline-flex items-center">
+              <img src="/logo.png" alt="Renthob" className="h-12" />
             </Link>
           </div>
 
@@ -137,13 +132,8 @@ export default function SignupPage() {
     <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-muted/30">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-              <Home className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <span className="font-display text-2xl font-bold text-foreground">
-              Renthob
-            </span>
+          <Link to="/" className="inline-flex items-center">
+            <img src="/logo.png" alt="Renthob" className="h-12" />
           </Link>
         </div>
 
