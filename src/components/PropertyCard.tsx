@@ -189,6 +189,18 @@ export function PropertyCard({ property, onSave, showCompareButton = true }: Pro
               <Scale className="h-5 w-5" />
             </button>
           )}
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              const price = `${formatPrice(property.price)}/${property.pricePeriod === "year" ? "yr" : "mo"}`;
+              shareToWhatsApp(property.title, property.id, price, property.address);
+            }}
+            className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-background text-muted-foreground"
+            aria-label="Share listing"
+          >
+            <Share2 className="h-4 w-4" />
+          </button>
         </div>
       </div>
 
