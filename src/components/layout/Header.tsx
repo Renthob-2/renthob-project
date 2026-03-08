@@ -68,7 +68,7 @@ export function Header() {
       case "agent":
         return "/dashboard/agent";
       case "admin":
-        return "/dashboard/admin";
+        return "/admin";
       default:
         return "/";
     }

@@ -120,7 +120,7 @@ export function AdminUsersTab({ users, onRefresh }: AdminUsersTabProps) {
                       {new Date(user.created_at).toLocaleDateString()}
                     </span>
                     {user.role !== "admin" && (
-                      (user as any).is_suspended ? (
+                      user.is_suspended ? (
                         <Button variant="outline" size="sm" onClick={() => handleUnsuspend(user)}>
                           <CheckCircle className="h-3.5 w-3.5 mr-1" /> Unsuspend
                         </Button>
