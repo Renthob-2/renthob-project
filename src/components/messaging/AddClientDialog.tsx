@@ -160,7 +160,7 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
                 type="email"
                 value={searchEmail}
                 onChange={(e) => setSearchEmail(e.target.value)}
-                placeholder={`Search ${targetLabel.toLowerCase()} by email...`}
+                placeholder={`Search ${targetLabel.toLowerCase()} by email or username...`}
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               />
             </div>
