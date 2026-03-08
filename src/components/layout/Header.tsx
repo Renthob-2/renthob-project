@@ -5,6 +5,7 @@ import { Home, Menu, X, LogOut, User, Mail, Settings, Users } from "lucide-react
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMessages } from "@/hooks/useMessages";
+import { useChatRooms } from "@/hooks/useChatRooms";
 import {
   DropdownMenu,
   DropdownMenuContent,
