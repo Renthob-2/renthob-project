@@ -142,7 +142,31 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [customNeighborhoodInput, setCustomNeighborhoodInput] = useState("");
+  const [customNeighborhoodFeatures, setCustomNeighborhoodFeatures] = useState<string[]>(() => {
+    if (property?.neighborhood_features) {
+      const predefinedIds = NEIGHBORHOOD_FEATURES_OPTIONS.map(o => o.id);
+      return (property.neighborhood_features as string[]).filter(f => !predefinedIds.includes(f));
+    }
+    return [];
+  });
 
+  const addCustomNeighborhoodFeature = () => {
+    const value = customNeighborhoodInput.trim();
+    if (!value) return;
+    const current = form.getValues("neighborhood_features");
+    if (!current.includes(value) && !customNeighborhoodFeatures.includes(value)) {
+      form.setValue("neighborhood_features", [...current, value]);
+      setCustomNeighborhoodFeatures(prev => [...prev, value]);
+    }
+    setCustomNeighborhoodInput("");
+  };
+
+  const removeCustomNeighborhoodFeature = (feature: string) => {
+    const current = form.getValues("neighborhood_features");
+    form.setValue("neighborhood_features", current.filter(f => f !== feature));
+    setCustomNeighborhoodFeatures(prev => prev.filter(f => f !== feature));
+  };
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
