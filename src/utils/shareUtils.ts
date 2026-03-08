@@ -1,7 +1,16 @@
 const BASE_URL = window.location.origin;
+const SUPABASE_PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID || "njgecwxeuuazcgshkkmj";
 
 export function getPropertyUrl(propertyId: string): string {
   return `${BASE_URL}/property/${propertyId}`;
+}
+
+/**
+ * Returns the OG-enabled share URL that serves HTML with meta tags
+ * so WhatsApp / Facebook / Twitter crawlers can read the preview image.
+ */
+export function getPropertyShareUrl(propertyId: string): string {
+  return `https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/og-property?id=${propertyId}`;
 }
 
 /**
