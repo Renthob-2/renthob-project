@@ -42,6 +42,19 @@ export function useRentalApplications() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
+
+      // Mask sensitive fields for pending applications
+      return (data || []).map((app: any) => {
+        const isPending = app.status === 'pending';
+        return {
+          ...app,
+          email: isPending ? '••••••••' : app.email,
+          phone: isPending ? '••••••••' : app.phone,
+          monthly_income: isPending ? null : app.monthly_income,
+        } as RentalApplication;
+      });
+
+      if (error) throw error;
       return data as RentalApplication[];
     },
     enabled: !!user,
