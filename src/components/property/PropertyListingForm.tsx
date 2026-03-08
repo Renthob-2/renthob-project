@@ -45,8 +45,11 @@ const AMENITIES_OPTIONS = [
 
 const PROPERTY_TYPES = [
   { value: "apartment", label: "Apartment" },
+  { value: "flat", label: "Flat" },
   { value: "house", label: "House" },
+  { value: "bungalow", label: "Bungalow" },
   { value: "duplex", label: "Duplex" },
+  { value: "terrace", label: "Terrace" },
   { value: "studio", label: "Studio" },
   { value: "penthouse", label: "Penthouse" },
   { value: "villa", label: "Villa" },
