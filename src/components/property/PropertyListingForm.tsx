@@ -749,6 +749,45 @@ export default function PropertyListingForm({ property, isEditing = false }: Pro
                       </FormItem>
                     )}
                   />
+
+                  {/* Custom Neighborhood Features */}
+                  <div className="space-y-2">
+                    <FormLabel>Add Custom Features</FormLabel>
+                    <p className="text-sm text-muted-foreground">Type a custom feature and press Enter or click Add.</p>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="e.g., Near University of Lagos"
+                        value={customNeighborhoodInput}
+                        onChange={(e) => setCustomNeighborhoodInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            addCustomNeighborhoodFeature();
+                          }
+                        }}
+                      />
+                      <Button type="button" variant="outline" size="sm" onClick={addCustomNeighborhoodFeature}>
+                        <Plus className="h-4 w-4 mr-1" /> Add
+                      </Button>
+                    </div>
+                    {/* Display custom features as removable badges */}
+                    {customNeighborhoodFeatures.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {customNeighborhoodFeatures.map((feature) => (
+                          <Badge key={feature} variant="secondary" className="flex items-center gap-1 px-3 py-1">
+                            {feature}
+                            <button
+                              type="button"
+                              onClick={() => removeCustomNeighborhoodFeature(feature)}
+                              className="ml-1 hover:text-destructive"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Lifestyle Fit */}
