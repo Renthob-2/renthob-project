@@ -6,6 +6,7 @@ import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { SearchProperty } from "@/hooks/useProperties";
 import { useComparisonContext } from "@/contexts/ComparisonContext";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
@@ -16,10 +17,10 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, onSave, showCompareButton = true }: PropertyCardProps) {
-  const [isSaved, setIsSaved] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { isInComparison, addToCompare, removeFromCompare, canAddMore } = useComparisonContext();
+  const { isSaved, toggleSave } = useSavedProperties();
   
   const inComparison = isInComparison(property.id);
   const images = property.images;
@@ -66,7 +67,7 @@ export function PropertyCard({ property, onSave, showCompareButton = true }: Pro
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsSaved(!isSaved);
+    toggleSave(property.id);
     onSave?.(property.id);
   };
 
@@ -163,12 +164,12 @@ export function PropertyCard({ property, onSave, showCompareButton = true }: Pro
           <button
             onClick={handleSave}
             className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-background"
-            aria-label={isSaved ? "Remove from saved" : "Save property"}
+            aria-label={isSaved(property.id) ? "Remove from saved" : "Save property"}
           >
             <Heart
               className={cn(
                 "h-5 w-5 transition-colors",
-                isSaved ? "fill-destructive text-destructive" : "text-muted-foreground"
+                isSaved(property.id) ? "fill-destructive text-destructive" : "text-muted-foreground"
               )}
             />
           </button>

@@ -28,6 +28,7 @@ import ProfileSettingsPage from "./pages/ProfileSettingsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ChatRoomsPage from "./pages/ChatRoomsPage";
+import SavedPropertiesPage from "./pages/SavedPropertiesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -114,6 +115,11 @@ const App = () => (
               <Route path="/settings/profile" element={
                 <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin"]}>
                   <ProfileSettingsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/saved" element={
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
+                  <SavedPropertiesPage />
                 </ProtectedRoute>
               } />
             </Route>

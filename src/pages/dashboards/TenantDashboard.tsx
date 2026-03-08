@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTenantProfile } from "@/hooks/useTenantProfile";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { TenantActivityList } from "@/components/dashboard/TenantActivityList";
 import { IDVerificationDialog } from "@/components/verification/IDVerificationDialog";
 import { Link, useNavigate } from "react-router-dom";
@@ -23,14 +24,8 @@ import {
 export default function TenantDashboard() {
   const { profile } = useAuth();
   const { isComplete, isLoading: profileLoading, completenessPercentage } = useTenantProfile();
+  const { savedPropertiesWithDetails, savedCount, isLoadingDetails } = useSavedProperties();
   const navigate = useNavigate();
-
-  // Mock data for demonstration
-  const savedProperties = [
-    { id: 1, title: "Modern 2BR Apartment", location: "Lagos Island", price: "₦2.5M/year", image: "/placeholder.svg" },
-    { id: 2, title: "Spacious 3BR Flat", location: "Lekki Phase 1", price: "₦3.8M/year", image: "/placeholder.svg" },
-    { id: 3, title: "Cozy Studio", location: "Victoria Island", price: "₦1.2M/year", image: "/placeholder.svg" },
-  ];
 
 
 
@@ -83,9 +78,11 @@ export default function TenantDashboard() {
               <span>Search Properties</span>
             </Link>
           </Button>
-          <Button variant="outline" className="h-auto py-4 flex flex-col gap-2">
-            <Heart className="h-6 w-6 text-primary" />
-            <span>Saved ({savedProperties.length})</span>
+          <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2">
+            <Link to="/saved">
+              <Heart className="h-6 w-6 text-primary" />
+              <span>Saved ({savedCount})</span>
+            </Link>
           </Button>
           <Button variant="outline" className="h-auto py-4 flex flex-col gap-2">
             <FileText className="h-6 w-6 text-primary" />
@@ -116,26 +113,42 @@ export default function TenantDashboard() {
                   </CardTitle>
                   <CardDescription>Properties you've bookmarked</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm">View All</Button>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/saved">View All</Link>
+                </Button>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {savedProperties.map((property) => (
-                    <div key={property.id} className="flex gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
-                      <img 
-                        src={property.image} 
-                        alt={property.title}
-                        className="w-20 h-20 rounded-md object-cover bg-muted"
-                      />
-                      <div className="flex-1">
-                        <h4 className="font-medium">{property.title}</h4>
-                        <p className="text-sm text-muted-foreground">{property.location}</p>
-                        <p className="text-sm font-semibold text-primary mt-1">{property.price}</p>
-                      </div>
-                      <Button variant="outline" size="sm">View</Button>
-                    </div>
-                  ))}
-                </div>
+                {isLoadingDetails ? (
+                  <p className="text-sm text-muted-foreground">Loading...</p>
+                ) : savedPropertiesWithDetails.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No saved properties yet. Browse and save properties you like!</p>
+                ) : (
+                  <div className="space-y-4">
+                    {savedPropertiesWithDetails.slice(0, 3).map((item: any) => {
+                      const p = item.properties;
+                      if (!p) return null;
+                      const formatPrice = (price: number) => {
+                        if (price >= 1000000) return `₦${(price / 1000000).toFixed(1)}M`;
+                        return `₦${price.toLocaleString()}`;
+                      };
+                      return (
+                        <div key={p.id} className="flex gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer" onClick={() => navigate(`/property/${p.id}`)}>
+                          <img 
+                            src={(p.images && p.images[0]) || "/placeholder.svg"} 
+                            alt={p.title}
+                            className="w-20 h-20 rounded-md object-cover bg-muted"
+                          />
+                          <div className="flex-1">
+                            <h4 className="font-medium">{p.title}</h4>
+                            <p className="text-sm text-muted-foreground">{p.location}, {p.city}</p>
+                            <p className="text-sm font-semibold text-primary mt-1">{formatPrice(Number(p.price))}/{p.price_period === "year" ? "yr" : "mo"}</p>
+                          </div>
+                          <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/property/${p.id}`); }}>View</Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
