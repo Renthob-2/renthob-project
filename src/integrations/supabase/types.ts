@@ -665,6 +665,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_username_taken: {
+        Args: { check_username: string; current_user_id: string }
+        Returns: boolean
+      }
       mask_application_field: {
         Args: { app_status: string; field_value: string }
         Returns: string
