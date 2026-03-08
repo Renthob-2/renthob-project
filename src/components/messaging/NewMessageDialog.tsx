@@ -63,8 +63,8 @@ export function NewMessageDialog() {
     try {
       const { data: profiles, error } = await supabase
         .from("profiles")
-        .select("user_id, full_name, email")
-        .or(`email.ilike.%${searchQuery.trim()}%,full_name.ilike.%${searchQuery.trim()}%`)
+        .select("user_id, full_name, email, username")
+        .or(`email.ilike.%${searchQuery.trim()}%,full_name.ilike.%${searchQuery.trim()}%,username.ilike.%${searchQuery.trim()}%`)
         .neq("user_id", user?.id || "")
         .limit(10);
 
