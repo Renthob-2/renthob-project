@@ -22,6 +22,7 @@ interface FoundUser {
   user_id: string;
   full_name: string | null;
   email: string | null;
+  username: string | null;
 }
 
 const roleBadgeClass: Record<string, string> = {
