@@ -669,6 +669,15 @@ export type Database = {
         Args: { app_status: string; field_value: string }
         Returns: string
       }
+      search_profiles_for_invite: {
+        Args: { search_term: string }
+        Returns: {
+          email: string
+          full_name: string
+          user_id: string
+          username: string
+        }[]
+      }
     }
     Enums: {
       app_role: "tenant" | "landlord" | "agent" | "admin"
