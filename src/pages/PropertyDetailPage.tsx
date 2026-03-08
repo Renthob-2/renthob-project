@@ -15,8 +15,16 @@ import {
   Heart,
   Share2,
   CheckCircle2,
-  Building2
+  Building2,
+  Copy,
+  MessageCircle
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { PropertyImageGallery } from "@/components/property/PropertyImageGallery";
 import { ContactLandlordDialog } from "@/components/messaging/ContactLandlordDialog";
 import { ApplyNowDialog } from "@/components/property/ApplyNowDialog";
