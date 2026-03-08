@@ -67,7 +67,7 @@ export function PropertyCard({ property, onSave, showCompareButton = true }: Pro
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsSaved(!isSaved);
+    toggleSave(property.id);
     onSave?.(property.id);
   };
 
