@@ -78,7 +78,8 @@ export default function LandlordDashboard() {
                 <Plus className="h-5 w-5 mr-2" />
                 List New Property
               </Link>
-          </Button>
+            </Button>
+          </div>
         </div>
 
         {/* Stats Overview */}
