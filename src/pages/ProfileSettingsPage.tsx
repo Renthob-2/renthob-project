@@ -165,7 +165,7 @@ export default function ProfileSettingsPage() {
               <User className="h-5 w-5 text-primary" />
               Personal Information
             </CardTitle>
-            <CardDescription>Update your name and phone number</CardDescription>
+            <CardDescription>Update your name, username, and phone number</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -173,10 +173,38 @@ export default function ProfileSettingsPage() {
               <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                value={username}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/[^a-zA-Z0-9._-]/g, "");
+                  setUsername(val);
+                  setUsernameError("");
+                }}
+                onBlur={() => checkUsernameAvailability(username)}
+                placeholder="e.g. johndoe"
+              />
+              {checkingUsername && (
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Loader2 className="h-3 w-3 animate-spin" /> Checking availability...
+                </p>
+              )}
+              {usernameError && (
+                <p className="text-xs text-destructive">{usernameError}</p>
+              )}
+              {username && !usernameError && !checkingUsername && username !== profile?.username && (
+                <p className="text-xs text-green-600">Username is available!</p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Others can find you by your username. Only letters, numbers, dots, hyphens, and underscores.
+              </p>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
               <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+234..." />
             </div>
-            <Button onClick={handleSaveProfile} disabled={savingProfile} className="w-full">
+            <Button onClick={handleSaveProfile} disabled={savingProfile || !!usernameError} className="w-full">
               {savingProfile ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
               Save Changes
             </Button>
