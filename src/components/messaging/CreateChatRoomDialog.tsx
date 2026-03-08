@@ -79,11 +79,7 @@ export function CreateChatRoomDialog() {
     setSearching(true);
     try {
       const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, email, username")
-        .or(`email.ilike.%${searchQuery.trim()}%,username.ilike.%${searchQuery.trim()}%,full_name.ilike.%${searchQuery.trim()}%`)
-        .neq("user_id", user?.id || "")
-        .limit(10);
+        .rpc("search_profiles_for_invite", { search_term: searchQuery.trim() });
 
       if (profiles) {
         const userIds = profiles.map(p => p.user_id);

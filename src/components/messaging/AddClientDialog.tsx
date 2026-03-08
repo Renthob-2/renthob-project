@@ -48,11 +48,9 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
     setSearching(true);
     setHasSearched(true);
     try {
-      // Search profiles by email or username
+      // Search profiles using secure function
       const { data: profiles, error: profileError } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, email, username")
-        .or(`email.ilike.%${searchEmail.trim()}%,username.ilike.%${searchEmail.trim()}%`);
+        .rpc("search_profiles_for_invite", { search_term: searchEmail.trim() });
 
       if (profileError) throw profileError;
 
