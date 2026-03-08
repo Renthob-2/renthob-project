@@ -146,6 +146,11 @@ export function Header() {
                   <Link to="/chat-rooms" className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
                     Group Chats
+                    {pendingInvites.length > 0 && (
+                      <Badge variant="destructive" className="ml-auto h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                        {pendingInvites.length}
+                      </Badge>
+                    )}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
