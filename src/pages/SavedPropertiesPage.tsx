@@ -18,14 +18,20 @@ export default function SavedPropertiesPage() {
         id: p.id,
         title: p.title,
         address: `${p.location}, ${p.city}`,
+        neighborhood: p.location || "",
+        city: p.city || "",
+        state: p.state || "",
         price: Number(p.price),
-        pricePeriod: p.price_period as "year" | "month",
+        pricePeriod: p.price_period || "year",
         bedrooms: p.bedrooms,
         bathrooms: p.bathrooms,
         sqft: 0,
-        propertyType: "",
+        imageUrl: (p.images && p.images[0]) || "/placeholder.svg",
         images: p.images || ["/placeholder.svg"],
+        propertyType: "",
+        amenities: [],
         isNew: false,
+        listedAt: new Date(),
       };
     });
 
