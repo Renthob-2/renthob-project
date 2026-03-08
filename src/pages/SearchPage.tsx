@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { SearchFilters } from "@/components/search/SearchFilters";
 import { SearchResults } from "@/components/search/SearchResults";
 import { MobileFiltersSheet } from "@/components/search/MobileFiltersSheet";
@@ -9,11 +10,25 @@ import { FilterState, SortOption, DEFAULT_FILTERS } from "@/types/filters";
 const RESULTS_PER_PAGE = 6;
 
 export default function SearchPage() {
+  const [searchParams] = useSearchParams();
+  const locationParam = searchParams.get("location") || "";
+  
   const { properties, loading } = useProperties();
-  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<FilterState>({
+    ...DEFAULT_FILTERS,
+    location: locationParam,
+  });
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [currentPage, setCurrentPage] = useState(1);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  // Sync location param on URL change
+  useEffect(() => {
+    if (locationParam) {
+      setFilters((prev) => ({ ...prev, location: locationParam }));
+      setCurrentPage(1);
+    }
+  }, [locationParam]);
 
   // Calculate active filter count
   const activeFilterCount = useMemo(() => {
