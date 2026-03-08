@@ -27,6 +27,7 @@ import MessagesPage from "./pages/MessagesPage";
 import ProfileSettingsPage from "./pages/ProfileSettingsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ChatRoomsPage from "./pages/ChatRoomsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
