@@ -39,6 +39,16 @@ export function CreateChatRoomDialog() {
   const [invitedUsers, setInvitedUsers] = useState<Set<string>>(new Set());
   const [inviting, setInviting] = useState<string | null>(null);
 
+  // Fetch user's properties
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("properties")
+      .select("id, title, location")
+      .eq("owner_id", user.id)
+      .then(({ data }) => { if (data) setMyProperties(data); });
+  }, [user]);
+
   const resetState = () => {
     setStep("details");
     setName("");
