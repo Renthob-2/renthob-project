@@ -5,6 +5,7 @@ import { Home, Menu, X, LogOut, User, Mail, Settings, Users } from "lucide-react
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMessages } from "@/hooks/useMessages";
+import { useChatRooms } from "@/hooks/useChatRooms";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,6 +26,7 @@ export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, profile, role, signOut, loading } = useAuth();
   const { unreadCount } = useMessages();
+  const { pendingInvites } = useChatRooms();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -144,6 +146,11 @@ export function Header() {
                   <Link to="/chat-rooms" className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
                     Group Chats
+                    {pendingInvites.length > 0 && (
+                      <Badge variant="destructive" className="ml-auto h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                        {pendingInvites.length}
+                      </Badge>
+                    )}
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
@@ -234,6 +241,11 @@ export function Header() {
                     <Link to="/chat-rooms" onClick={() => setIsMobileMenuOpen(false)}>
                       <Users className="h-4 w-4 mr-2" />
                       Group Chats
+                      {pendingInvites.length > 0 && (
+                        <Badge variant="destructive" className="ml-2 h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                          {pendingInvites.length}
+                        </Badge>
+                      )}
                     </Link>
                   </Button>
                   <Button variant="ghost" asChild className="w-full justify-start">
