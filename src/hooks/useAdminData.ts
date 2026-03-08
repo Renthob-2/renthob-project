@@ -91,6 +91,7 @@ export function useAdminData() {
     totalUsers: 0, totalTenants: 0, totalLandlords: 0, totalAgents: 0,
     totalProperties: 0, activeProperties: 0, pendingProperties: 0,
     pendingVerifications: 0, pendingApplications: 0, pendingTours: 0,
+    pendingRoleRequests: 0,
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
