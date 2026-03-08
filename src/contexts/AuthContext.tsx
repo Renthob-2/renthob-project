@@ -64,10 +64,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(currentSession?.user ?? null);
         
         if (currentSession?.user) {
+          const userId = currentSession.user.id;
+          
+          // On first sign-in after email verification, insert the role from metadata
+          if (event === "SIGNED_IN") {
+            const appRole = currentSession.user.user_metadata?.app_role;
+            if (appRole) {
+              // Check if role already exists before inserting
+              const { data: existingRole } = await supabase
+                .from("user_roles")
+                .select("id")
+                .eq("user_id", userId)
+                .maybeSingle();
+              
+              if (!existingRole) {
+                await supabase
+                  .from("user_roles")
+                  .insert({ user_id: userId, role: appRole });
+              }
+            }
+          }
+          
           // Use setTimeout to avoid potential race conditions with Supabase
           setTimeout(() => {
-            fetchProfile(currentSession.user.id);
-            fetchRole(currentSession.user.id);
+            fetchProfile(userId);
+            fetchRole(userId);
           }, 0);
         } else {
           setProfile(null);
