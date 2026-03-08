@@ -40,8 +40,12 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  Archive
+  Archive,
+  MessageCircle,
+  Copy,
+  Share2
 } from "lucide-react";
+import { shareToWhatsApp, copyPropertyLink } from "@/utils/shareUtils";
 
 type PropertyStatus = "draft" | "pending" | "active" | "rented" | "inactive";
 
@@ -330,6 +334,21 @@ export default function MyPropertiesPage() {
                               <Edit className="h-4 w-4 mr-2" />
                               Edit Property
                             </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => {
+                            const price = formatPrice(property.price, property.price_period);
+                            shareToWhatsApp(property.title, property.id, price, `${property.location}, ${property.city}`);
+                          }}>
+                            <MessageCircle className="h-4 w-4 mr-2" />
+                            Share on WhatsApp
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={async () => {
+                            await copyPropertyLink(property.id);
+                            toast({ title: "Link copied to clipboard" });
+                          }}>
+                            <Copy className="h-4 w-4 mr-2" />
+                            Copy Link
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {property.status !== "active" && (
