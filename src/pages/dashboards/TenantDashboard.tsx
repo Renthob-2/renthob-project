@@ -78,9 +78,11 @@ export default function TenantDashboard() {
               <span>Search Properties</span>
             </Link>
           </Button>
-          <Button variant="outline" className="h-auto py-4 flex flex-col gap-2">
-            <Heart className="h-6 w-6 text-primary" />
-            <span>Saved ({savedProperties.length})</span>
+          <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2">
+            <Link to="/saved">
+              <Heart className="h-6 w-6 text-primary" />
+              <span>Saved ({savedCount})</span>
+            </Link>
           </Button>
           <Button variant="outline" className="h-auto py-4 flex flex-col gap-2">
             <FileText className="h-6 w-6 text-primary" />
