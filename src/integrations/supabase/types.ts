@@ -44,6 +44,39 @@ export type Database = {
         }
         Relationships: []
       }
+      announcements: {
+        Row: {
+          admin_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          message: string
+          target_role: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          message: string
+          target_role?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          message?: string
+          target_role?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       chat_room_members: {
         Row: {
           created_at: string
@@ -223,6 +256,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          is_approved: boolean
           is_suspended: boolean
           phone: string | null
           suspension_reason: string | null
@@ -238,6 +272,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_approved?: boolean
           is_suspended?: boolean
           phone?: string | null
           suspension_reason?: string | null
@@ -253,6 +288,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          is_approved?: boolean
           is_suspended?: boolean
           phone?: string | null
           suspension_reason?: string | null
