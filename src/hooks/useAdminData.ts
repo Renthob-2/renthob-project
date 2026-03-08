@@ -78,6 +78,7 @@ export interface AdminStats {
   pendingVerifications: number;
   pendingApplications: number;
   pendingTours: number;
+  pendingRoleRequests: number;
 }
 
 export function useAdminData() {
