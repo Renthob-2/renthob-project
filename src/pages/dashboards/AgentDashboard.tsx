@@ -90,10 +90,7 @@ export default function AgentDashboard() {
             </p>
           </div>
           <div className="flex gap-2 mt-4 md:mt-0">
-            <Button variant="outline" size="lg">
-              <UserPlus className="h-5 w-5 mr-2" />
-              Add Client
-            </Button>
+            <AddClientDialog />
             <Button size="lg" asChild>
               <Link to="/property/create">
                 <Plus className="h-5 w-5 mr-2" />
