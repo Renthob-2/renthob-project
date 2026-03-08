@@ -702,6 +702,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_room_member: {
+        Args: { _room_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_username_taken: {
         Args: { check_username: string; current_user_id: string }
         Returns: boolean
