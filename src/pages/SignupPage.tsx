@@ -98,13 +98,24 @@ export default function SignupPage() {
     setVerifyingOTP(true);
 
     try {
-      const { error } = await supabase.auth.verifyOtp({
+      const { data, error } = await supabase.auth.verifyOtp({
         email: formData.email,
         token: otpValue,
         type: "signup",
       });
 
       if (error) throw error;
+
+      // Now the user is authenticated, insert their role
+      if (data.user) {
+        const { error: roleError } = await supabase
+          .from("user_roles")
+          .insert({ user_id: data.user.id, role: selectedRole });
+
+        if (roleError) {
+          console.error("Role insert error:", roleError);
+        }
+      }
 
       toast({
         title: "Account verified!",
