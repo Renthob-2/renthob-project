@@ -447,6 +447,39 @@ export type Database = {
           },
         ]
       }
+      role_requests: {
+        Row: {
+          created_at: string
+          id: string
+          requested_role: Database["public"]["Enums"]["app_role"]
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          requested_role: Database["public"]["Enums"]["app_role"]
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          requested_role?: Database["public"]["Enums"]["app_role"]
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       saved_properties: {
         Row: {
           created_at: string
@@ -654,6 +687,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      approve_role_request: {
+        Args: { admin_note?: string; request_id: string }
+        Returns: undefined
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -672,6 +709,10 @@ export type Database = {
       mask_application_field: {
         Args: { app_status: string; field_value: string }
         Returns: string
+      }
+      reject_role_request: {
+        Args: { admin_note?: string; request_id: string }
+        Returns: undefined
       }
       search_profiles_for_invite: {
         Args: { search_term: string }
