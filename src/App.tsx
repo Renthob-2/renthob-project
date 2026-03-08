@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ComparisonProvider } from "@/contexts/ComparisonContext";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import LandingPage from "./pages/LandingPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
 import FeaturesPage from "./pages/FeaturesPage";
@@ -19,7 +20,6 @@ import TenantDashboard from "./pages/dashboards/TenantDashboard";
 import TenantProfileSetup from "./pages/TenantProfileSetup";
 import LandlordDashboard from "./pages/dashboards/LandlordDashboard";
 import AgentDashboard from "./pages/dashboards/AgentDashboard";
-import AdminDashboard from "./pages/dashboards/AdminDashboard";
 import CreateListingPage from "./pages/CreateListingPage";
 import EditPropertyPage from "./pages/EditPropertyPage";
 import MyPropertiesPage from "./pages/MyPropertiesPage";
@@ -29,6 +29,14 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ChatRoomsPage from "./pages/ChatRoomsPage";
 import SavedPropertiesPage from "./pages/SavedPropertiesPage";
+import AdminOverviewPage from "./pages/admin/AdminOverviewPage";
+import AdminUsersPage from "./pages/admin/AdminUsersPage";
+import AdminApprovalsPage from "./pages/admin/AdminApprovalsPage";
+import AdminPropertiesPage from "./pages/admin/AdminPropertiesPage";
+import AdminVerificationsPage from "./pages/admin/AdminVerificationsPage";
+import AdminApplicationsPage from "./pages/admin/AdminApplicationsPage";
+import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
+import AdminActivityPage from "./pages/admin/AdminActivityPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -80,11 +88,6 @@ const App = () => (
                   <AgentDashboard />
                 </ProtectedRoute>
               } />
-              <Route path="/dashboard/admin" element={
-                <ProtectedRoute allowedRoles={["admin"]}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } />
               
               {/* Property Management Routes */}
               <Route path="/property/create" element={
@@ -122,6 +125,22 @@ const App = () => (
                   <SavedPropertiesPage />
                 </ProtectedRoute>
               } />
+            </Route>
+
+            {/* Admin Routes - with sidebar layout */}
+            <Route path="/admin" element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<AdminOverviewPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
+              <Route path="approvals" element={<AdminApprovalsPage />} />
+              <Route path="properties" element={<AdminPropertiesPage />} />
+              <Route path="verifications" element={<AdminVerificationsPage />} />
+              <Route path="applications" element={<AdminApplicationsPage />} />
+              <Route path="announcements" element={<AdminAnnouncementsPage />} />
+              <Route path="activity" element={<AdminActivityPage />} />
             </Route>
             
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

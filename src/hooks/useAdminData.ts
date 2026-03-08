@@ -115,6 +115,7 @@ export function useAdminData() {
         role: roleMap.get(p.user_id) || "unknown",
         created_at: p.created_at,
         is_suspended: (p as any).is_suspended || false,
+        is_approved: (p as any).is_approved !== false,
         suspension_reason: (p as any).suspension_reason || null,
       }));
       setUsers(adminUsers);
