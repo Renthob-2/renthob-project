@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRentalApplications } from "@/hooks/useRentalApplications";
-import { Users, CheckCircle, XCircle, Clock, Mail, Phone, Briefcase, DollarSign, CalendarDays } from "lucide-react";
+import { ComposeMessageDialog } from "@/components/messaging/ComposeMessageDialog";
+import { Users, CheckCircle, XCircle, Clock, Mail, Phone, Briefcase, DollarSign, CalendarDays, MessageSquare } from "lucide-react";
 import {
   Dialog,
   DialogContent,
