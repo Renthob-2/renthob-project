@@ -48,11 +48,11 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
     setSearching(true);
     setHasSearched(true);
     try {
-      // Search profiles by email
+      // Search profiles by email or username
       const { data: profiles, error: profileError } = await supabase
         .from("profiles")
-        .select("user_id, full_name, email")
-        .ilike("email", `%${searchEmail.trim()}%`);
+        .select("user_id, full_name, email, username")
+        .or(`email.ilike.%${searchEmail.trim()}%,username.ilike.%${searchEmail.trim()}%`);
 
       if (profileError) throw profileError;
 
