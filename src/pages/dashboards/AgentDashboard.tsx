@@ -331,10 +331,14 @@ export default function AgentDashboard() {
                     Add New Listing
                   </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <UserPlus className="h-4 w-4 mr-2" />
-                  Add New Client
-                </Button>
+                <AddClientDialog
+                  trigger={
+                    <Button variant="outline" className="w-full justify-start">
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Add New Client
+                    </Button>
+                  }
+                />
                 <Button variant="outline" className="w-full justify-start">
                   <BarChart3 className="h-4 w-4 mr-2" />
                   View Reports
