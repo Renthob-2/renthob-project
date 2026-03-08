@@ -8,6 +8,7 @@ import { DisplayNameSettings } from "@/components/settings/DisplayNameSettings";
 import { RentalApplicationsList } from "@/components/dashboard/RentalApplicationsList";
 import { TourRequestsList } from "@/components/dashboard/TourRequestsList";
 import { IDVerificationDialog } from "@/components/verification/IDVerificationDialog";
+import { AddClientDialog } from "@/components/messaging/AddClientDialog";
 import { 
   Home, 
   Plus, 
