@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTenantProfile } from "@/hooks/useTenantProfile";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { TenantActivityList } from "@/components/dashboard/TenantActivityList";
 import { IDVerificationDialog } from "@/components/verification/IDVerificationDialog";
 import { Link, useNavigate } from "react-router-dom";
