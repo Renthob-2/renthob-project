@@ -113,26 +113,42 @@ export default function TenantDashboard() {
                   </CardTitle>
                   <CardDescription>Properties you've bookmarked</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm">View All</Button>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/saved">View All</Link>
+                </Button>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {savedProperties.map((property) => (
-                    <div key={property.id} className="flex gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
-                      <img 
-                        src={property.image} 
-                        alt={property.title}
-                        className="w-20 h-20 rounded-md object-cover bg-muted"
-                      />
-                      <div className="flex-1">
-                        <h4 className="font-medium">{property.title}</h4>
-                        <p className="text-sm text-muted-foreground">{property.location}</p>
-                        <p className="text-sm font-semibold text-primary mt-1">{property.price}</p>
-                      </div>
-                      <Button variant="outline" size="sm">View</Button>
-                    </div>
-                  ))}
-                </div>
+                {isLoadingDetails ? (
+                  <p className="text-sm text-muted-foreground">Loading...</p>
+                ) : savedPropertiesWithDetails.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No saved properties yet. Browse and save properties you like!</p>
+                ) : (
+                  <div className="space-y-4">
+                    {savedPropertiesWithDetails.slice(0, 3).map((item: any) => {
+                      const p = item.properties;
+                      if (!p) return null;
+                      const formatPrice = (price: number) => {
+                        if (price >= 1000000) return `₦${(price / 1000000).toFixed(1)}M`;
+                        return `₦${price.toLocaleString()}`;
+                      };
+                      return (
+                        <div key={p.id} className="flex gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer" onClick={() => navigate(`/property/${p.id}`)}>
+                          <img 
+                            src={(p.images && p.images[0]) || "/placeholder.svg"} 
+                            alt={p.title}
+                            className="w-20 h-20 rounded-md object-cover bg-muted"
+                          />
+                          <div className="flex-1">
+                            <h4 className="font-medium">{p.title}</h4>
+                            <p className="text-sm text-muted-foreground">{p.location}, {p.city}</p>
+                            <p className="text-sm font-semibold text-primary mt-1">{formatPrice(Number(p.price))}/{p.price_period === "year" ? "yr" : "mo"}</p>
+                          </div>
+                          <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/property/${p.id}`); }}>View</Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
