@@ -31,6 +31,8 @@ import { ApplyNowDialog } from "@/components/property/ApplyNowDialog";
 import { ScheduleTourDialog } from "@/components/property/ScheduleTourDialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
+import { shareToWhatsApp, copyPropertyLink } from "@/utils/shareUtils";
+import { toast } from "sonner";
 
 type DbProperty = Database["public"]["Tables"]["properties"]["Row"];
 
