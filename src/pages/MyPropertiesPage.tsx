@@ -40,8 +40,12 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  Archive
+  Archive,
+  MessageCircle,
+  Copy,
+  Share2
 } from "lucide-react";
+import { shareToWhatsApp, copyPropertyLink } from "@/utils/shareUtils";
 
 type PropertyStatus = "draft" | "pending" | "active" | "rented" | "inactive";
 
