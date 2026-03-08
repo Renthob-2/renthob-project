@@ -665,6 +665,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      mask_application_field: {
+        Args: { app_status: string; field_value: string }
+        Returns: string
+      }
     }
     Enums: {
       app_role: "tenant" | "landlord" | "agent" | "admin"
