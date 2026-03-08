@@ -45,7 +45,7 @@ import {
   Copy,
   Share2
 } from "lucide-react";
-import { shareToWhatsApp, copyPropertyLink } from "@/utils/shareUtils";
+import { shareToWhatsApp, copyPropertyLink, shareCatalogToWhatsApp } from "@/utils/shareUtils";
 
 type PropertyStatus = "draft" | "pending" | "active" | "rented" | "inactive";
 
