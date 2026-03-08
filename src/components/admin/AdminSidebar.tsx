@@ -38,6 +38,7 @@ const navItems = [
   { title: "Overview", url: "/admin", icon: LayoutDashboard },
   { title: "Users", url: "/admin/users", icon: Users },
   { title: "Approvals", url: "/admin/approvals", icon: UserCheck },
+  { title: "Role Requests", url: "/admin/role-requests", icon: Shield },
   { title: "Properties", url: "/admin/properties", icon: Building2 },
   { title: "Verifications", url: "/admin/verifications", icon: ShieldCheck },
   { title: "Applications", url: "/admin/applications", icon: FileText },
