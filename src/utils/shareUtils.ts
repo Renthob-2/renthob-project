@@ -14,107 +14,22 @@ export function getPropertyShareUrl(propertyId: string): string {
 }
 
 /**
- * Creates an attractive share-card image on a canvas:
- * property photo as background with a gradient overlay and text.
+ * Fetches an image URL as a File object, bypassing canvas CORS issues.
  */
-async function generateShareCard(
-  imageUrl: string,
-  title: string,
-  price?: string,
-  location?: string
-): Promise<File | null> {
+async function fetchImageAsFile(imageUrl: string, filename = "property.jpg"): Promise<File | null> {
   try {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-
-    await new Promise<void>((resolve, reject) => {
-      img.onload = () => resolve();
-      img.onerror = () => reject(new Error("Image load failed"));
-      img.src = imageUrl;
-    });
-
-    const W = 1080;
-    const H = 1080;
-    const canvas = document.createElement("canvas");
-    canvas.width = W;
-    canvas.height = H;
-    const ctx = canvas.getContext("2d")!;
-
-    // Draw property image covering the canvas
-    const scale = Math.max(W / img.naturalWidth, H / img.naturalHeight);
-    const sw = img.naturalWidth * scale;
-    const sh = img.naturalHeight * scale;
-    ctx.drawImage(img, (W - sw) / 2, (H - sh) / 2, sw, sh);
-
-    // Gradient overlay at bottom for text readability
-    const grad = ctx.createLinearGradient(0, H * 0.45, 0, H);
-    grad.addColorStop(0, "rgba(0,0,0,0)");
-    grad.addColorStop(0.4, "rgba(0,0,0,0.55)");
-    grad.addColorStop(1, "rgba(0,0,0,0.85)");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-
-    // Subtle top gradient for branding
-    const topGrad = ctx.createLinearGradient(0, 0, 0, H * 0.15);
-    topGrad.addColorStop(0, "rgba(0,0,0,0.4)");
-    topGrad.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = topGrad;
-    ctx.fillRect(0, 0, W, H * 0.15);
-
-    // Branding
-    ctx.fillStyle = "rgba(255,255,255,0.9)";
-    ctx.font = "bold 32px sans-serif";
-    ctx.fillText("Renthob", 40, 60);
-
-    // Title
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 52px sans-serif";
-    const titleY = H - 220;
-    wrapText(ctx, `🏠 ${title}`, 50, titleY, W - 100, 60);
-
-    // Price badge
-    if (price) {
-      ctx.font = "bold 44px sans-serif";
-      const priceText = `💰 ${price}`;
-      ctx.fillStyle = "#ffffff";
-      ctx.fillText(priceText, 50, H - 130);
-    }
-
-    // Location
-    if (location) {
-      ctx.font = "400 36px sans-serif";
-      ctx.fillStyle = "rgba(255,255,255,0.9)";
-      ctx.fillText(`📍 ${location}`, 50, H - 60);
-    }
-
-    const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob((b) => resolve(b), "image/jpeg", 0.92)
-    );
-    if (!blob) return null;
-    return new File([blob], "property-share.jpg", { type: "image/jpeg" });
+    const response = await fetch(imageUrl);
+    if (!response.ok) return null;
+    const blob = await response.blob();
+    const type = blob.type || "image/jpeg";
+    const ext = type.includes("png") ? ".png" : ".jpg";
+    return new File([blob], filename.replace(/\.[^.]+$/, ext), { type });
   } catch (err) {
-    console.warn("Could not generate share card:", err);
+    console.warn("Could not fetch image for sharing:", err);
     return null;
   }
 }
 
-function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
-  const words = text.split(" ");
-  let line = "";
-  let currentY = y;
-
-  for (const word of words) {
-    const testLine = line + (line ? " " : "") + word;
-    if (ctx.measureText(testLine).width > maxWidth && line) {
-      ctx.fillText(line, x, currentY);
-      line = word;
-      currentY += lineHeight;
-    } else {
-      line = testLine;
-    }
-  }
-  ctx.fillText(line, x, currentY);
-}
 
 function buildShareText(title: string, price?: string, location?: string, url?: string): string {
   const lines = [`🏠 *${title}*`];
