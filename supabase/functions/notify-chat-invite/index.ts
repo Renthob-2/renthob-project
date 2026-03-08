@@ -12,6 +12,18 @@ serve(async (req) => {
   }
 
   try {
+    // Validate caller is the service role (DB trigger), not a regular user
+    const authHeader = req.headers.get("Authorization");
+    const callerToken = authHeader?.replace("Bearer ", "");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+    if (!callerToken || callerToken !== serviceRoleKey) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const payload = await req.json();
     const record = payload.record;
 
@@ -21,9 +33,45 @@ serve(async (req) => {
       });
     }
 
+    // Validate required fields
+    if (!record.user_id || !record.room_id || !record.invited_by) {
+      return new Response(
+        JSON.stringify({ error: "Missing required fields" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
+
+    // Validate room exists
+    const { data: room } = await supabase
+      .from("chat_rooms")
+      .select("name")
+      .eq("id", record.room_id)
+      .single();
+
+    if (!room) {
+      return new Response(
+        JSON.stringify({ error: "Invalid room" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Validate user is actually a member of this room
+    const { data: membership } = await supabase
+      .from("chat_room_members")
+      .select("id")
+      .eq("room_id", record.room_id)
+      .eq("user_id", record.user_id)
+      .single();
+
+    if (!membership) {
+      return new Response(
+        JSON.stringify({ error: "User is not a member of this room" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Get invited user's profile
     const { data: invitedProfile } = await supabase
@@ -39,13 +87,6 @@ serve(async (req) => {
       .eq("user_id", record.invited_by)
       .single();
 
-    // Get room info
-    const { data: room } = await supabase
-      .from("chat_rooms")
-      .select("name")
-      .eq("id", record.room_id)
-      .single();
-
     if (!invitedProfile?.email) {
       return new Response(JSON.stringify({ message: "No email found" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -54,48 +95,23 @@ serve(async (req) => {
 
     const inviterName = inviterProfile?.full_name || "Someone";
     const roomName = room?.name || "a group chat";
-    const recipientName = invitedProfile.full_name || "there";
 
-    // Send email via Supabase Auth admin API (uses built-in email service)
-    // We use the REST API to send a custom email
-    const emailResponse = await fetch(`${supabaseUrl}/auth/v1/admin/generate_link`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${serviceRoleKey}`,
-        "Content-Type": "application/json",
-        "apikey": serviceRoleKey,
-      },
-      body: JSON.stringify({
-        type: "magiclink",
-        email: invitedProfile.email,
-        options: {
-          data: {
-            notification_type: "chat_invite",
-          },
-        },
-      }),
-    });
+    // Log the notification intent (no PII in response)
+    console.log(`Chat invite notification processed for room "${roomName}" by ${inviterName}`);
 
-    // Even if magic link generation isn't ideal, we log the intent.
-    // For production, integrate with a dedicated email service (Resend, SendGrid, etc.)
-    console.log(`Email notification intent for ${invitedProfile.email}: ${inviterName} invited you to "${roomName}"`);
-
+    // Never return PII in the response
     return new Response(
       JSON.stringify({
         success: true,
-        message: `Notification sent to ${invitedProfile.email}`,
-        details: {
-          recipient: recipientName,
-          inviter: inviterName,
-          room: roomName,
-        },
+        message: "Notification processed",
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
     console.error("Error processing chat invite notification:", error);
+    // Generic error - no internal details
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
