@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Bed, Bath, Square, MapPin, Scale, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
-import { shareToWhatsApp } from "@/utils/shareUtils";
+import { shareProperty } from "@/utils/shareUtils";
 import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { SearchProperty } from "@/hooks/useProperties";
@@ -194,7 +194,12 @@ export function PropertyCard({ property, onSave, showCompareButton = true }: Pro
             onClick={(e) => {
               e.stopPropagation();
               const price = `${formatPrice(property.price)}/${property.pricePeriod === "year" ? "yr" : "mo"}`;
-              shareToWhatsApp(property.title, property.id, price, property.address);
+              const location = `${property.neighborhood}, ${property.city}, ${property.state}`;
+              shareProperty(property.title, property.id, {
+                price,
+                location,
+                imageUrl: property.images[0],
+              });
             }}
             className="h-9 w-9 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center transition-colors hover:bg-background text-muted-foreground"
             aria-label="Share listing"

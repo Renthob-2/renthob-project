@@ -31,7 +31,7 @@ import { ApplyNowDialog } from "@/components/property/ApplyNowDialog";
 import { ScheduleTourDialog } from "@/components/property/ScheduleTourDialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { shareToWhatsApp, copyPropertyLink } from "@/utils/shareUtils";
+import { shareProperty, copyPropertyLink } from "@/utils/shareUtils";
 import { toast } from "sonner";
 
 type DbProperty = Database["public"]["Tables"]["properties"]["Row"];
@@ -219,8 +219,12 @@ export default function PropertyDetailPage() {
                 <DropdownMenuItem onClick={() => {
                   if (property) {
                     const price = `₦${Number(property.price).toLocaleString()}/${property.price_period}`;
-                    const location = `${property.location}, ${property.city}`;
-                    shareToWhatsApp(property.title, property.id, price, location);
+                    const location = `${property.location}, ${property.city}, ${property.state}`;
+                    shareProperty(property.title, property.id, {
+                      price,
+                      location,
+                      imageUrl: property.images?.[0],
+                    });
                   }
                 }}>
                   <MessageCircle className="h-4 w-4 mr-2" />
