@@ -117,6 +117,11 @@ const App = () => (
                   <ProfileSettingsPage />
                 </ProtectedRoute>
               } />
+              <Route path="/saved" element={
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
+                  <SavedPropertiesPage />
+                </ProtectedRoute>
+              } />
             </Route>
             
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
