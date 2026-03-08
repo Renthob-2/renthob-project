@@ -18,6 +18,7 @@ export interface SearchProperty {
   bathrooms: number;
   sqft: number;
   imageUrl: string;
+  images: string[];
   propertyType: string;
   amenities: string[];
   isNew: boolean;
