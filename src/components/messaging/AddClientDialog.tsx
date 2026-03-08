@@ -154,7 +154,7 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
         <div className="space-y-4 pt-2">
           <div className="flex gap-2">
             <div className="flex-1 space-y-2">
-              <Label htmlFor="client-email">Email Address</Label>
+              <Label htmlFor="client-search">Email or Username</Label>
               <Input
                 id="client-email"
                 type="email"
