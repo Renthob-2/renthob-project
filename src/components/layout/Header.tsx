@@ -138,6 +138,12 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/saved" className="flex items-center gap-2">
+                    <Heart className="h-4 w-4" />
+                    Saved Properties
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/chat-rooms" className="flex items-center gap-2">
                     <Users className="h-4 w-4" />
                     Group Chats
