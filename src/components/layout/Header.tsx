@@ -231,6 +231,12 @@ export function Header() {
                     </Link>
                   </Button>
                   <Button variant="ghost" asChild className="w-full justify-start">
+                    <Link to="/chat-rooms" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Users className="h-4 w-4 mr-2" />
+                      Group Chats
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" asChild className="w-full justify-start">
                     <Link to="/settings/profile" onClick={() => setIsMobileMenuOpen(false)}>
                       <Settings className="h-4 w-4 mr-2" />
                       Profile Settings
