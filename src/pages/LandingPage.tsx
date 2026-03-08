@@ -44,8 +44,9 @@ const benefits = [
 
 export default function LandingPage() {
   const { properties, loading } = useProperties();
+  const [searchLocation, setSearchLocation] = useState("");
+  const navigate = useNavigate();
   
-  // Get first 3 properties as featured (or show empty state)
   const featuredProperties = properties.slice(0, 3);
   
   return (
