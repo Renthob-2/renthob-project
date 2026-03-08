@@ -102,8 +102,11 @@ export function AdminUsersTab({ users, onRefresh }: AdminUsersTabProps) {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{user.full_name || "No Name"}</p>
-                        {(user as any).is_suspended && (
+                        {user.is_suspended && (
                           <Badge variant="destructive" className="text-[10px]">Suspended</Badge>
+                        )}
+                        {!user.is_approved && (
+                          <Badge className="bg-yellow-100 text-yellow-800 text-[10px]">Pending Approval</Badge>
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground">{user.email || "No email"}</p>
