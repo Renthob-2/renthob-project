@@ -15,6 +15,7 @@ export function AdminLayout() {
     pendingVerifications: adminData.stats.pendingVerifications,
     pendingApplications: adminData.stats.pendingApplications,
     pendingApprovals: adminData.users.filter(u => !(u as any).is_approved).length,
+    pendingRoleRequests: adminData.stats.pendingRoleRequests,
   };
 
   return (
