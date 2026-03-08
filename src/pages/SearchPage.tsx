@@ -45,6 +45,12 @@ export default function SearchPage() {
 
   // Filter and sort properties using the hook
   const filteredProperties = useFilteredProperties(properties, filters, sortBy);
+  
+  // If location filter yields no results but there are properties, show all as "nearest"
+  const noLocationMatches = filters.location && filteredProperties.length === 0 && properties.length > 0 && !loading;
+  const displayProperties = noLocationMatches
+    ? useFilteredProperties(properties, { ...filters, location: "" }, sortBy)
+    : filteredProperties;
 
   const totalPages = Math.ceil(filteredProperties.length / RESULTS_PER_PAGE);
 
