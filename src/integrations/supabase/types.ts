@@ -44,6 +44,105 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_room_members: {
+        Row: {
+          created_at: string
+          id: string
+          invited_by: string
+          room_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_by: string
+          room_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_by?: string
+          room_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_room_members_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_room_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          room_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          room_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          room_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_room_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_rooms: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          property_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          property_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_rooms_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       id_verifications: {
         Row: {
           document_type: string
