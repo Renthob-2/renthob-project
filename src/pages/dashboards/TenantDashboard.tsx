@@ -24,14 +24,8 @@ import {
 export default function TenantDashboard() {
   const { profile } = useAuth();
   const { isComplete, isLoading: profileLoading, completenessPercentage } = useTenantProfile();
+  const { savedPropertiesWithDetails, savedCount, isLoadingDetails } = useSavedProperties();
   const navigate = useNavigate();
-
-  // Mock data for demonstration
-  const savedProperties = [
-    { id: 1, title: "Modern 2BR Apartment", location: "Lagos Island", price: "₦2.5M/year", image: "/placeholder.svg" },
-    { id: 2, title: "Spacious 3BR Flat", location: "Lekki Phase 1", price: "₦3.8M/year", image: "/placeholder.svg" },
-    { id: 3, title: "Cozy Studio", location: "Victoria Island", price: "₦1.2M/year", image: "/placeholder.svg" },
-  ];
 
 
 
