@@ -110,6 +110,7 @@ function PropertyCardComponent({ property, onSave, showCompareButton = true }: P
           alt={`${property.title} - Image ${currentImageIndex + 1}`}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           draggable={false}
+          loading="lazy"
         />
 
         {/* Navigation Arrows */}
