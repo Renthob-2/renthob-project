@@ -1,9 +1,9 @@
+import { memo, useState, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Bed, Bath, Square, MapPin, Scale, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import { shareProperty } from "@/utils/shareUtils";
-import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { SearchProperty } from "@/hooks/useProperties";
 import { useComparisonContext } from "@/contexts/ComparisonContext";
@@ -17,7 +17,7 @@ interface PropertyCardProps {
   showCompareButton?: boolean;
 }
 
-export function PropertyCard({ property, onSave, showCompareButton = true }: PropertyCardProps) {
+function PropertyCardComponent({ property, onSave, showCompareButton = true }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { isInComparison, addToCompare, removeFromCompare, canAddMore } = useComparisonContext();
@@ -110,6 +110,7 @@ export function PropertyCard({ property, onSave, showCompareButton = true }: Pro
           alt={`${property.title} - Image ${currentImageIndex + 1}`}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           draggable={false}
+          loading="lazy"
         />
 
         {/* Navigation Arrows */}
@@ -261,3 +262,5 @@ export function PropertyCard({ property, onSave, showCompareButton = true }: Pro
     </Card>
   );
 }
+
+export const PropertyCard = memo(PropertyCardComponent);

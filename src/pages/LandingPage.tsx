@@ -44,11 +44,10 @@ export default function LandingPage() {
   const loadMore = useCallback(() => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
-    // Small delay for smooth UX
     setTimeout(() => {
       setVisibleCount((prev) => Math.min(prev + PROPERTIES_PER_PAGE, properties.length));
       setLoadingMore(false);
-    }, 300);
+    }, 100);
   }, [loadingMore, hasMore, properties.length]);
 
   // Intersection Observer for infinite scroll
