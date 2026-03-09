@@ -20,12 +20,11 @@ import {
   MessageCircle
 } from "lucide-react";
 import { PropertyImageGallery } from "@/components/property/PropertyImageGallery";
+import { PropertyShareSheet } from "@/components/property/PropertyShareSheet";
 import { ContactLandlordDialog } from "@/components/messaging/ContactLandlordDialog";
 import { ApplyNowDialog } from "@/components/property/ApplyNowDialog";
 import { ScheduleTourDialog } from "@/components/property/ScheduleTourDialog";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
-import { shareProperty, copyPropertyLink } from "@/utils/shareUtils";
 import { toast } from "sonner";
 
 type DbProperty = Database["public"]["Tables"]["properties"]["Row"];
