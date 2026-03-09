@@ -146,8 +146,14 @@ export default function LandingPage() {
           ) : visibleProperties.length > 0 ? (
             <>
               <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-                {visibleProperties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
+                {visibleProperties.map((property, index) => (
+                  <div
+                    key={property.id}
+                    className="animate-fade-in"
+                    style={{ animationDelay: `${(index % PROPERTIES_PER_PAGE) * 80}ms`, animationFillMode: 'backwards' }}
+                  >
+                    <PropertyCard property={property} />
+                  </div>
                 ))}
               </div>
 
