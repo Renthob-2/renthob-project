@@ -34,10 +34,41 @@ const benefits = [
 export default function LandingPage() {
   const { properties, loading } = useProperties();
   const [searchLocation, setSearchLocation] = useState("");
+  const [visibleCount, setVisibleCount] = useState(PROPERTIES_PER_PAGE);
+  const [loadingMore, setLoadingMore] = useState(false);
   const navigate = useNavigate();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Show 6 on desktop (2 rows of 3), 4 on mobile (2 rows of 2)
-  const featuredProperties = properties.slice(0, 6);
+  const visibleProperties = properties.slice(0, visibleCount);
+  const hasMore = visibleCount < properties.length;
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    // Small delay for smooth UX
+    setTimeout(() => {
+      setVisibleCount((prev) => Math.min(prev + PROPERTIES_PER_PAGE, properties.length));
+      setLoadingMore(false);
+    }, 300);
+  }, [loadingMore, hasMore, properties.length]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          loadMore();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore, loadMore]);
 
   return (
     <div>
