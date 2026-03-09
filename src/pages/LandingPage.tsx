@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
@@ -15,6 +15,8 @@ import {
   Loader2,
   Briefcase,
 } from "lucide-react";
+
+const PROPERTIES_PER_PAGE = 6;
 
 const stats = [
   { value: "1,000+", label: "Listings" },
