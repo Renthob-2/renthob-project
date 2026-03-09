@@ -17,7 +17,7 @@ interface PropertyCardProps {
   showCompareButton?: boolean;
 }
 
-export function PropertyCard({ property, onSave, showCompareButton = true }: PropertyCardProps) {
+function PropertyCardComponent({ property, onSave, showCompareButton = true }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { isInComparison, addToCompare, removeFromCompare, canAddMore } = useComparisonContext();
