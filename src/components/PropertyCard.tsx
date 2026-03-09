@@ -262,3 +262,5 @@ function PropertyCardComponent({ property, onSave, showCompareButton = true }: P
     </Card>
   );
 }
+
+export const PropertyCard = memo(PropertyCardComponent);
