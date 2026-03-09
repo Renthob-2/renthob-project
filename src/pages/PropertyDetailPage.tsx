@@ -19,12 +19,6 @@ import {
   Copy,
   MessageCircle
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { PropertyImageGallery } from "@/components/property/PropertyImageGallery";
 import { ContactLandlordDialog } from "@/components/messaging/ContactLandlordDialog";
 import { ApplyNowDialog } from "@/components/property/ApplyNowDialog";
