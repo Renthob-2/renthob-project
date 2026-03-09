@@ -13,25 +13,16 @@ import {
   MapPin, 
   Calendar,
   Heart,
-  Share2,
   CheckCircle2,
   Building2,
-  Copy,
-  MessageCircle
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { PropertyImageGallery } from "@/components/property/PropertyImageGallery";
+import { PropertyShareSheet } from "@/components/property/PropertyShareSheet";
 import { ContactLandlordDialog } from "@/components/messaging/ContactLandlordDialog";
 import { ApplyNowDialog } from "@/components/property/ApplyNowDialog";
 import { ScheduleTourDialog } from "@/components/property/ScheduleTourDialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { shareProperty, copyPropertyLink } from "@/utils/shareUtils";
 import { toast } from "sonner";
 
 type DbProperty = Database["public"]["Tables"]["properties"]["Row"];
@@ -256,39 +247,13 @@ export default function PropertyDetailPage() {
               <Heart className={`h-4 w-4 ${isSaved ? "fill-destructive text-destructive" : ""}`} />
               <span className="hidden sm:inline">{isSaved ? "Saved" : "Save"}</span>
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Share2 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Share</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => {
-                  if (property) {
-                    const price = `₦${Number(property.price).toLocaleString()}/${property.price_period}`;
-                    const location = `${property.location}, ${property.city}, ${property.state}`;
-                    shareProperty(property.title, property.id, {
-                      price,
-                      location,
-                      imageUrl: property.images?.[0],
-                    });
-                  }
-                }}>
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Share on WhatsApp
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={async () => {
-                  if (property) {
-                    await copyPropertyLink(property.id);
-                    toast.success("Link copied to clipboard");
-                  }
-                }}>
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copy Link
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <PropertyShareSheet
+              propertyId={property.id}
+              propertyTitle={property.title}
+              price={`₦${Number(property.price).toLocaleString()}/${property.price_period}`}
+              location={`${property.location}, ${property.city}, ${property.state}`}
+              imageUrl={property.images?.[0]}
+            />
           </div>
         </div>
       </div>
