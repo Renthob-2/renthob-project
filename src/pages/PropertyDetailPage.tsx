@@ -250,39 +250,13 @@ export default function PropertyDetailPage() {
               <Heart className={`h-4 w-4 ${isSaved ? "fill-destructive text-destructive" : ""}`} />
               <span className="hidden sm:inline">{isSaved ? "Saved" : "Save"}</span>
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Share2 className="h-4 w-4" />
-                  <span className="hidden sm:inline">Share</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => {
-                  if (property) {
-                    const price = `₦${Number(property.price).toLocaleString()}/${property.price_period}`;
-                    const location = `${property.location}, ${property.city}, ${property.state}`;
-                    shareProperty(property.title, property.id, {
-                      price,
-                      location,
-                      imageUrl: property.images?.[0],
-                    });
-                  }
-                }}>
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  Share on WhatsApp
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={async () => {
-                  if (property) {
-                    await copyPropertyLink(property.id);
-                    toast.success("Link copied to clipboard");
-                  }
-                }}>
-                  <Copy className="h-4 w-4 mr-2" />
-                  Copy Link
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <PropertyShareSheet
+              propertyId={property.id}
+              propertyTitle={property.title}
+              price={`₦${Number(property.price).toLocaleString()}/${property.price_period}`}
+              location={`${property.location}, ${property.city}, ${property.state}`}
+              imageUrl={property.images?.[0]}
+            />
           </div>
         </div>
       </div>
