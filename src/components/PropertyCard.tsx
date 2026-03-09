@@ -1,9 +1,9 @@
+import { memo, useState, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, Bed, Bath, Square, MapPin, Scale, ChevronLeft, ChevronRight, Share2 } from "lucide-react";
 import { shareProperty } from "@/utils/shareUtils";
-import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import type { SearchProperty } from "@/hooks/useProperties";
 import { useComparisonContext } from "@/contexts/ComparisonContext";
