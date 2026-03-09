@@ -13,11 +13,8 @@ import {
   MapPin, 
   Calendar,
   Heart,
-  Share2,
   CheckCircle2,
   Building2,
-  Copy,
-  MessageCircle
 } from "lucide-react";
 import { PropertyImageGallery } from "@/components/property/PropertyImageGallery";
 import { PropertyShareSheet } from "@/components/property/PropertyShareSheet";
