@@ -143,12 +143,33 @@ export default function LandingPage() {
             <div className="flex items-center justify-center py-16">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : featuredProperties.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-              {featuredProperties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
-            </div>
+          ) : visibleProperties.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+                {visibleProperties.map((property) => (
+                  <PropertyCard key={property.id} property={property} />
+                ))}
+              </div>
+
+              {/* Infinite scroll sentinel + load more button */}
+              <div ref={loadMoreRef} className="flex flex-col items-center gap-3 mt-6">
+                {loadingMore && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span className="text-sm">Loading more properties...</span>
+                  </div>
+                )}
+                {hasMore && !loadingMore && (
+                  <Button variant="outline" size="lg" onClick={loadMore} className="gap-2">
+                    Load More Properties
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                )}
+                {!hasMore && properties.length > PROPERTIES_PER_PAGE && (
+                  <p className="text-sm text-muted-foreground">You've seen all {properties.length} properties</p>
+                )}
+              </div>
+            </>
           ) : (
             <div className="text-center py-12 bg-muted/50 rounded-xl">
               <Home className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -160,7 +181,7 @@ export default function LandingPage() {
             </div>
           )}
 
-          {featuredProperties.length > 0 && (
+          {visibleProperties.length > 0 && !hasMore && (
             <div className="text-center mt-6">
               <Button asChild variant="outline" size="lg">
                 <Link to="/search" className="gap-2">
