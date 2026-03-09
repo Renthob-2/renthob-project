@@ -19,7 +19,6 @@ import {
 const PROPERTIES_PER_PAGE = 6;
 
 const stats = [
-  { value: "1,000+", label: "Listings" },
   { value: "500+", label: "Renters" },
   { value: "200+", label: "Landlords" },
   { value: "98%", label: "Satisfied" },
