@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { PropertyCard } from "@/components/PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
@@ -16,6 +16,8 @@ import {
   Briefcase,
 } from "lucide-react";
 
+const PROPERTIES_PER_PAGE = 6;
+
 const stats = [
   { value: "1,000+", label: "Listings" },
   { value: "500+", label: "Renters" },
@@ -32,10 +34,41 @@ const benefits = [
 export default function LandingPage() {
   const { properties, loading } = useProperties();
   const [searchLocation, setSearchLocation] = useState("");
+  const [visibleCount, setVisibleCount] = useState(PROPERTIES_PER_PAGE);
+  const [loadingMore, setLoadingMore] = useState(false);
   const navigate = useNavigate();
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
-  // Show 6 on desktop (2 rows of 3), 4 on mobile (2 rows of 2)
-  const featuredProperties = properties.slice(0, 6);
+  const visibleProperties = properties.slice(0, visibleCount);
+  const hasMore = visibleCount < properties.length;
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    // Small delay for smooth UX
+    setTimeout(() => {
+      setVisibleCount((prev) => Math.min(prev + PROPERTIES_PER_PAGE, properties.length));
+      setLoadingMore(false);
+    }, 300);
+  }, [loadingMore, hasMore, properties.length]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const el = loadMoreRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          loadMore();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasMore, loadingMore, loadMore]);
 
   return (
     <div>
@@ -110,12 +143,33 @@ export default function LandingPage() {
             <div className="flex items-center justify-center py-16">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
             </div>
-          ) : featuredProperties.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
-              {featuredProperties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
-            </div>
+          ) : visibleProperties.length > 0 ? (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+                {visibleProperties.map((property) => (
+                  <PropertyCard key={property.id} property={property} />
+                ))}
+              </div>
+
+              {/* Infinite scroll sentinel + load more button */}
+              <div ref={loadMoreRef} className="flex flex-col items-center gap-3 mt-6">
+                {loadingMore && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span className="text-sm">Loading more properties...</span>
+                  </div>
+                )}
+                {hasMore && !loadingMore && (
+                  <Button variant="outline" size="lg" onClick={loadMore} className="gap-2">
+                    Load More Properties
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                )}
+                {!hasMore && properties.length > PROPERTIES_PER_PAGE && (
+                  <p className="text-sm text-muted-foreground">You've seen all {properties.length} properties</p>
+                )}
+              </div>
+            </>
           ) : (
             <div className="text-center py-12 bg-muted/50 rounded-xl">
               <Home className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -127,7 +181,7 @@ export default function LandingPage() {
             </div>
           )}
 
-          {featuredProperties.length > 0 && (
+          {visibleProperties.length > 0 && !hasMore && (
             <div className="text-center mt-6">
               <Button asChild variant="outline" size="lg">
                 <Link to="/search" className="gap-2">
