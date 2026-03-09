@@ -25,6 +25,7 @@ import { ContactLandlordDialog } from "@/components/messaging/ContactLandlordDia
 import { ApplyNowDialog } from "@/components/property/ApplyNowDialog";
 import { ScheduleTourDialog } from "@/components/property/ScheduleTourDialog";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { toast } from "sonner";
 
 type DbProperty = Database["public"]["Tables"]["properties"]["Row"];
