@@ -278,7 +278,7 @@ export default function LandingPage() {
             <Button size="sm" variant="secondary" asChild className="bg-background text-foreground hover:bg-background/90">
               <Link to="/signup">Create Account</Link>
             </Button>
-            <Button size="sm" variant="outline" asChild className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
+            <Button size="sm" variant="outline" asChild className="border-primary-foreground text-primary-foreground bg-primary-foreground/10 hover:bg-primary-foreground/20">
               <Link to="/contact">Contact Support</Link>
             </Button>
           </div>
