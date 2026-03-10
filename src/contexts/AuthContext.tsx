@@ -56,6 +56,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRole(roleData?.role as AppRole | null);
   };
 
+  // Re-fetch role when tab regains focus (catches admin role changes)
+  const refetchUserData = async () => {
+    const currentUser = (await supabase.auth.getUser()).data.user;
+    if (currentUser) {
+      await fetchProfile(currentUser.id);
+      await fetchRole(currentUser.id);
+    }
+  };
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && user) {
+        refetchUserData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Also poll every 60 seconds for role changes
+    const interval = setInterval(() => {
+      if (user) {
+        fetchRole(user.id);
+      }
+    }, 60000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(interval);
+    };
+  }, [user]);
+
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -79,15 +110,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               
               if (!existingRole) {
                 // Always insert tenant role first (RLS only allows tenant self-assignment)
-                await supabase
+                const { error: roleInsertError } = await supabase
                   .from("user_roles")
                   .insert({ user_id: userId, role: "tenant" });
                 
+                if (roleInsertError) {
+                  console.error("Failed to insert tenant role:", roleInsertError);
+                }
+                
                 // If they requested landlord/agent, create a role upgrade request
                 if (appRole === "landlord" || appRole === "agent") {
-                  await supabase
+                  const { error: requestError } = await supabase
                     .from("role_requests")
                     .insert({ user_id: userId, requested_role: appRole } as any);
+                  
+                  if (requestError) {
+                    console.error("Failed to create role request:", requestError);
+                  }
                 }
               }
             }
