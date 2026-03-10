@@ -84,11 +84,7 @@ export default function ChatRoomsPage() {
     setInviteSearching(true);
     try {
       const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, email, username")
-        .or(`email.ilike.%${inviteSearch.trim()}%,username.ilike.%${inviteSearch.trim()}%,full_name.ilike.%${inviteSearch.trim()}%`)
-        .neq("user_id", user?.id || "")
-        .limit(10);
+        .rpc("search_profiles_for_invite", { search_term: inviteSearch.trim() });
       setInviteResults(profiles || []);
     } catch { setInviteResults([]); }
     finally { setInviteSearching(false); }
