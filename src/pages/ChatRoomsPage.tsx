@@ -233,11 +233,9 @@ export default function ChatRoomsPage() {
                       {members.filter(m => m.status === "approved").length} member{members.filter(m => m.status === "approved").length !== 1 ? "s" : ""}
                     </p>
                   </div>
-                  {isCreator && (
-                    <Button variant="outline" size="sm" onClick={() => setShowInviteDialog(true)}>
-                      <UserPlus className="h-4 w-4 mr-1" /> Invite
-                    </Button>
-                  )}
+                  <Button variant="outline" size="sm" onClick={() => setShowInviteDialog(true)}>
+                    <UserPlus className="h-4 w-4 mr-1" /> Invite
+                  </Button>
                 </div>
 
                 {/* Messages */}
