@@ -718,6 +718,19 @@ export type Database = {
         Args: { admin_note?: string; request_id: string }
         Returns: undefined
       }
+      search_profiles_by_role: {
+        Args: {
+          search_term: string
+          target_role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: {
+          email: string
+          full_name: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+          username: string
+        }[]
+      }
       search_profiles_for_invite: {
         Args: { search_term: string }
         Returns: {

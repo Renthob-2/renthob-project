@@ -84,11 +84,7 @@ export default function ChatRoomsPage() {
     setInviteSearching(true);
     try {
       const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, email, username")
-        .or(`email.ilike.%${inviteSearch.trim()}%,username.ilike.%${inviteSearch.trim()}%,full_name.ilike.%${inviteSearch.trim()}%`)
-        .neq("user_id", user?.id || "")
-        .limit(10);
+        .rpc("search_profiles_for_invite", { search_term: inviteSearch.trim() });
       setInviteResults(profiles || []);
     } catch { setInviteResults([]); }
     finally { setInviteSearching(false); }
@@ -237,11 +233,9 @@ export default function ChatRoomsPage() {
                       {members.filter(m => m.status === "approved").length} member{members.filter(m => m.status === "approved").length !== 1 ? "s" : ""}
                     </p>
                   </div>
-                  {isCreator && (
-                    <Button variant="outline" size="sm" onClick={() => setShowInviteDialog(true)}>
-                      <UserPlus className="h-4 w-4 mr-1" /> Invite
-                    </Button>
-                  )}
+                  <Button variant="outline" size="sm" onClick={() => setShowInviteDialog(true)}>
+                    <UserPlus className="h-4 w-4 mr-1" /> Invite
+                  </Button>
                 </div>
 
                 {/* Messages */}

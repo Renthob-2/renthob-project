@@ -48,9 +48,12 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
     setSearching(true);
     setHasSearched(true);
     try {
-      // Search profiles using secure function
+      // Search profiles filtered by role using secure RPC
       const { data: profiles, error: profileError } = await supabase
-        .rpc("search_profiles_for_invite", { search_term: searchEmail.trim() });
+        .rpc("search_profiles_by_role", { 
+          search_term: searchEmail.trim(),
+          target_role: targetRole 
+        });
 
       if (profileError) throw profileError;
 
@@ -60,20 +63,9 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
         return;
       }
 
-      // Check which of these users have the target role
-      const userIds = profiles.map((p) => p.user_id);
-      const { data: roles, error: roleError } = await supabase
-        .from("user_roles")
-        .select("user_id, role")
-        .in("user_id", userIds)
-        .eq("role", targetRole);
-
-      if (roleError) throw roleError;
-
-      const matchedUserIds = new Set((roles || []).map((r) => r.user_id));
       const filtered: FoundUser[] = profiles
-        .filter((p) => matchedUserIds.has(p.user_id) && p.user_id !== user?.id)
-        .map((p) => ({ ...p, role: targetRole }));
+        .filter((p: any) => p.user_id !== user?.id)
+        .map((p: any) => ({ user_id: p.user_id, full_name: p.full_name, email: p.email, role: targetRole }));
 
       setResults(filtered);
     } catch (err: any) {
