@@ -1,54 +1,58 @@
 
-# Add Agent Section to Homepage
 
-## Overview
-Add a third CTA card on the homepage for Agents, alongside the existing Renter and Landlord sections. This will provide visibility and a clear signup path for real estate agents who want to use the platform to manage listings on behalf of landlords.
+## Fix: WhatsApp Property Share — Encoding and Redirect Issues
 
-## Current State
-The homepage has a CTA section with two cards:
-- **For Renters**: Encouraging users to search and apply for properties
-- **For Landlords**: Encouraging property owners to list their properties
+### Problems Identified
 
-## Changes Required
+1. **Naira symbol (₦) showing as garbled text ("â‚¦")** — The `escapeHtml` function is converting the `₦` character unnecessarily. WhatsApp's in-app browser may not handle the raw UTF-8 properly when it appears in HTML attributes. We should use the HTML entity `&#8358;` instead of the raw `₦` character.
 
-### File: `src/pages/LandingPage.tsx`
+2. **Redirect URL is hardcoded** — The canonical URL is hardcoded to `https://eazhob.lovable.app` on line 45. This works but should use the published URL dynamically for future-proofing.
 
-1. **Import an Agent-appropriate icon**
-   - Add `Briefcase` or `UserCheck` from lucide-react for the Agent card
+### Plan
 
-2. **Update the CTA grid layout**
-   - Change from `lg:grid-cols-2` to `lg:grid-cols-3` for the three-card layout
+**File: `supabase/functions/og-property/index.ts`**
 
-3. **Add Agent CTA Card**
-   - Position after the Landlord card
-   - Use a distinct gradient (e.g., purple-themed to match the agent badge color used elsewhere)
-   - Include relevant Agent benefits:
-     - Manage multiple client properties
-     - Track leads and inquiries
-     - Professional dashboard tools
-     - Earn commissions efficiently
+1. Replace the raw `₦` character in `ogTitle` (line 38) with the HTML entity `&#8358;` so it renders correctly across all browsers and WhatsApp's preview.
 
-### Design Consistency
-- The Agent card will follow the same visual structure as Renter and Landlord cards
-- Uses gradient background, icon header, benefit list with checkmarks, and CTA button
-- Links to `/signup?role=agent`
+2. Also add a `&#x20A6;` numeric reference as a fallback approach — actually, simplest fix: use `"NGN "` or the HTML entity `&#8358;` in the title string, and keep the raw `₦` only in the plain-text body (not inside HTML attributes).
 
-## Visual Layout
+3. Update `escapeHtml` to also handle non-ASCII currency symbols by encoding them as HTML numeric entities, or simply replace `₦` with `&#8358;` before inserting into HTML.
 
-```text
-Before (2 columns):
-┌─────────────────┐  ┌─────────────────┐
-│   For Renters   │  │  For Landlords  │
-└─────────────────┘  └─────────────────┘
+**Concrete change:**
+- Line 38: Change `₦${price}` to use the HTML-safe Naira representation
+- Best approach: build `ogTitle` with a plain "NGN" or "₦" and then let `escapeHtml` handle it by adding Unicode-aware encoding, OR simply hardcode `&#8358;` for the Naira sign in the HTML template (not in `escapeHtml` input).
 
-After (3 columns):
-┌────────────┐  ┌────────────┐  ┌────────────┐
-│ For Renters│  │For Landlords│ │ For Agents │
-└────────────┘  └────────────┘  └────────────┘
+Since `escapeHtml` is called on `ogTitle`, the simplest fix:
+```typescript
+const ogTitle = `${property.title} - \u20A6${price}/${property.price_period}`;
+```
+This uses the actual Unicode codepoint. The real issue is that `escapeHtml` doesn't break this — the HTML already declares `charset=utf-8`. The garbled display suggests the Deno runtime or response might not be sending proper UTF-8 bytes.
+
+**Root cause fix:** Encode the response body explicitly as UTF-8 using `TextEncoder`:
+```typescript
+const encoder = new TextEncoder();
+return new Response(encoder.encode(html), {
+  headers: {
+    ...corsHeaders,
+    "Content-Type": "text/html; charset=utf-8",
+    "Cache-Control": "public, max-age=300",
+  },
+});
 ```
 
-## Implementation Summary
-- Modify 1 file: `src/pages/LandingPage.tsx`
-- Add Briefcase icon import
-- Update grid to 3 columns
-- Add Agent card with benefits list and signup CTA
+Or alternatively, avoid the issue entirely by using HTML entities in the template:
+```typescript
+const naira = "&#8358;";
+// Use naira in the HTML directly, not through escapeHtml
+```
+
+### Final Approach (2 changes in one file)
+
+**`supabase/functions/og-property/index.ts`:**
+
+1. Use HTML entity `&#8358;` for the Naira sign in the HTML output to avoid any UTF-8 encoding issues
+2. Build two versions of the title: one with raw `₦` for the redirect body text, one with `&#8358;` for meta tags
+3. Ensure the redirect URL points to the published app URL (`https://eazhob.lovable.app/property/{id}`) — this is already correct
+
+This single edge function update will fix the garbled Naira symbol on WhatsApp previews and ensure clicking the link correctly opens the property page.
+
