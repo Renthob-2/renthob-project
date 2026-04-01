@@ -6,6 +6,21 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const SOCIAL_CRAWLER_SIGNATURES = [
+  "facebookexternalhit",
+  "facebot",
+  "meta-externalagent",
+  "twitterbot",
+  "xbot",
+  "linkedinbot",
+  "slackbot",
+  "discordbot",
+  "telegrambot",
+  "skypeuripreview",
+  "googlebot",
+  "bingbot",
+];
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -43,6 +58,21 @@ Deno.serve(async (req) => {
     : `${property.bedrooms} bed, ${property.bathrooms} bath property in ${escapeHtml(locationStr)}. Available on Renthob.`;
 
   const canonicalUrl = `https://eazhob.lovable.app/property/${propertyId}`;
+  const sharedHeaders = {
+    ...corsHeaders,
+    "Cache-Control": "public, max-age=300",
+    Vary: "User-Agent",
+  };
+
+  if (!isSocialCrawler(req)) {
+    return new Response(null, {
+      status: 302,
+      headers: {
+        ...sharedHeaders,
+        Location: canonicalUrl,
+      },
+    });
+  }
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -50,6 +80,7 @@ Deno.serve(async (req) => {
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>${ogTitle}</title>
+  <link rel="canonical" href="${escapeHtml(canonicalUrl)}"/>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website"/>
@@ -66,25 +97,24 @@ Deno.serve(async (req) => {
   <meta name="twitter:title" content="${ogTitle}"/>
   <meta name="twitter:description" content="${ogDescription}"/>
   <meta name="twitter:image" content="${escapeHtml(image)}"/>
-
-  <!-- Redirect human visitors to the real app -->
-  <meta http-equiv="refresh" content="0;url=${escapeHtml(canonicalUrl)}"/>
-  <script>window.location.replace("${escapeHtml(canonicalUrl)}");</script>
 </head>
 <body>
-  <p>Redirecting to <a href="${escapeHtml(canonicalUrl)}">${escapeHtml(propertyTitle)}</a>... If not redirected, <a href="${escapeHtml(canonicalUrl)}">click here</a>.</p>
+  <p>Open this listing: <a href="${escapeHtml(canonicalUrl)}">${propertyTitle}</a></p>
 </body>
 </html>`;
 
-  const encoder = new TextEncoder();
-  return new Response(encoder.encode(html), {
+  return new Response(html, {
     headers: {
-      ...corsHeaders,
+      ...sharedHeaders,
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "public, max-age=300",
     },
   });
 });
+
+function isSocialCrawler(req: Request): boolean {
+  const userAgent = req.headers.get("user-agent")?.toLowerCase() ?? "";
+  return SOCIAL_CRAWLER_SIGNATURES.some((signature) => userAgent.includes(signature));
+}
 
 function escapeHtml(str: string): string {
   return str
