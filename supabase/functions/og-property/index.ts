@@ -35,28 +35,25 @@ Deno.serve(async (req) => {
   const image = property.images?.[0] || "";
   const price = Number(property.price).toLocaleString();
   const locationStr = `${property.location}, ${property.city}, ${property.state}`;
-  const ogTitle = `${property.title} - ₦${price}/${property.price_period}`;
+  const naira = "&#8358;";
+  const ogTitle = `${escapeHtml(property.title)} - ${naira}${price}/${property.price_period}`;
   const ogDescription = property.description
-    ? property.description.substring(0, 160)
-    : `${property.bedrooms} bed, ${property.bathrooms} bath property in ${locationStr}. Available on Renthob.`;
+    ? escapeHtml(property.description.substring(0, 160))
+    : `${property.bedrooms} bed, ${property.bathrooms} bath property in ${escapeHtml(locationStr)}. Available on Renthob.`;
 
-  // The canonical app URL the user should land on
-  const siteOrigin = Deno.env.get("SITE_URL") || `${supabaseUrl.replace('.supabase.co', '')}.lovable.app`;
   const canonicalUrl = `https://eazhob.lovable.app/property/${propertyId}`;
 
-  // Serve a full HTML page with OG meta tags so crawlers (WhatsApp, Facebook, Twitter) can read them.
-  // The page auto-redirects the human visitor to the real SPA.
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>${escapeHtml(ogTitle)}</title>
+  <title>${ogTitle}</title>
 
   <!-- Open Graph -->
   <meta property="og:type" content="website"/>
-  <meta property="og:title" content="${escapeHtml(ogTitle)}"/>
-  <meta property="og:description" content="${escapeHtml(ogDescription)}"/>
+  <meta property="og:title" content="${ogTitle}"/>
+  <meta property="og:description" content="${ogDescription}"/>
   <meta property="og:image" content="${escapeHtml(image)}"/>
   <meta property="og:image:width" content="1200"/>
   <meta property="og:image:height" content="630"/>
@@ -65,19 +62,20 @@ Deno.serve(async (req) => {
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image"/>
-  <meta name="twitter:title" content="${escapeHtml(ogTitle)}"/>
-  <meta name="twitter:description" content="${escapeHtml(ogDescription)}"/>
+  <meta name="twitter:title" content="${ogTitle}"/>
+  <meta name="twitter:description" content="${ogDescription}"/>
   <meta name="twitter:image" content="${escapeHtml(image)}"/>
 
   <!-- Redirect human visitors to the real app -->
   <meta http-equiv="refresh" content="0;url=${escapeHtml(canonicalUrl)}"/>
 </head>
 <body>
-  <p>Redirecting to <a href="${escapeHtml(canonicalUrl)}">${escapeHtml(ogTitle)}</a>...</p>
+  <p>Redirecting to <a href="${escapeHtml(canonicalUrl)}">${ogTitle}</a>...</p>
 </body>
 </html>`;
 
-  return new Response(html, {
+  const encoder = new TextEncoder();
+  return new Response(encoder.encode(html), {
     headers: {
       ...corsHeaders,
       "Content-Type": "text/html; charset=utf-8",
