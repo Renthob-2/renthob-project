@@ -36,7 +36,8 @@ Deno.serve(async (req) => {
   const price = Number(property.price).toLocaleString();
   const locationStr = `${property.location}, ${property.city}, ${property.state}`;
   const naira = "&#8358;";
-  const ogTitle = `${escapeHtml(property.title)} - ${naira}${price}/${property.price_period}`;
+  const propertyTitle = escapeHtml(property.title);
+  const ogTitle = `${propertyTitle} - ${naira}${price}/${property.price_period}`;
   const ogDescription = property.description
     ? escapeHtml(property.description.substring(0, 160))
     : `${property.bedrooms} bed, ${property.bathrooms} bath property in ${escapeHtml(locationStr)}. Available on Renthob.`;
