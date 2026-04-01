@@ -68,9 +68,10 @@ Deno.serve(async (req) => {
 
   <!-- Redirect human visitors to the real app -->
   <meta http-equiv="refresh" content="0;url=${escapeHtml(canonicalUrl)}"/>
+  <script>window.location.replace("${escapeHtml(canonicalUrl)}");</script>
 </head>
 <body>
-  <p>Redirecting to <a href="${escapeHtml(canonicalUrl)}">${ogTitle}</a>...</p>
+  <p>Redirecting to <a href="${escapeHtml(canonicalUrl)}">${escapeHtml(propertyTitle)}</a>... If not redirected, <a href="${escapeHtml(canonicalUrl)}">click here</a>.</p>
 </body>
 </html>`;
 
