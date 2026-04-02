@@ -251,6 +251,18 @@ export default function SignupPage() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="referralCode">Referral Code <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                <Input
+                  id="referralCode"
+                  name="referralCode"
+                  placeholder="Enter referral code"
+                  value={formData.referralCode}
+                  onChange={handleInputChange}
+                  disabled={isLoading}
+                />
+              </div>
+
               <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
                 {isLoading ? (
                   <>
