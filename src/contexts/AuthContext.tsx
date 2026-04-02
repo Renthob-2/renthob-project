@@ -150,7 +150,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               }
             }
           }
-          }
           
           // Use setTimeout to avoid potential race conditions with Supabase
           setTimeout(() => {
