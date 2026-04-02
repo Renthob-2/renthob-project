@@ -20,6 +20,7 @@ import TenantDashboard from "./pages/dashboards/TenantDashboard";
 import TenantProfileSetup from "./pages/TenantProfileSetup";
 import LandlordDashboard from "./pages/dashboards/LandlordDashboard";
 import AgentDashboard from "./pages/dashboards/AgentDashboard";
+import AffiliateDashboard from "./pages/dashboards/AffiliateDashboard";
 import CreateListingPage from "./pages/CreateListingPage";
 import EditPropertyPage from "./pages/EditPropertyPage";
 import MyPropertiesPage from "./pages/MyPropertiesPage";
