@@ -91,6 +91,11 @@ const App = () => (
                   <AgentDashboard />
                 </ProtectedRoute>
               } />
+              <Route path="/dashboard/affiliate" element={
+                <ProtectedRoute allowedRoles={["affiliate"]}>
+                  <AffiliateDashboard />
+                </ProtectedRoute>
+              } />
               
               {/* Property Management Routes */}
               <Route path="/property/create" element={
