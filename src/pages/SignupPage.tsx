@@ -65,7 +65,8 @@ export default function SignupPage() {
       formData.email,
       formData.password,
       formData.fullName,
-      selectedRole
+      selectedRole,
+      formData.referralCode || undefined
     );
 
     setIsLoading(false);
