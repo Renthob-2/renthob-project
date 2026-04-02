@@ -128,8 +128,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     console.error("Failed to create role request:", requestError);
                   }
                 }
+
+                // Track referral signup if referral code was provided
+                const referralCode = currentSession.user.user_metadata?.referral_code;
+                if (referralCode) {
+                  // Look up the affiliate by referral code
+                  const { data: affiliateUserId } = await supabase.rpc("get_affiliate_by_code", { code: referralCode });
+                  if (affiliateUserId && affiliateUserId !== userId) {
+                    const { error: refError } = await supabase
+                      .from("referral_signups")
+                      .insert({
+                        referred_user_id: userId,
+                        affiliate_user_id: affiliateUserId,
+                        referral_code_used: referralCode,
+                      } as any);
+                    if (refError) {
+                      console.error("Failed to track referral:", refError);
+                    }
+                  }
+                }
               }
             }
+          }
           }
           
           // Use setTimeout to avoid potential race conditions with Supabase
