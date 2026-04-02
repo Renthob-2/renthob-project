@@ -44,6 +44,7 @@ const navItems = [
   { title: "Verifications", url: "/admin/verifications", icon: ShieldCheck },
   { title: "Applications", url: "/admin/applications", icon: FileText },
   { title: "Announcements", url: "/admin/announcements", icon: Megaphone },
+  { title: "Affiliates", url: "/admin/affiliates", icon: Link2 },
   { title: "Activity Log", url: "/admin/activity", icon: ClipboardList },
 ];
 
