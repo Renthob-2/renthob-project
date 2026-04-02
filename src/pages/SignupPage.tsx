@@ -34,11 +34,13 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailSent, setShowEmailSent] = useState(false);
+  const referralCode = searchParams.get("ref") || "";
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
+    referralCode: referralCode,
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
