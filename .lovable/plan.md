@@ -1,58 +1,51 @@
+## Affiliate Program — Full Implementation Plan
 
+### 1. Database Schema (Migration)
+Create the following tables:
 
-## Fix: WhatsApp Property Share — Encoding and Redirect Issues
+- **`affiliate_profiles`** — Stores affiliate-specific data
+  - `user_id`, `referral_code` (unique), `commission_rate` (admin-configurable, default 5%), `is_active`, `total_earnings`, `available_balance`, `created_at`
 
-### Problems Identified
+- **`referral_signups`** — Tracks who signed up using which code
+  - `referred_user_id`, `affiliate_user_id`, `referral_code_used`, `status` (signed_up → verified → converted), `created_at`
 
-1. **Naira symbol (₦) showing as garbled text ("â‚¦")** — The `escapeHtml` function is converting the `₦` character unnecessarily. WhatsApp's in-app browser may not handle the raw UTF-8 properly when it appears in HTML attributes. We should use the HTML entity `&#8358;` instead of the raw `₦` character.
+- **`affiliate_commissions`** — Earned commissions per transaction
+  - `affiliate_user_id`, `referral_signup_id`, `property_id`, `transaction_amount`, `commission_rate`, `commission_amount`, `status` (pending → approved → paid), `created_at`
 
-2. **Redirect URL is hardcoded** — The canonical URL is hardcoded to `https://eazhob.lovable.app` on line 45. This works but should use the published URL dynamically for future-proofing.
+- **`affiliate_withdrawals`** — Withdrawal requests
+  - `affiliate_user_id`, `amount`, `status` (pending → approved → paid → rejected), `admin_note`, `reviewed_by`, `created_at`, `reviewed_at`
 
-### Plan
+- Add `affiliate` to the `app_role` enum
 
-**File: `supabase/functions/og-property/index.ts`**
+- RLS: Affiliates see own data; admins see/manage all
 
-1. Replace the raw `₦` character in `ogTitle` (line 38) with the HTML entity `&#8358;` so it renders correctly across all browsers and WhatsApp's preview.
+### 2. Signup Flow Update
+- Add optional "referral code" field on the signup page
+- Store referral code in `user_metadata` during signup
+- On first sign-in, create a `referral_signups` record linking the new user to the affiliate
 
-2. Also add a `&#x20A6;` numeric reference as a fallback approach — actually, simplest fix: use `"NGN "` or the HTML entity `&#8358;` in the title string, and keep the raw `₦` only in the plain-text body (not inside HTML attributes).
+### 3. Anti-Abuse Measures
+- Prevent self-referral (affiliate can't use own code)
+- Require email verification before referral counts
+- Delay affiliate activation until profile is complete
 
-3. Update `escapeHtml` to also handle non-ASCII currency symbols by encoding them as HTML numeric entities, or simply replace `₦` with `&#8358;` before inserting into HTML.
+### 4. Affiliate Dashboard (`/dashboard/affiliate`)
+- Overview: referral link/code, total clicks, signups, conversions, earnings
+- Referral list with statuses
+- Withdrawal request form + history
+- Copy referral link button
 
-**Concrete change:**
-- Line 38: Change `₦${price}` to use the HTML-safe Naira representation
-- Best approach: build `ogTitle` with a plain "NGN" or "₦" and then let `escapeHtml` handle it by adding Unicode-aware encoding, OR simply hardcode `&#8358;` for the Naira sign in the HTML template (not in `escapeHtml` input).
+### 5. Admin Affiliate Management (`/admin/affiliates`)
+- View all affiliates, their stats, and commission rates
+- Adjust commission % per affiliate
+- Approve/reject withdrawal requests
+- View referral chains and conversion data
 
-Since `escapeHtml` is called on `ogTitle`, the simplest fix:
-```typescript
-const ogTitle = `${property.title} - \u20A6${price}/${property.price_period}`;
-```
-This uses the actual Unicode codepoint. The real issue is that `escapeHtml` doesn't break this — the HTML already declares `charset=utf-8`. The garbled display suggests the Deno runtime or response might not be sending proper UTF-8 bytes.
+### 6. Commission Logic
+- Commission earned only on successful transaction (rental application approved)
+- Single commission per deal even if affiliate referred both parties
+- Admin can manually approve/adjust commissions
 
-**Root cause fix:** Encode the response body explicitly as UTF-8 using `TextEncoder`:
-```typescript
-const encoder = new TextEncoder();
-return new Response(encoder.encode(html), {
-  headers: {
-    ...corsHeaders,
-    "Content-Type": "text/html; charset=utf-8",
-    "Cache-Control": "public, max-age=300",
-  },
-});
-```
-
-Or alternatively, avoid the issue entirely by using HTML entities in the template:
-```typescript
-const naira = "&#8358;";
-// Use naira in the HTML directly, not through escapeHtml
-```
-
-### Final Approach (2 changes in one file)
-
-**`supabase/functions/og-property/index.ts`:**
-
-1. Use HTML entity `&#8358;` for the Naira sign in the HTML output to avoid any UTF-8 encoding issues
-2. Build two versions of the title: one with raw `₦` for the redirect body text, one with `&#8358;` for meta tags
-3. Ensure the redirect URL points to the published app URL (`https://eazhob.lovable.app/property/{id}`) — this is already correct
-
-This single edge function update will fix the garbled Naira symbol on WhatsApp previews and ensure clicking the link correctly opens the property page.
-
+### 7. Routes
+- `/dashboard/affiliate` — Affiliate dashboard (protected, affiliate role)
+- `/admin/affiliates` — Admin affiliate management page

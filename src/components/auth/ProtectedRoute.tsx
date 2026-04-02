@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
-type AppRole = "tenant" | "landlord" | "agent" | "admin";
+type AppRole = "tenant" | "landlord" | "agent" | "admin" | "affiliate";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -28,7 +28,8 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     // Redirect to their appropriate dashboard
     const dashboardPath = role === "tenant" ? "/dashboard/tenant" 
       : role === "landlord" ? "/dashboard/landlord" 
-      : role === "admin" ? "/dashboard/admin"
+      : role === "admin" ? "/admin"
+      : role === "affiliate" ? "/dashboard/affiliate"
       : "/dashboard/agent";
     return <Navigate to={dashboardPath} replace />;
   }

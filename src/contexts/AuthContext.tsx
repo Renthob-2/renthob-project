@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-type AppRole = "tenant" | "landlord" | "agent" | "admin";
+type AppRole = "tenant" | "landlord" | "agent" | "admin" | "affiliate";
 
 interface Profile {
   id: string;
@@ -22,7 +22,7 @@ interface AuthContextType {
   profile: Profile | null;
   role: AppRole | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, role: AppRole, referralCode?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -128,6 +128,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     console.error("Failed to create role request:", requestError);
                   }
                 }
+
+                // Track referral signup if referral code was provided
+                const referralCode = currentSession.user.user_metadata?.referral_code;
+                if (referralCode) {
+                  // Look up the affiliate by referral code
+                  const { data: affiliateUserId } = await supabase.rpc("get_affiliate_by_code", { code: referralCode });
+                  if (affiliateUserId && affiliateUserId !== userId) {
+                    const { error: refError } = await supabase
+                      .from("referral_signups")
+                      .insert({
+                        referred_user_id: userId,
+                        affiliate_user_id: affiliateUserId,
+                        referral_code_used: referralCode,
+                      } as any);
+                    if (refError) {
+                      console.error("Failed to track referral:", refError);
+                    }
+                  }
+                }
               }
             }
           }
@@ -162,7 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, role: AppRole) => {
+  const signUp = async (email: string, password: string, fullName: string, role: AppRole, referralCode?: string) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -172,6 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: {
             full_name: fullName,
             app_role: role,
+            referral_code: referralCode || null,
           },
         },
       });

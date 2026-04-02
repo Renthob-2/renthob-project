@@ -20,6 +20,7 @@ import TenantDashboard from "./pages/dashboards/TenantDashboard";
 import TenantProfileSetup from "./pages/TenantProfileSetup";
 import LandlordDashboard from "./pages/dashboards/LandlordDashboard";
 import AgentDashboard from "./pages/dashboards/AgentDashboard";
+import AffiliateDashboard from "./pages/dashboards/AffiliateDashboard";
 import CreateListingPage from "./pages/CreateListingPage";
 import EditPropertyPage from "./pages/EditPropertyPage";
 import MyPropertiesPage from "./pages/MyPropertiesPage";
@@ -38,6 +39,7 @@ import AdminApplicationsPage from "./pages/admin/AdminApplicationsPage";
 import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
 import AdminActivityPage from "./pages/admin/AdminActivityPage";
 import AdminRoleRequestsPage from "./pages/admin/AdminRoleRequestsPage";
+import AdminAffiliatesPage from "./pages/admin/AdminAffiliatesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -87,6 +89,11 @@ const App = () => (
               <Route path="/dashboard/agent" element={
                 <ProtectedRoute allowedRoles={["agent"]}>
                   <AgentDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/affiliate" element={
+                <ProtectedRoute allowedRoles={["affiliate"]}>
+                  <AffiliateDashboard />
                 </ProtectedRoute>
               } />
               
@@ -143,6 +150,7 @@ const App = () => (
               <Route path="applications" element={<AdminApplicationsPage />} />
               <Route path="announcements" element={<AdminAnnouncementsPage />} />
               <Route path="activity" element={<AdminActivityPage />} />
+              <Route path="affiliates" element={<AdminAffiliatesPage />} />
             </Route>
             
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

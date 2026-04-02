@@ -44,6 +44,138 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_commissions: {
+        Row: {
+          affiliate_user_id: string
+          commission_amount: number
+          commission_rate: number
+          created_at: string
+          id: string
+          property_id: string | null
+          referral_signup_id: string | null
+          status: string
+          transaction_amount: number
+          updated_at: string
+        }
+        Insert: {
+          affiliate_user_id: string
+          commission_amount: number
+          commission_rate: number
+          created_at?: string
+          id?: string
+          property_id?: string | null
+          referral_signup_id?: string | null
+          status?: string
+          transaction_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          affiliate_user_id?: string
+          commission_amount?: number
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          property_id?: string | null
+          referral_signup_id?: string | null
+          status?: string
+          transaction_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_commissions_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_commissions_referral_signup_id_fkey"
+            columns: ["referral_signup_id"]
+            isOneToOne: false
+            referencedRelation: "referral_signups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_profiles: {
+        Row: {
+          available_balance: number
+          commission_rate: number
+          created_at: string
+          id: string
+          is_active: boolean
+          referral_code: string
+          total_earnings: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_balance?: number
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          referral_code: string
+          total_earnings?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_balance?: number
+          commission_rate?: number
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          referral_code?: string
+          total_earnings?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      affiliate_withdrawals: {
+        Row: {
+          account_name: string | null
+          account_number: string | null
+          admin_note: string | null
+          affiliate_user_id: string
+          amount: number
+          bank_name: string | null
+          created_at: string
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          account_name?: string | null
+          account_number?: string | null
+          admin_note?: string | null
+          affiliate_user_id: string
+          amount: number
+          bank_name?: string | null
+          created_at?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          account_name?: string | null
+          account_number?: string | null
+          admin_note?: string | null
+          affiliate_user_id?: string
+          amount?: number
+          bank_name?: string | null
+          created_at?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       announcements: {
         Row: {
           admin_id: string
@@ -388,6 +520,36 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_signups: {
+        Row: {
+          affiliate_user_id: string
+          created_at: string
+          id: string
+          referral_code_used: string
+          referred_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          affiliate_user_id: string
+          created_at?: string
+          id?: string
+          referral_code_used: string
+          referred_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          affiliate_user_id?: string
+          created_at?: string
+          id?: string
+          referral_code_used?: string
+          referred_user_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       rental_applications: {
         Row: {
           applicant_id: string
@@ -691,6 +853,7 @@ export type Database = {
         Args: { admin_note?: string; request_id: string }
         Returns: undefined
       }
+      get_affiliate_by_code: { Args: { code: string }; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -742,7 +905,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "tenant" | "landlord" | "agent" | "admin"
+      app_role: "tenant" | "landlord" | "agent" | "admin" | "affiliate"
       property_status: "draft" | "pending" | "active" | "rented" | "inactive"
       property_type:
         | "apartment"
@@ -883,7 +1046,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["tenant", "landlord", "agent", "admin"],
+      app_role: ["tenant", "landlord", "agent", "admin", "affiliate"],
       property_status: ["draft", "pending", "active", "rented", "inactive"],
       property_type: [
         "apartment",

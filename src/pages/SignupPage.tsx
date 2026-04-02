@@ -34,11 +34,13 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailSent, setShowEmailSent] = useState(false);
+  const referralCode = searchParams.get("ref") || "";
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
     confirmPassword: "",
+    referralCode: referralCode,
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +65,8 @@ export default function SignupPage() {
       formData.email,
       formData.password,
       formData.fullName,
-      selectedRole
+      selectedRole,
+      formData.referralCode || undefined
     );
 
     setIsLoading(false);
@@ -245,6 +248,18 @@ export default function SignupPage() {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   required
+                  disabled={isLoading}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="referralCode">Referral Code <span className="text-muted-foreground text-xs">(optional)</span></Label>
+                <Input
+                  id="referralCode"
+                  name="referralCode"
+                  placeholder="Enter referral code"
+                  value={formData.referralCode}
+                  onChange={handleInputChange}
                   disabled={isLoading}
                 />
               </div>
