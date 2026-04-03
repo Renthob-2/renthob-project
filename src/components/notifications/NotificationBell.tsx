@@ -1,4 +1,5 @@
 import { Bell, Check, CheckCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -77,6 +78,11 @@ export function NotificationBell() {
             ))
           )}
         </ScrollArea>
+        <div className="border-t px-4 py-2">
+          <Button variant="ghost" size="sm" className="w-full text-xs" asChild>
+            <Link to="/notifications">View all notifications</Link>
+          </Button>
+        </div>
       </PopoverContent>
     </Popover>
   );

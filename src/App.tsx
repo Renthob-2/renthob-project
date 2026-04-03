@@ -40,6 +40,7 @@ import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
 import AdminActivityPage from "./pages/admin/AdminActivityPage";
 import AdminRoleRequestsPage from "./pages/admin/AdminRoleRequestsPage";
 import AdminAffiliatesPage from "./pages/admin/AdminAffiliatesPage";
+import NotificationsPage from "./pages/NotificationsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -131,6 +132,11 @@ const App = () => (
               <Route path="/saved" element={
                 <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
                   <SavedPropertiesPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/notifications" element={
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin", "affiliate"]}>
+                  <NotificationsPage />
                 </ProtectedRoute>
               } />
             </Route>
