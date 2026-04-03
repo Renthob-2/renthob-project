@@ -11,8 +11,15 @@ import { BackButton } from "@/components/BackButton";
 
 const typeConfig: Record<string, { emoji: string; label: string }> = {
   commission_earned: { emoji: "💰", label: "Commission" },
-  withdrawal_approved: { emoji: "✅", label: "Approved" },
-  withdrawal_rejected: { emoji: "❌", label: "Rejected" },
+  withdrawal_approved: { emoji: "✅", label: "Withdrawal Approved" },
+  withdrawal_rejected: { emoji: "❌", label: "Withdrawal Rejected" },
+  new_application: { emoji: "📋", label: "New Application" },
+  new_tour_request: { emoji: "🏠", label: "Tour Request" },
+  application_reviewing: { emoji: "🔍", label: "Under Review" },
+  application_approved: { emoji: "🎉", label: "App. Approved" },
+  application_rejected: { emoji: "📝", label: "App. Rejected" },
+  tour_confirmed: { emoji: "✅", label: "Tour Confirmed" },
+  tour_declined: { emoji: "🚫", label: "Tour Declined" },
 };
 
 export default function NotificationsPage() {
@@ -23,7 +30,13 @@ export default function NotificationsPage() {
     ? notifications
     : filter === "unread"
       ? notifications.filter((n) => !n.is_read)
-      : notifications.filter((n) => n.type === filter);
+      : filter === "tour"
+        ? notifications.filter((n) => n.type.startsWith("tour_") || n.type === "new_tour_request")
+        : filter === "withdrawal"
+          ? notifications.filter((n) => n.type.startsWith("withdrawal_"))
+          : filter === "new_application"
+            ? notifications.filter((n) => n.type === "new_application" || n.type.startsWith("application_"))
+            : notifications.filter((n) => n.type === filter);
 
   if (loading) {
     return (
@@ -63,9 +76,10 @@ export default function NotificationsPage() {
               </Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="new_application" className="text-xs">📋 Applications</TabsTrigger>
+          <TabsTrigger value="tour" className="text-xs">🏠 Tours</TabsTrigger>
           <TabsTrigger value="commission_earned" className="text-xs">💰 Commissions</TabsTrigger>
-          <TabsTrigger value="withdrawal_approved" className="text-xs">✅ Approved</TabsTrigger>
-          <TabsTrigger value="withdrawal_rejected" className="text-xs">❌ Rejected</TabsTrigger>
+          <TabsTrigger value="withdrawal" className="text-xs">💳 Withdrawals</TabsTrigger>
         </TabsList>
 
         <TabsContent value={filter} className="mt-4 space-y-2">
