@@ -78,6 +78,11 @@ export function NotificationBell() {
             ))
           )}
         </ScrollArea>
+        <div className="border-t px-4 py-2">
+          <Button variant="ghost" size="sm" className="w-full text-xs" asChild>
+            <Link to="/notifications">View all notifications</Link>
+          </Button>
+        </div>
       </PopoverContent>
     </Popover>
   );
