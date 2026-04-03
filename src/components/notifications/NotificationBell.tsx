@@ -16,14 +16,17 @@ export function NotificationBell() {
 
   const typeIcon = (type: string) => {
     switch (type) {
-      case "commission_earned":
-        return "💰";
-      case "withdrawal_approved":
-        return "✅";
-      case "withdrawal_rejected":
-        return "❌";
-      default:
-        return "🔔";
+      case "commission_earned": return "💰";
+      case "withdrawal_approved": return "✅";
+      case "withdrawal_rejected": return "❌";
+      case "new_application": return "📋";
+      case "new_tour_request": return "🏠";
+      case "application_reviewing": return "🔍";
+      case "application_approved": return "🎉";
+      case "application_rejected": return "📝";
+      case "tour_confirmed": return "✅";
+      case "tour_declined": return "🚫";
+      default: return "🔔";
     }
   };
 
