@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Home, Menu, X, LogOut, User, Mail, Settings, Users, Heart } from "lucide-react";
+import { Home, Menu, X, LogOut, User, Mail, Settings, Users, Heart, Bell } from "lucide-react";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMessages } from "@/hooks/useMessages";
@@ -100,7 +101,9 @@ export function Header() {
           {loading ? (
             <div className="h-9 w-20 bg-muted animate-pulse rounded-md" />
           ) : user ? (
-            <DropdownMenu>
+            <>
+              <NotificationBell />
+              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 px-2">
                   <Avatar className="h-8 w-8">
@@ -167,6 +170,7 @@ export function Header() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </>
           ) : (
             <>
               <Button variant="ghost" asChild>
