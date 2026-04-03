@@ -70,9 +70,10 @@ export default function NotificationsPage() {
               </Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="new_application" className="text-xs">📋 Applications</TabsTrigger>
+          <TabsTrigger value="tour" className="text-xs">🏠 Tours</TabsTrigger>
           <TabsTrigger value="commission_earned" className="text-xs">💰 Commissions</TabsTrigger>
-          <TabsTrigger value="withdrawal_approved" className="text-xs">✅ Approved</TabsTrigger>
-          <TabsTrigger value="withdrawal_rejected" className="text-xs">❌ Rejected</TabsTrigger>
+          <TabsTrigger value="withdrawal" className="text-xs">💳 Withdrawals</TabsTrigger>
         </TabsList>
 
         <TabsContent value={filter} className="mt-4 space-y-2">
