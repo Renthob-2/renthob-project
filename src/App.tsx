@@ -134,6 +134,11 @@ const App = () => (
                   <SavedPropertiesPage />
                 </ProtectedRoute>
               } />
+              <Route path="/notifications" element={
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin", "affiliate"]}>
+                  <NotificationsPage />
+                </ProtectedRoute>
+              } />
             </Route>
 
             {/* Admin Routes - with sidebar layout */}
