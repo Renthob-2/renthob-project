@@ -101,7 +101,9 @@ export function Header() {
           {loading ? (
             <div className="h-9 w-20 bg-muted animate-pulse rounded-md" />
           ) : user ? (
-            <DropdownMenu>
+            <>
+              <NotificationBell />
+              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 px-2">
                   <Avatar className="h-8 w-8">
