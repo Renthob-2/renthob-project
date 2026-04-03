@@ -30,7 +30,13 @@ export default function NotificationsPage() {
     ? notifications
     : filter === "unread"
       ? notifications.filter((n) => !n.is_read)
-      : notifications.filter((n) => n.type === filter);
+      : filter === "tour"
+        ? notifications.filter((n) => n.type.startsWith("tour_") || n.type === "new_tour_request")
+        : filter === "withdrawal"
+          ? notifications.filter((n) => n.type.startsWith("withdrawal_"))
+          : filter === "new_application"
+            ? notifications.filter((n) => n.type === "new_application" || n.type.startsWith("application_"))
+            : notifications.filter((n) => n.type === filter);
 
   if (loading) {
     return (
