@@ -11,8 +11,15 @@ import { BackButton } from "@/components/BackButton";
 
 const typeConfig: Record<string, { emoji: string; label: string }> = {
   commission_earned: { emoji: "💰", label: "Commission" },
-  withdrawal_approved: { emoji: "✅", label: "Approved" },
-  withdrawal_rejected: { emoji: "❌", label: "Rejected" },
+  withdrawal_approved: { emoji: "✅", label: "Withdrawal Approved" },
+  withdrawal_rejected: { emoji: "❌", label: "Withdrawal Rejected" },
+  new_application: { emoji: "📋", label: "New Application" },
+  new_tour_request: { emoji: "🏠", label: "Tour Request" },
+  application_reviewing: { emoji: "🔍", label: "Under Review" },
+  application_approved: { emoji: "🎉", label: "App. Approved" },
+  application_rejected: { emoji: "📝", label: "App. Rejected" },
+  tour_confirmed: { emoji: "✅", label: "Tour Confirmed" },
+  tour_declined: { emoji: "🚫", label: "Tour Declined" },
 };
 
 export default function NotificationsPage() {
