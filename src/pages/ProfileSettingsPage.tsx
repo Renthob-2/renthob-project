@@ -229,6 +229,9 @@ export default function ProfileSettingsPage() {
           </CardContent>
         </Card>
 
+        {/* Notification Preferences */}
+        <NotificationPreferencesCard />
+
         <Separator />
 
         {/* Password */}
