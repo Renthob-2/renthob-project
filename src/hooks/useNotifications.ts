@@ -19,6 +19,7 @@ export function useNotifications() {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const { preferences } = useNotificationPreferences();
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
