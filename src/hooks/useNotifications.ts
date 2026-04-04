@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { playNotificationSound, showBrowserNotification } from "@/utils/notificationSound";
+import { useNotificationPreferences } from "@/hooks/useNotificationPreferences";
 
 export interface Notification {
   id: string;
@@ -18,6 +19,7 @@ export function useNotifications() {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+  const { preferences } = useNotificationPreferences();
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
@@ -69,8 +71,8 @@ export function useNotifications() {
         (payload) => {
           const newNotif = payload.new as Notification;
           setNotifications((prev) => [newNotif, ...prev]);
-          playNotificationSound();
-          showBrowserNotification(newNotif.title, newNotif.message);
+          if (preferences.sound_enabled) playNotificationSound();
+          if (preferences.browser_notifications) showBrowserNotification(newNotif.title, newNotif.message);
         }
       )
       .subscribe();
