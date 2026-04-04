@@ -71,8 +71,8 @@ export function useNotifications() {
         (payload) => {
           const newNotif = payload.new as Notification;
           setNotifications((prev) => [newNotif, ...prev]);
-          playNotificationSound();
-          showBrowserNotification(newNotif.title, newNotif.message);
+          if (preferences.sound_enabled) playNotificationSound();
+          if (preferences.browser_notifications) showBrowserNotification(newNotif.title, newNotif.message);
         }
       )
       .subscribe();
