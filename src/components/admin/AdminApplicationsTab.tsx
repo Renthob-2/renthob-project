@@ -1,14 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { FileText, Check, X } from "lucide-react";
+import { FileText } from "lucide-react";
 import type { AdminApplication, AdminTourRequest } from "@/hooks/useAdminData";
 
 interface AdminApplicationsTabProps {
   applications: AdminApplication[];
   tourRequests: AdminTourRequest[];
-  onUpdateAppStatus: (id: string, status: string) => void;
-  onUpdateTourStatus: (id: string, status: string) => void;
 }
 
 const statusBadge: Record<string, string> = {
@@ -20,7 +17,7 @@ const statusBadge: Record<string, string> = {
 };
 
 export function AdminApplicationsTab({
-  applications, tourRequests, onUpdateAppStatus, onUpdateTourStatus,
+  applications, tourRequests,
 }: AdminApplicationsTabProps) {
   return (
     <div className="space-y-6">
@@ -64,16 +61,6 @@ export function AdminApplicationsTab({
                         Applied: {new Date(app.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                    {app.status === "pending" && (
-                      <div className="flex items-center gap-2">
-                        <Button size="sm" onClick={() => onUpdateAppStatus(app.id, "approved")}>
-                          <Check className="h-4 w-4 mr-1" /> Approve
-                        </Button>
-                        <Button size="sm" variant="destructive" onClick={() => onUpdateAppStatus(app.id, "rejected")}>
-                          <X className="h-4 w-4 mr-1" /> Reject
-                        </Button>
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
@@ -103,19 +90,9 @@ export function AdminApplicationsTab({
                       Tenant: {tour.tenant_name} • {new Date(tour.preferred_date).toLocaleDateString()} at {tour.preferred_time}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className={statusBadge[tour.status] || "bg-muted"}>{tour.status}</Badge>
-                    {tour.status === "pending" && (
-                      <>
-                        <Button size="sm" variant="outline" onClick={() => onUpdateTourStatus(tour.id, "confirmed")}>
-                          Confirm
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => onUpdateTourStatus(tour.id, "cancelled")}>
-                          Cancel
-                        </Button>
-                      </>
-                    )}
-                  </div>
+                   <div className="flex items-center gap-2">
+                     <Badge className={statusBadge[tour.status] || "bg-muted"}>{tour.status}</Badge>
+                   </div>
                 </div>
               ))}
             </div>
