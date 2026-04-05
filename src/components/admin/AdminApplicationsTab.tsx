@@ -7,8 +7,6 @@ import type { AdminApplication, AdminTourRequest } from "@/hooks/useAdminData";
 interface AdminApplicationsTabProps {
   applications: AdminApplication[];
   tourRequests: AdminTourRequest[];
-  onUpdateAppStatus: (id: string, status: string) => void;
-  onUpdateTourStatus: (id: string, status: string) => void;
 }
 
 const statusBadge: Record<string, string> = {
