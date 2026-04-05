@@ -50,6 +50,9 @@ export default function AdminAffiliatesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [editingRate, setEditingRate] = useState<{ id: string; rate: string } | null>(null);
+  const [editingCode, setEditingCode] = useState<{ id: string; code: string } | null>(null);
+  const [emailInput, setEmailInput] = useState("");
+  const [addingByEmail, setAddingByEmail] = useState(false);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -92,7 +95,6 @@ export default function AdminAffiliatesPage() {
   const addAffiliate = async (userId: string) => {
     const code = "REF" + Math.random().toString(36).substring(2, 8).toUpperCase();
     
-    // Create affiliate profile
     const { error: profileError } = await supabase.from("affiliate_profiles").insert({
       user_id: userId,
       referral_code: code,
@@ -103,7 +105,6 @@ export default function AdminAffiliatesPage() {
       return;
     }
 
-    // Update user role to affiliate
     const { error: roleError } = await supabase.from("user_roles").update({ role: "affiliate" as any }).eq("user_id", userId);
     if (roleError) {
       console.error("Role update error:", roleError);
@@ -113,7 +114,65 @@ export default function AdminAffiliatesPage() {
     setAddOpen(false);
     setSearchTerm("");
     setSearchResults([]);
+    setEmailInput("");
     fetchAll();
+  };
+
+  const addAffiliateByEmail = async () => {
+    if (!emailInput.trim()) return;
+    setAddingByEmail(true);
+    try {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, email")
+        .eq("email", emailInput.trim().toLowerCase())
+        .maybeSingle();
+
+      if (!profile) {
+        toast({ title: "User Not Found", description: "No account found with that email address.", variant: "destructive" });
+        return;
+      }
+
+      const existing = affiliates.find(a => a.user_id === profile.user_id);
+      if (existing) {
+        toast({ title: "Already an Affiliate", description: `${profile.full_name || profile.email} is already an affiliate.`, variant: "destructive" });
+        return;
+      }
+
+      await addAffiliate(profile.user_id);
+    } finally {
+      setAddingByEmail(false);
+    }
+  };
+
+  const removeAffiliate = async (affiliate: AffiliateWithProfile) => {
+    // Delete affiliate profile
+    const { error: delError } = await supabase.from("affiliate_profiles").delete().eq("id", affiliate.id);
+    if (delError) {
+      toast({ title: "Error", description: delError.message, variant: "destructive" });
+      return;
+    }
+
+    // Revert role back to tenant
+    await supabase.from("user_roles").update({ role: "tenant" as any }).eq("user_id", affiliate.user_id);
+
+    toast({ title: "Affiliate Removed", description: `${affiliate.full_name || "User"} has been removed from the affiliate program.` });
+    fetchAll();
+  };
+
+  const updateReferralCode = async (affiliateId: string, newCode: string) => {
+    if (!newCode.trim()) {
+      toast({ title: "Error", description: "Referral code cannot be empty.", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("affiliate_profiles").update({ referral_code: newCode.trim().toUpperCase() } as any).eq("id", affiliateId);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Referral Code Updated" });
+      setEditingCode(null);
+      fetchAll();
+    }
   };
 
   const updateCommissionRate = async (affiliateId: string, newRate: number) => {
@@ -139,7 +198,6 @@ export default function AdminAffiliatesPage() {
       return;
     }
 
-    // If approved, deduct from available balance
     if (status === "approved") {
       const aff = affiliates.find(a => a.user_id === affiliateUserId);
       if (aff) {
@@ -199,6 +257,29 @@ export default function AdminAffiliatesPage() {
                 <DialogTitle>Add New Affiliate</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-2">
+                {/* Add by email */}
+                <div className="space-y-2">
+                  <Label>Add by email address</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      value={emailInput}
+                      onChange={e => setEmailInput(e.target.value)}
+                      placeholder="user@example.com"
+                      onKeyDown={e => e.key === "Enter" && addAffiliateByEmail()}
+                    />
+                    <Button size="sm" onClick={addAffiliateByEmail} disabled={addingByEmail || !emailInput.trim()}>
+                      {addingByEmail ? "Adding..." : "Add"}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+                  <div className="relative flex justify-center text-xs uppercase"><span className="bg-background px-2 text-muted-foreground">or search</span></div>
+                </div>
+
+                {/* Search by name */}
                 <div className="space-y-2">
                   <Label>Search user by name or email</Label>
                   <Input value={searchTerm} onChange={e => searchUsers(e.target.value)} placeholder="Type to search..." />
@@ -286,7 +367,19 @@ export default function AdminAffiliatesPage() {
                           <p className="text-xs text-muted-foreground">{a.email}</p>
                         </div>
                       </TableCell>
-                      <TableCell className="font-mono text-sm">{a.referral_code}</TableCell>
+                      <TableCell>
+                        {editingCode?.id === a.id ? (
+                          <div className="flex gap-1">
+                            <Input className="w-24 h-7 text-sm font-mono" value={editingCode.code} onChange={e => setEditingCode({ ...editingCode, code: e.target.value })} />
+                            <Button size="sm" variant="outline" className="h-7" onClick={() => updateReferralCode(a.id, editingCode.code)}>Save</Button>
+                            <Button size="sm" variant="ghost" className="h-7" onClick={() => setEditingCode(null)}>✕</Button>
+                          </div>
+                        ) : (
+                          <button className="font-mono text-sm hover:underline" onClick={() => setEditingCode({ id: a.id, code: a.referral_code })}>
+                            {a.referral_code}
+                          </button>
+                        )}
+                      </TableCell>
                       <TableCell>
                         {editingRate?.id === a.id ? (
                           <div className="flex gap-1">
@@ -307,9 +400,14 @@ export default function AdminAffiliatesPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button size="sm" variant="outline" onClick={() => toggleActive(a.id, a.is_active)}>
-                          {a.is_active ? "Deactivate" : "Activate"}
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="outline" onClick={() => toggleActive(a.id, a.is_active)}>
+                            {a.is_active ? "Deactivate" : "Activate"}
+                          </Button>
+                          <Button size="sm" variant="destructive" onClick={() => removeAffiliate(a)}>
+                            Remove
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
