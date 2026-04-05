@@ -62,16 +62,6 @@ export function AdminApplicationsTab({
                         Applied: {new Date(app.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                    {app.status === "pending" && (
-                      <div className="flex items-center gap-2">
-                        <Button size="sm" onClick={() => onUpdateAppStatus(app.id, "approved")}>
-                          <Check className="h-4 w-4 mr-1" /> Approve
-                        </Button>
-                        <Button size="sm" variant="destructive" onClick={() => onUpdateAppStatus(app.id, "rejected")}>
-                          <X className="h-4 w-4 mr-1" /> Reject
-                        </Button>
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
