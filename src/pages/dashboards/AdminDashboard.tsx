@@ -96,8 +96,6 @@ export default function AdminDashboard() {
             <AdminApplicationsTab
               applications={applications}
               tourRequests={tourRequests}
-              onUpdateAppStatus={updateApplicationStatus}
-              onUpdateTourStatus={updateTourStatus}
             />
           </TabsContent>
           <TabsContent value="activity">

@@ -18,7 +18,7 @@ const statusBadge: Record<string, string> = {
 };
 
 export function AdminApplicationsTab({
-  applications, tourRequests, onUpdateAppStatus, onUpdateTourStatus,
+  applications, tourRequests,
 }: AdminApplicationsTabProps) {
   return (
     <div className="space-y-6">
