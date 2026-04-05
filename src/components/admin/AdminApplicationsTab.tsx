@@ -91,19 +91,9 @@ export function AdminApplicationsTab({
                       Tenant: {tour.tenant_name} • {new Date(tour.preferred_date).toLocaleDateString()} at {tour.preferred_time}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className={statusBadge[tour.status] || "bg-muted"}>{tour.status}</Badge>
-                    {tour.status === "pending" && (
-                      <>
-                        <Button size="sm" variant="outline" onClick={() => onUpdateTourStatus(tour.id, "confirmed")}>
-                          Confirm
-                        </Button>
-                        <Button size="sm" variant="ghost" onClick={() => onUpdateTourStatus(tour.id, "cancelled")}>
-                          Cancel
-                        </Button>
-                      </>
-                    )}
-                  </div>
+                   <div className="flex items-center gap-2">
+                     <Badge className={statusBadge[tour.status] || "bg-muted"}>{tour.status}</Badge>
+                   </div>
                 </div>
               ))}
             </div>
