@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Search, Check, X, Eye } from "lucide-react";
+import { Building2, Search, Check, X, MessageSquare } from "lucide-react";
+import { ComposeMessageDialog } from "@/components/messaging/ComposeMessageDialog";
 import type { AdminProperty } from "@/hooks/useAdminData";
 
 interface AdminPropertiesTabProps {
