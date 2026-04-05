@@ -4,7 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Search, Check, X, Eye } from "lucide-react";
+import { Building2, Search, Check, X, MessageSquare } from "lucide-react";
+import { ComposeMessageDialog } from "@/components/messaging/ComposeMessageDialog";
 import type { AdminProperty } from "@/hooks/useAdminData";
 
 interface AdminPropertiesTabProps {
@@ -93,7 +94,19 @@ export function AdminPropertiesTab({ properties, onUpdateStatus }: AdminProperti
                       <span>Owner: {prop.owner_name}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <ComposeMessageDialog
+                      recipientId={prop.owner_id}
+                      recipientName={prop.owner_name || "Property Owner"}
+                      propertyId={prop.id}
+                      propertyTitle={prop.title}
+                      defaultSubject={`Regarding: ${prop.title}`}
+                      trigger={
+                        <Button size="sm" variant="outline">
+                          <MessageSquare className="h-4 w-4 mr-1" /> Message Owner
+                        </Button>
+                      }
+                    />
                     {prop.status === "pending" && (
                       <>
                         <Button size="sm" variant="default" onClick={() => onUpdateStatus(prop.id, "active")}>
