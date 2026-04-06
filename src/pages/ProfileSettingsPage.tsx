@@ -233,6 +233,9 @@ export default function ProfileSettingsPage() {
         {/* Notification Preferences */}
         <NotificationPreferencesCard />
 
+        {/* Affiliate Program */}
+        <AffiliateSignupCard />
+
         <Separator />
 
         {/* Password */}
