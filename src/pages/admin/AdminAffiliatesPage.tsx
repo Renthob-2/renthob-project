@@ -231,6 +231,8 @@ export default function AdminAffiliatesPage() {
   };
 
   const pendingWithdrawals = withdrawals.filter(w => w.status === "pending");
+  const pendingApplications = affiliates.filter(a => !a.is_active);
+  const activeAffiliates = affiliates.filter(a => a.is_active);
   const totalAffiliateEarnings = affiliates.reduce((sum, a) => sum + a.total_earnings, 0);
 
   if (loading) {
