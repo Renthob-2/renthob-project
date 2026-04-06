@@ -3,13 +3,12 @@ import { AdminStatsCards } from "@/components/admin/AdminStatsCards";
 import type { AdminDataContext } from "@/types/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, AlertCircle } from "lucide-react";
+import { TrendingUp, AlertCircle, Link2, Users, DollarSign, Clock } from "lucide-react";
 
 export default function AdminOverviewPage() {
   const { stats, applications, verifications, users } = useOutletContext<AdminDataContext>();
 
   const recentApps = applications.slice(0, 5);
-  const pendingVerifs = verifications.filter(v => v.status === "pending").slice(0, 5);
   const pendingApprovals = users.filter(u => !(u as any).is_approved);
 
   return (
@@ -20,6 +19,57 @@ export default function AdminOverviewPage() {
       </div>
 
       <AdminStatsCards stats={stats} />
+
+      {/* Affiliate Stats Row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Total Affiliates</p>
+                <p className="text-2xl font-bold">{stats.totalAffiliates}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {stats.activeAffiliates} active · {stats.pendingAffiliates} pending
+                </p>
+              </div>
+              <Link2 className="h-8 w-8 text-primary opacity-30" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Total Referrals</p>
+                <p className="text-2xl font-bold">{stats.totalReferrals}</p>
+              </div>
+              <Users className="h-8 w-8 text-blue-600 opacity-30" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Total Commissions</p>
+                <p className="text-2xl font-bold">₦{stats.totalCommissions.toLocaleString()}</p>
+              </div>
+              <DollarSign className="h-8 w-8 text-green-600 opacity-30" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-muted-foreground">Pending Withdrawals</p>
+                <p className="text-2xl font-bold">{stats.pendingWithdrawals}</p>
+              </div>
+              <Clock className="h-8 w-8 text-yellow-600 opacity-30" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Pending Approvals */}
