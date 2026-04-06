@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Home, Menu, X, LogOut, User, Mail, Settings, Users, Heart, Bell } from "lucide-react";
+import { Home, Menu, X, LogOut, User, Mail, Settings, Users, Heart, Bell, Link2 } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
