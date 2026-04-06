@@ -79,6 +79,12 @@ export interface AdminStats {
   pendingApplications: number;
   pendingTours: number;
   pendingRoleRequests: number;
+  totalAffiliates: number;
+  activeAffiliates: number;
+  pendingAffiliates: number;
+  totalReferrals: number;
+  totalCommissions: number;
+  pendingWithdrawals: number;
 }
 
 export function useAdminData() {
