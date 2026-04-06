@@ -191,11 +191,19 @@ export function useAdminData() {
       });
       setTourRequests(adminTours);
 
-      // Fetch pending role requests count
-      const { count: roleReqCount } = await supabase
-        .from("role_requests")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
+      // Fetch pending role requests count + affiliate data
+      const [{ count: roleReqCount }, affiliatesRes, referralsRes, commissionsRes, withdrawalsRes] = await Promise.all([
+        supabase.from("role_requests").select("*", { count: "exact", head: true }).eq("status", "pending"),
+        supabase.from("affiliate_profiles").select("*"),
+        supabase.from("referral_signups").select("*"),
+        supabase.from("affiliate_commissions").select("*"),
+        supabase.from("affiliate_withdrawals").select("*").eq("status", "pending"),
+      ]);
+
+      const affiliates = affiliatesRes.data || [];
+      const referrals = referralsRes.data || [];
+      const commissions = commissionsRes.data || [];
+      const pendingWithdrawalsData = withdrawalsRes.data || [];
 
       // Calculate stats
       setStats({
@@ -210,6 +218,12 @@ export function useAdminData() {
         pendingApplications: adminApps.filter(a => a.status === "pending").length,
         pendingTours: adminTours.filter(t => t.status === "pending").length,
         pendingRoleRequests: roleReqCount || 0,
+        totalAffiliates: affiliates.length,
+        activeAffiliates: affiliates.filter(a => a.is_active).length,
+        pendingAffiliates: affiliates.filter(a => !a.is_active).length,
+        totalReferrals: referrals.length,
+        totalCommissions: commissions.reduce((sum, c) => sum + Number(c.commission_amount), 0),
+        pendingWithdrawals: pendingWithdrawalsData.length,
       });
     } catch (err) {
       console.error("Admin data fetch error:", err);
