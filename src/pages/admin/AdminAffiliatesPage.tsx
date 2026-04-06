@@ -406,7 +406,7 @@ export default function AdminAffiliatesPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {affiliates.map(a => (
+                  {activeAffiliates.map(a => (
                     <TableRow key={a.id}>
                       <TableCell>
                         <div>
