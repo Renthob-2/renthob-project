@@ -73,7 +73,7 @@ export default function TenantDashboard() {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
           <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2">
             <Link to="/search">
               <Search className="h-6 w-6 text-primary" />
@@ -98,6 +98,12 @@ export default function TenantDashboard() {
             <Link to="/profile/setup">
               <UserCircle className="h-6 w-6 text-primary" />
               <span>Edit Profile</span>
+            </Link>
+          </Button>
+          <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2 border-primary/30">
+            <Link to="/affiliate">
+              <Sparkles className="h-6 w-6 text-primary" />
+              <span>Affiliate</span>
             </Link>
           </Button>
         </div>
