@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Home, Menu, X, LogOut, User, Mail, Settings, Users, Heart, Bell } from "lucide-react";
+import { Home, Menu, X, LogOut, User, Mail, Settings, Users, Heart, Bell, Link2 } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -158,6 +158,12 @@ export function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
+                  <Link to="/affiliate" className="flex items-center gap-2">
+                    <Link2 className="h-4 w-4" />
+                    Affiliate Program
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
                   <Link to="/settings/profile" className="flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     Profile Settings
@@ -257,6 +263,12 @@ export function Header() {
                           {pendingInvites.length}
                         </Badge>
                       )}
+                    </Link>
+                  </Button>
+                  <Button variant="ghost" asChild className="w-full justify-start">
+                    <Link to="/affiliate" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Link2 className="h-4 w-4 mr-2" />
+                      Affiliate Program
                     </Link>
                   </Button>
                   <Button variant="ghost" asChild className="w-full justify-start">

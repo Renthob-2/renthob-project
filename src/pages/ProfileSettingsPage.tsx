@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, Save, User, Lock, Phone, Shield } from "lucide-react";
 import { NotificationPreferencesCard } from "@/components/settings/NotificationPreferencesCard";
+import { AffiliateSignupCard } from "@/components/settings/AffiliateSignupCard";
 
 const roleMeta: Record<string, { label: string; className: string }> = {
   tenant: { label: "Tenant", className: "bg-blue-100 text-blue-700" },
@@ -231,6 +232,9 @@ export default function ProfileSettingsPage() {
 
         {/* Notification Preferences */}
         <NotificationPreferencesCard />
+
+        {/* Affiliate Program */}
+        <AffiliateSignupCard />
 
         <Separator />
 

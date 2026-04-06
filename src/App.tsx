@@ -97,6 +97,11 @@ const App = () => (
                   <AffiliateDashboard />
                 </ProtectedRoute>
               } />
+              <Route path="/affiliate" element={
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin", "affiliate"]}>
+                  <AffiliateDashboard />
+                </ProtectedRoute>
+              } />
               
               {/* Property Management Routes */}
               <Route path="/property/create" element={
@@ -125,7 +130,7 @@ const App = () => (
                 </ProtectedRoute>
               } />
               <Route path="/settings/profile" element={
-                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin"]}>
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin", "affiliate"]}>
                   <ProfileSettingsPage />
                 </ProtectedRoute>
               } />

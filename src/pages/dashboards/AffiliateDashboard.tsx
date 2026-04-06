@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BackButton } from "@/components/BackButton";
 import { useAffiliateData } from "@/hooks/useAffiliateData";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,10 +30,31 @@ export default function AffiliateDashboard() {
   if (!profile) {
     return (
       <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+        <BackButton />
         <Card>
           <CardHeader>
             <CardTitle>Affiliate Program</CardTitle>
-            <CardDescription>Your affiliate account is being set up. Please contact support if this persists.</CardDescription>
+            <CardDescription>
+              You haven't joined the affiliate program yet. Go to your{" "}
+              <a href="/settings/profile" className="text-primary underline">Profile Settings</a>{" "}
+              to apply.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!profile.is_active) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+        <BackButton />
+        <Card>
+          <CardHeader>
+            <CardTitle>Application Pending</CardTitle>
+            <CardDescription>
+              Your affiliate application is awaiting admin approval. You'll be notified once it's reviewed.
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
@@ -73,6 +95,7 @@ export default function AffiliateDashboard() {
 
   return (
     <div className="max-w-5xl mx-auto py-6 px-4 space-y-6">
+      <BackButton />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Affiliate Dashboard</h1>
