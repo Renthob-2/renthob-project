@@ -30,10 +30,31 @@ export default function AffiliateDashboard() {
   if (!profile) {
     return (
       <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+        <BackButton />
         <Card>
           <CardHeader>
             <CardTitle>Affiliate Program</CardTitle>
-            <CardDescription>Your affiliate account is being set up. Please contact support if this persists.</CardDescription>
+            <CardDescription>
+              You haven't joined the affiliate program yet. Go to your{" "}
+              <a href="/settings/profile" className="text-primary underline">Profile Settings</a>{" "}
+              to apply.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!profile.is_active) {
+    return (
+      <div className="max-w-2xl mx-auto py-12 px-4 text-center">
+        <BackButton />
+        <Card>
+          <CardHeader>
+            <CardTitle>Application Pending</CardTitle>
+            <CardDescription>
+              Your affiliate application is awaiting admin approval. You'll be notified once it's reviewed.
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
