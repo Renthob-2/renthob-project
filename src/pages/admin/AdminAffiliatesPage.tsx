@@ -339,11 +339,56 @@ export default function AdminAffiliatesPage() {
 
       <Tabs defaultValue="affiliates">
         <TabsList>
-          <TabsTrigger value="affiliates">Affiliates</TabsTrigger>
+          <TabsTrigger value="affiliates">Active ({activeAffiliates.length})</TabsTrigger>
+          <TabsTrigger value="pending">
+            Applications {pendingApplications.length > 0 && <Badge variant="destructive" className="ml-1 h-5 text-[10px]">{pendingApplications.length}</Badge>}
+          </TabsTrigger>
           <TabsTrigger value="withdrawals">
             Withdrawals {pendingWithdrawals.length > 0 && <Badge variant="destructive" className="ml-1 h-5 text-[10px]">{pendingWithdrawals.length}</Badge>}
           </TabsTrigger>
         </TabsList>
+
+        {/* Pending Applications */}
+        <TabsContent value="pending">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Pending Affiliate Applications</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {pendingApplications.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-6">No pending applications.</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Code</TableHead>
+                      <TableHead>Applied</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pendingApplications.map(a => (
+                      <TableRow key={a.id}>
+                        <TableCell className="font-medium">{a.full_name}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{a.email}</TableCell>
+                        <TableCell className="font-mono text-sm">{a.referral_code}</TableCell>
+                        <TableCell className="text-sm">{format(new Date(a.created_at), "MMM d, yyyy")}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button size="sm" onClick={() => toggleActive(a.id, false)}>Approve</Button>
+                            <Button size="sm" variant="destructive" onClick={() => removeAffiliate(a)}>Reject</Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="affiliates">
           <Card>
