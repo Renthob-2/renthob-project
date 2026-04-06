@@ -130,7 +130,7 @@ const App = () => (
                 </ProtectedRoute>
               } />
               <Route path="/settings/profile" element={
-                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin"]}>
+                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin", "affiliate"]}>
                   <ProfileSettingsPage />
                 </ProtectedRoute>
               } />
