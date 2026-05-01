@@ -1,12 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, MapPin, Instagram, Twitter, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Twitter, MessageCircle, Linkedin } from "lucide-react";
 
 export default function ContactPage() {
   const social = [
     { label: "Instagram", handle: "@userenthob", href: "https://instagram.com/userenthob", icon: Instagram },
     { label: "TikTok", handle: "@userenthob", href: "https://tiktok.com/@userenthob", icon: MessageCircle },
     { label: "X (Twitter)", handle: "@userenthob", href: "https://x.com/userenthob", icon: Twitter },
+    { label: "LinkedIn", handle: "Rental Africa", href: "https://www.linkedin.com/company/rentalafrica/", icon: Linkedin },
   ];
 
   return (
@@ -40,8 +41,8 @@ export default function ContactPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <a href="tel:+2345551234567" className="text-primary hover:underline">
-              (555) 123-4567
+            <a href="tel:+2349161216153" className="text-primary hover:underline">
+              +234 916 121 6153
             </a>
             <p className="text-sm text-muted-foreground mt-2">Mon–Fri, 9am – 6pm WAT.</p>
           </CardContent>
@@ -54,7 +55,7 @@ export default function ContactPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-foreground">Lagos, Nigeria</p>
+            <p className="text-foreground">15 Satellite Junction, FUTA South Gate, Akure, Nigeria</p>
           </CardContent>
         </Card>
       </div>
