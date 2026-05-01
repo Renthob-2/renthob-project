@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Home, Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Twitter, MessageCircle } from "lucide-react";
 
 const footerLinks = {
   company: [
@@ -42,7 +42,7 @@ export function Footer() {
             <div className="space-y-2 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
-                <span>hello@renthob.com</span>
+                <a href="mailto:support@renthob.com" className="hover:text-foreground transition-colors">support@renthob.com</a>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4" />
@@ -52,6 +52,17 @@ export function Footer() {
                 <MapPin className="h-4 w-4" />
                 <span>Lagos, Nigeria</span>
               </div>
+            </div>
+            <div className="flex items-center gap-3 pt-2">
+              <a href="https://instagram.com/userenthob" target="_blank" rel="noopener noreferrer" aria-label="Instagram @userenthob" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a href="https://tiktok.com/@userenthob" target="_blank" rel="noopener noreferrer" aria-label="TikTok @userenthob" className="text-muted-foreground hover:text-foreground transition-colors">
+                <MessageCircle className="h-5 w-5" />
+              </a>
+              <a href="https://x.com/userenthob" target="_blank" rel="noopener noreferrer" aria-label="X @userenthob" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Twitter className="h-5 w-5" />
+              </a>
             </div>
           </div>
 
