@@ -236,7 +236,7 @@ export default function FAQsPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg">
-              <a href="mailto:hello@renthob.com">Contact Support</a>
+              <a href="mailto:support@renthob.com">Contact Support</a>
             </Button>
             <Button asChild size="lg" variant="outline">
               <Link to="/signup">Create Account</Link>
