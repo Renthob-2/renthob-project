@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, Instagram, Twitter, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Twitter, MessageCircle, Linkedin } from "lucide-react";
 
 const footerLinks = {
   company: [
