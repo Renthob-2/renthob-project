@@ -12,6 +12,7 @@ import LandingPage from "./pages/LandingPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
 import FeaturesPage from "./pages/FeaturesPage";
 import FAQsPage from "./pages/FAQsPage";
+import ContactPage from "./pages/ContactPage";
 import SearchPage from "./pages/SearchPage";
 import PropertyDetailPage from "./pages/PropertyDetailPage";
 import SignupPage from "./pages/SignupPage";
