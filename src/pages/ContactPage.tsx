@@ -55,7 +55,7 @@ export default function ContactPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-foreground">Lagos, Nigeria</p>
+            <p className="text-foreground">15 Satellite Junction, FUTA South Gate, Akure, Nigeria</p>
           </CardContent>
         </Card>
       </div>
