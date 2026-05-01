@@ -41,8 +41,8 @@ export default function ContactPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <a href="tel:+2345551234567" className="text-primary hover:underline">
-              (555) 123-4567
+            <a href="tel:+2349161216153" className="text-primary hover:underline">
+              +234 916 121 6153
             </a>
             <p className="text-sm text-muted-foreground mt-2">Mon–Fri, 9am – 6pm WAT.</p>
           </CardContent>
