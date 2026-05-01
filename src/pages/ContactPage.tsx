@@ -1,12 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, MapPin, Instagram, Twitter, MessageCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Twitter, MessageCircle, Linkedin } from "lucide-react";
 
 export default function ContactPage() {
   const social = [
     { label: "Instagram", handle: "@userenthob", href: "https://instagram.com/userenthob", icon: Instagram },
     { label: "TikTok", handle: "@userenthob", href: "https://tiktok.com/@userenthob", icon: MessageCircle },
     { label: "X (Twitter)", handle: "@userenthob", href: "https://x.com/userenthob", icon: Twitter },
+    { label: "LinkedIn", handle: "Rental Africa", href: "https://www.linkedin.com/company/rentalafrica/", icon: Linkedin },
   ];
 
   return (
