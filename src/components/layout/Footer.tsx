@@ -46,11 +46,11 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4" />
-                <span>(555) 123-4567</span>
+                <a href="tel:+2349161216153" className="hover:text-foreground transition-colors">+234 916 121 6153</a>
               </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                <span>Lagos, Nigeria</span>
+              <div className="flex items-start gap-2">
+                <MapPin className="h-4 w-4 mt-0.5" />
+                <span>15 Satellite Junction, FUTA South Gate, Akure</span>
               </div>
             </div>
             <div className="flex items-center gap-3 pt-2">
@@ -62,6 +62,9 @@ export function Footer() {
               </a>
               <a href="https://x.com/userenthob" target="_blank" rel="noopener noreferrer" aria-label="X @userenthob" className="text-muted-foreground hover:text-foreground transition-colors">
                 <Twitter className="h-5 w-5" />
+              </a>
+              <a href="https://www.linkedin.com/company/rentalafrica/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Rental Africa" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Linkedin className="h-5 w-5" />
               </a>
             </div>
           </div>
