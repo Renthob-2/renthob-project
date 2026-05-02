@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, DollarSign, ArrowDownToLine, Plus, RefreshCw, Percent } from "lucide-react";
 import { format } from "date-fns";
+import { AffiliateTermsPanel } from "@/components/admin/AffiliateTermsPanel";
 
 interface AffiliateWithProfile {
   id: string;
