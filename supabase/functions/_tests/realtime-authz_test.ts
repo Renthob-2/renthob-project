@@ -39,7 +39,9 @@ Deno.test("realtime.messages has RLS enabled", async () => {
     console.warn("SUPABASE_SERVICE_ROLE_KEY missing — skipping RLS-enabled check");
     return;
   }
-  const admin = createClient(url, serviceKey);
+  const admin = createClient(url, serviceKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
   const { data, error } = await admin
     .from("pg_class" as any)
     .select("relname,relrowsecurity")
