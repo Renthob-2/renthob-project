@@ -29,9 +29,12 @@ const getDashboardPath = (role: string | null) => {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { signIn, role, user } = useAuth();
   const { toast } = useToast();
-  
+  const justVerified = searchParams.get("verified") === "1";
+  const wasReset = searchParams.get("reset") === "1";
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
