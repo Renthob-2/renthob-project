@@ -7,8 +7,10 @@
 import { assert, assertEquals } from "https://deno.land/std@0.208.0/assert/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
-const url = Deno.env.get("SUPABASE_URL")!;
-const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+const url = Deno.env.get("SUPABASE_URL") ?? "https://njgecwxeuuazcgshkkmj.supabase.co";
+const anonKey = Deno.env.get("SUPABASE_ANON_KEY")
+  ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY")
+  ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qZ2Vjd3hldXVhemNnc2hra21qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MTczNzYsImV4cCI6MjA4NTA5MzM3Nn0.Ss1GJaJ75Hbbjc9zVUMg6gUrneQX8US1KQboL0MXrQc";
 
 Deno.test("anon user cannot join any realtime topic", async () => {
   const anon = createClient(url, anonKey);
