@@ -55,15 +55,19 @@ export default function ResetPasswordPage() {
 
     setIsLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
-    setIsLoading(false);
 
     if (error) {
+      setIsLoading(false);
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;
     }
 
+    // Sign out the recovery session so the user must log in fresh with their new password.
+    await supabase.auth.signOut();
+    setIsLoading(false);
     setSuccess(true);
-    toast({ title: "Password updated", description: "You can now log in with your new password." });
+    toast({ title: "Password updated", description: "Please log in with your new password." });
+    setTimeout(() => navigate("/login?reset=1"), 1500);
   };
 
   if (!isRecovery && !success) {
