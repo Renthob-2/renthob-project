@@ -120,7 +120,7 @@ export default function ResetPasswordPage() {
                     <CheckCircle className="h-8 w-8 text-green-600" />
                   </div>
                 </div>
-                <Button className="w-full" onClick={() => navigate("/login")}>
+                <Button className="w-full" onClick={() => navigate("/login?reset=1")}>
                   Go to Login
                 </Button>
               </div>
