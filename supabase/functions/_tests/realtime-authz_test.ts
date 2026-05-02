@@ -13,7 +13,9 @@ const anonKey = Deno.env.get("SUPABASE_ANON_KEY")
   ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qZ2Vjd3hldXVhemNnc2hra21qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MTczNzYsImV4cCI6MjA4NTA5MzM3Nn0.Ss1GJaJ75Hbbjc9zVUMg6gUrneQX8US1KQboL0MXrQc";
 
 Deno.test("anon user cannot join any realtime topic", async () => {
-  const anon = createClient(url, anonKey);
+  const anon = createClient(url, anonKey, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
   const topics = [
     "user-00000000-0000-0000-0000-000000000000",
     "chat-room-00000000-0000-0000-0000-000000000000",
