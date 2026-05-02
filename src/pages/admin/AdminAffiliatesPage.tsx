@@ -347,7 +347,15 @@ export default function AdminAffiliatesPage() {
           <TabsTrigger value="withdrawals">
             Withdrawals {pendingWithdrawals.length > 0 && <Badge variant="destructive" className="ml-1 h-5 text-[10px]">{pendingWithdrawals.length}</Badge>}
           </TabsTrigger>
+          <TabsTrigger value="terms">Terms</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="terms">
+          <AffiliateTermsPanel
+            activeAffiliateCount={activeAffiliates.length}
+            onApplied={fetchAll}
+          />
+        </TabsContent>
 
         {/* Pending Applications */}
         <TabsContent value="pending">
