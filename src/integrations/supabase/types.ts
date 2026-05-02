@@ -457,6 +457,36 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           agency_name: string | null
@@ -930,6 +960,10 @@ export type Database = {
       approve_role_request: {
         Args: { admin_note?: string; request_id: string }
         Returns: undefined
+      }
+      bulk_update_affiliate_commission: {
+        Args: { new_rate: number; target_user_ids?: string[] }
+        Returns: number
       }
       can_join_realtime_topic: { Args: { topic: string }; Returns: boolean }
       get_affiliate_by_code: { Args: { code: string }; Returns: string }
