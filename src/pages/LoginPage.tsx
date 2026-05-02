@@ -97,6 +97,21 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {(justVerified || wasReset) && (
+              <div className="mb-4 flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3">
+                <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-green-800">
+                    {justVerified ? "Email verified!" : "Password updated!"}
+                  </p>
+                  <p className="text-green-700 text-xs">
+                    {justVerified
+                      ? "Your account is ready. Log in to continue."
+                      : "Use your new password to log in."}
+                  </p>
+                </div>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
