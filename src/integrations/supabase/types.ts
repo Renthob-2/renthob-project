@@ -931,6 +931,7 @@ export type Database = {
         Args: { admin_note?: string; request_id: string }
         Returns: undefined
       }
+      can_join_realtime_topic: { Args: { topic: string }; Returns: boolean }
       get_affiliate_by_code: { Args: { code: string }; Returns: string }
       get_user_role: {
         Args: { _user_id: string }
