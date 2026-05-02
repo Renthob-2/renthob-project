@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Home, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Home, Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -29,9 +29,12 @@ const getDashboardPath = (role: string | null) => {
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { signIn, role, user } = useAuth();
   const { toast } = useToast();
-  
+  const justVerified = searchParams.get("verified") === "1";
+  const wasReset = searchParams.get("reset") === "1";
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
@@ -94,6 +97,21 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {(justVerified || wasReset) && (
+              <div className="mb-4 flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3">
+                <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-green-800">
+                    {justVerified ? "Email verified!" : "Password updated!"}
+                  </p>
+                  <p className="text-green-700 text-xs">
+                    {justVerified
+                      ? "Your account is ready. Log in to continue."
+                      : "Use your new password to log in."}
+                  </p>
+                </div>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

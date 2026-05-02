@@ -89,6 +89,17 @@ export function useAffiliateData() {
       toast({ title: "Error", description: "Insufficient balance", variant: "destructive" });
       return;
     }
+    // Enforce platform-wide minimum withdrawal amount
+    const { data: minSetting } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "min_withdrawal_amount")
+      .maybeSingle();
+    const minAmount = minSetting?.value ? Number(minSetting.value) : 0;
+    if (amount < minAmount) {
+      toast({ title: "Below minimum", description: `Minimum withdrawal is ₦${minAmount.toLocaleString()}.`, variant: "destructive" });
+      return;
+    }
     const { error } = await supabase.from("affiliate_withdrawals").insert({
       affiliate_user_id: user.id,
       amount,

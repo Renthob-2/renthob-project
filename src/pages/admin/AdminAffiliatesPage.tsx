@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, DollarSign, ArrowDownToLine, Plus, RefreshCw, Percent } from "lucide-react";
 import { format } from "date-fns";
+import { AffiliateTermsPanel } from "@/components/admin/AffiliateTermsPanel";
 
 interface AffiliateWithProfile {
   id: string;
@@ -94,10 +95,19 @@ export default function AdminAffiliatesPage() {
 
   const addAffiliate = async (userId: string) => {
     const code = "REF" + Math.random().toString(36).substring(2, 8).toUpperCase();
-    
+
+    // Pull current default commission rate from platform settings
+    const { data: setting } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "default_affiliate_commission_rate")
+      .maybeSingle();
+    const defaultRate = setting?.value ? Number(setting.value) : 5;
+
     const { error: profileError } = await supabase.from("affiliate_profiles").insert({
       user_id: userId,
       referral_code: code,
+      commission_rate: defaultRate,
     } as any);
 
     if (profileError) {
@@ -346,7 +356,15 @@ export default function AdminAffiliatesPage() {
           <TabsTrigger value="withdrawals">
             Withdrawals {pendingWithdrawals.length > 0 && <Badge variant="destructive" className="ml-1 h-5 text-[10px]">{pendingWithdrawals.length}</Badge>}
           </TabsTrigger>
+          <TabsTrigger value="terms">Terms</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="terms">
+          <AffiliateTermsPanel
+            activeAffiliateCount={activeAffiliates.length}
+            onApplied={fetchAll}
+          />
+        </TabsContent>
 
         {/* Pending Applications */}
         <TabsContent value="pending">
