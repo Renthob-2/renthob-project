@@ -95,10 +95,19 @@ export default function AdminAffiliatesPage() {
 
   const addAffiliate = async (userId: string) => {
     const code = "REF" + Math.random().toString(36).substring(2, 8).toUpperCase();
-    
+
+    // Pull current default commission rate from platform settings
+    const { data: setting } = await supabase
+      .from("platform_settings")
+      .select("value")
+      .eq("key", "default_affiliate_commission_rate")
+      .maybeSingle();
+    const defaultRate = setting?.value ? Number(setting.value) : 5;
+
     const { error: profileError } = await supabase.from("affiliate_profiles").insert({
       user_id: userId,
       referral_code: code,
+      commission_rate: defaultRate,
     } as any);
 
     if (profileError) {
