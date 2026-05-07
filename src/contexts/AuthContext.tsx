@@ -93,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const interval = setInterval(() => {
       if (user) {
         fetchRole(user.id);
+        fetchAffiliate(user.id);
       }
     }, 60000);
 
