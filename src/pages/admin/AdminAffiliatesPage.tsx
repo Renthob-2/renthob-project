@@ -162,8 +162,7 @@ export default function AdminAffiliatesPage() {
       return;
     }
 
-    // Revert role back to tenant
-    await supabase.from("user_roles").update({ role: "tenant" as any }).eq("user_id", affiliate.user_id);
+    // Affiliate is an add-on; primary user_roles entry is left untouched.
 
     toast({ title: "Affiliate Removed", description: `${affiliate.full_name || "User"} has been removed from the affiliate program.` });
     fetchAll();
