@@ -221,6 +221,37 @@ export function AffiliateTermsPanel({ activeAffiliateCount, onApplied }: Affilia
               </AlertDialogContent>
             </AlertDialog>
           </div>
+
+          <div className="pt-2 border-t">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div className="flex-1 min-w-[200px]">
+                <p className="text-sm font-medium">Reset all affiliates to defaults</p>
+                <p className="text-xs text-muted-foreground">
+                  Reverts every active affiliate's commission rate to the saved default ({defaultRate}%). Minimum withdrawal (₦{Number(minWithdrawal).toLocaleString()}) is platform-wide and applies automatically.
+                </p>
+              </div>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" disabled={applying || activeAffiliateCount === 0}>
+                    {applying ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RotateCcw className="h-4 w-4 mr-2" />}
+                    Reset to defaults
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset all affiliates to defaults?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will revert the commission rate for all <strong>{activeAffiliateCount}</strong> active affiliate(s) to the platform default of <strong>{defaultRate}%</strong>. The minimum withdrawal of <strong>₦{Number(minWithdrawal).toLocaleString()}</strong> is enforced platform-wide and will apply automatically.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetToDefaults}>Yes, reset</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
