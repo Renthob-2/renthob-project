@@ -103,6 +103,38 @@ export function AffiliateTermsPanel({ activeAffiliateCount, onApplied }: Affilia
     }
   };
 
+  const handleResetToDefaults = async () => {
+    const rate = parseFloat(defaultRate);
+    if (isNaN(rate) || rate < 0 || rate > 100) {
+      toast({ title: "Invalid default", description: "Save a valid default rate first.", variant: "destructive" });
+      return;
+    }
+    setApplying(true);
+    const { data, error } = await supabase.rpc("bulk_update_affiliate_commission", {
+      new_rate: rate,
+      target_user_ids: null,
+    });
+    setApplying(false);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Reset complete", description: `Reset ${data} affiliate(s) to default ${rate}%. Minimum withdrawal applies platform-wide.` });
+      onApplied?.();
+    }
+  };
+    const { data, error } = await supabase.rpc("bulk_update_affiliate_commission", {
+      new_rate: rate,
+      target_user_ids: null,
+    });
+    setApplying(false);
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Applied", description: `Updated ${data} active affiliate(s) to ${rate}%.` });
+      onApplied?.();
+    }
+  };
+
   if (loading) {
     return (
       <Card>
