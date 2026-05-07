@@ -253,6 +253,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         profile,
         role,
+        isAffiliate,
+        affiliateActive,
         loading,
         signUp,
         signIn,
