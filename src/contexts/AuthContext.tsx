@@ -76,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (currentUser) {
       await fetchProfile(currentUser.id);
       await fetchRole(currentUser.id);
+      await fetchAffiliate(currentUser.id);
     }
   };
 
