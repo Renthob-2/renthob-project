@@ -171,10 +171,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setTimeout(() => {
             fetchProfile(userId);
             fetchRole(userId);
+            fetchAffiliate(userId);
           }, 0);
         } else {
           setProfile(null);
           setRole(null);
+          setIsAffiliate(false);
+          setAffiliateActive(false);
         }
         
         setLoading(false);
@@ -189,6 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (existingSession?.user) {
         fetchProfile(existingSession.user.id);
         fetchRole(existingSession.user.id);
+        fetchAffiliate(existingSession.user.id);
       }
       
       setLoading(false);
