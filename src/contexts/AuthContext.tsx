@@ -36,7 +36,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
+  const [isAffiliate, setIsAffiliate] = useState(false);
+  const [affiliateActive, setAffiliateActive] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const fetchAffiliate = async (userId: string) => {
+    const { data } = await supabase
+      .from("affiliate_profiles")
+      .select("is_active")
+      .eq("user_id", userId)
+      .maybeSingle();
+    setIsAffiliate(!!data);
+    setAffiliateActive(!!data?.is_active);
+  };
 
   const fetchProfile = async (userId: string) => {
     const { data: profileData } = await supabase
