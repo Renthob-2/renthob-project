@@ -20,7 +20,7 @@ export function AdminLayout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-muted/30">
+      <div className="min-h-screen flex w-full bg-muted/30 animate-fade-in">
         <AdminSidebar stats={sidebarStats} />
         <div className="flex-1 flex flex-col min-w-0">
           <header className="h-14 flex items-center justify-between border-b bg-card px-4">
