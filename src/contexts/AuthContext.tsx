@@ -249,6 +249,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
     setProfile(null);
     setRole(null);
+    setIsAffiliate(false);
+    setAffiliateActive(false);
     await supabase.auth.signOut();
   };
 
