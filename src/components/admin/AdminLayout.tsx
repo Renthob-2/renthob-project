@@ -1,8 +1,8 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "./AdminSidebar";
 import { useAdminData } from "@/hooks/useAdminData";
-import { Shield, RefreshCw } from "lucide-react";
+import { Shield, RefreshCw, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -32,9 +32,18 @@ export function AdminLayout() {
                 <p className="text-xs text-muted-foreground">Welcome, {profile?.full_name || "Admin"}</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={adminData.refetch}>
-              <RefreshCw className="h-4 w-4 mr-1" /> Refresh
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/">
+                  <Home className="h-4 w-4 mr-1" />
+                  <span className="hidden sm:inline">Back to site</span>
+                </Link>
+              </Button>
+              <Button variant="outline" size="sm" onClick={adminData.refetch}>
+                <RefreshCw className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Refresh</span>
+              </Button>
+            </div>
           </header>
           <main className="flex-1 p-6 overflow-auto">
             <Outlet context={adminData} />
