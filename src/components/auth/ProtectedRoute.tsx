@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { user, role, loading } = useAuth();
+  const { user, role, isAffiliate, loading } = useAuth();
 
   if (loading) {
     return (
@@ -24,14 +24,18 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && role && !allowedRoles.includes(role)) {
-    // Redirect to their appropriate dashboard
-    const dashboardPath = role === "tenant" ? "/dashboard/tenant" 
-      : role === "landlord" ? "/dashboard/landlord" 
-      : role === "admin" ? "/admin"
-      : role === "affiliate" ? "/dashboard/affiliate"
-      : "/dashboard/agent";
-    return <Navigate to={dashboardPath} replace />;
+  if (allowedRoles && role) {
+    // Affiliate is an add-on capability — users with an affiliate profile
+    // pass any check that allows "affiliate" while keeping their primary role.
+    const effectiveRoles: AppRole[] = isAffiliate ? [role, "affiliate"] : [role];
+    const allowed = allowedRoles.some(r => effectiveRoles.includes(r));
+    if (!allowed) {
+      const dashboardPath = role === "tenant" ? "/dashboard/tenant"
+        : role === "landlord" ? "/dashboard/landlord"
+        : role === "admin" ? "/admin"
+        : "/dashboard/agent";
+      return <Navigate to={dashboardPath} replace />;
+    }
   }
 
   return <>{children}</>;

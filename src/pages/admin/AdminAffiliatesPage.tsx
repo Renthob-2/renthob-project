@@ -115,10 +115,9 @@ export default function AdminAffiliatesPage() {
       return;
     }
 
-    const { error: roleError } = await supabase.from("user_roles").update({ role: "affiliate" as any }).eq("user_id", userId);
-    if (roleError) {
-      console.error("Role update error:", roleError);
-    }
+    // Note: do NOT change user_roles. Affiliate is an add-on capability —
+    // users keep their primary role (tenant/landlord/agent) and can use the
+    // affiliate dashboard alongside their normal account.
 
     toast({ title: "Affiliate Added", description: `Referral code: ${code}` });
     setAddOpen(false);
@@ -163,8 +162,7 @@ export default function AdminAffiliatesPage() {
       return;
     }
 
-    // Revert role back to tenant
-    await supabase.from("user_roles").update({ role: "tenant" as any }).eq("user_id", affiliate.user_id);
+    // Affiliate is an add-on; primary user_roles entry is left untouched.
 
     toast({ title: "Affiliate Removed", description: `${affiliate.full_name || "User"} has been removed from the affiliate program.` });
     fetchAll();

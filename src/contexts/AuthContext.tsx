@@ -21,6 +21,8 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   role: AppRole | null;
+  isAffiliate: boolean;
+  affiliateActive: boolean;
   loading: boolean;
   signUp: (email: string, password: string, fullName: string, role: AppRole, referralCode?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
@@ -34,7 +36,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
+  const [isAffiliate, setIsAffiliate] = useState(false);
+  const [affiliateActive, setAffiliateActive] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  const fetchAffiliate = async (userId: string) => {
+    const { data } = await supabase
+      .from("affiliate_profiles")
+      .select("is_active")
+      .eq("user_id", userId)
+      .maybeSingle();
+    setIsAffiliate(!!data);
+    setAffiliateActive(!!data?.is_active);
+  };
 
   const fetchProfile = async (userId: string) => {
     const { data: profileData } = await supabase
@@ -62,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (currentUser) {
       await fetchProfile(currentUser.id);
       await fetchRole(currentUser.id);
+      await fetchAffiliate(currentUser.id);
     }
   };
 
@@ -78,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const interval = setInterval(() => {
       if (user) {
         fetchRole(user.id);
+        fetchAffiliate(user.id);
       }
     }, 60000);
 
@@ -155,10 +171,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setTimeout(() => {
             fetchProfile(userId);
             fetchRole(userId);
+            fetchAffiliate(userId);
           }, 0);
         } else {
           setProfile(null);
           setRole(null);
+          setIsAffiliate(false);
+          setAffiliateActive(false);
         }
         
         setLoading(false);
@@ -173,6 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (existingSession?.user) {
         fetchProfile(existingSession.user.id);
         fetchRole(existingSession.user.id);
+        fetchAffiliate(existingSession.user.id);
       }
       
       setLoading(false);
@@ -229,6 +249,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(null);
     setProfile(null);
     setRole(null);
+    setIsAffiliate(false);
+    setAffiliateActive(false);
     await supabase.auth.signOut();
   };
 
@@ -239,6 +261,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         profile,
         role,
+        isAffiliate,
+        affiliateActive,
         loading,
         signUp,
         signIn,
