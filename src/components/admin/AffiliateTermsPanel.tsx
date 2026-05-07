@@ -122,18 +122,6 @@ export function AffiliateTermsPanel({ activeAffiliateCount, onApplied }: Affilia
       onApplied?.();
     }
   };
-    const { data, error } = await supabase.rpc("bulk_update_affiliate_commission", {
-      new_rate: rate,
-      target_user_ids: null,
-    });
-    setApplying(false);
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Applied", description: `Updated ${data} active affiliate(s) to ${rate}%.` });
-      onApplied?.();
-    }
-  };
 
   if (loading) {
     return (
