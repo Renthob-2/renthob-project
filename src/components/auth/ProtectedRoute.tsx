@@ -24,6 +24,11 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/login" replace />;
   }
 
+  // Users without a role yet — send them to settings where they can request one
+  if (allowedRoles && !role) {
+    return <Navigate to="/settings/profile" replace />;
+  }
+
   if (allowedRoles && role) {
     // Affiliate is an add-on capability — users with an affiliate profile
     // pass any check that allows "affiliate" while keeping their primary role.

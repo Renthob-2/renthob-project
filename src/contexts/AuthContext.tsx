@@ -97,9 +97,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }, 60000);
 
+    // Realtime: instantly reflect when admin changes this user's role
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    if (user) {
+      channel = supabase
+        .channel(`user-role-${user.id}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'user_roles', filter: `user_id=eq.${user.id}` },
+          () => {
+            fetchRole(user.id);
+          }
+        )
+        .subscribe();
+    }
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       clearInterval(interval);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [user]);
 
