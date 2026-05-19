@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const navLinks = [
   { href: "/search", label: "Browse Properties" },
+  { href: "/advisor", label: "AI Advisor", highlight: true },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/features", label: "Features" },
   { href: "/faqs", label: "FAQs" },
