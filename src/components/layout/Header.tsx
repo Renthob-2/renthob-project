@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Home, Menu, X, LogOut, User, Mail, Settings, Users, Heart, Bell, Link2 } from "lucide-react";
+import { Home, Menu, X, LogOut, User, Mail, Settings, Users, Heart, Bell, Link2, Sparkles } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -90,8 +90,11 @@ export function Header() {
             <Link
               key={link.href}
               to={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className={`text-sm font-medium transition-colors hover:text-foreground inline-flex items-center gap-1 ${
+                link.highlight ? "text-primary" : "text-muted-foreground"
+              }`}
             >
+              {link.highlight && <Sparkles className="h-3.5 w-3.5" />}
               {link.label}
             </Link>
           ))}
@@ -212,9 +215,12 @@ export function Header() {
               <Link
                 key={link.href}
                 to={link.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground py-2"
+                className={`text-sm font-medium transition-colors hover:text-foreground py-2 inline-flex items-center gap-1 ${
+                  link.highlight ? "text-primary" : "text-muted-foreground"
+                }`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
+                {link.highlight && <Sparkles className="h-3.5 w-3.5" />}
                 {link.label}
               </Link>
             ))}
