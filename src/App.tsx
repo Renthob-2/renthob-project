@@ -14,6 +14,7 @@ import FeaturesPage from "./pages/FeaturesPage";
 import FAQsPage from "./pages/FAQsPage";
 import ContactPage from "./pages/ContactPage";
 import SearchPage from "./pages/SearchPage";
+import SmartAdvisorPage from "./pages/SmartAdvisorPage";
 import PropertyDetailPage from "./pages/PropertyDetailPage";
 import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
@@ -63,6 +64,7 @@ const App = () => (
               <Route path="/faqs" element={<FAQsPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/search" element={<SearchPage />} />
+              <Route path="/advisor" element={<SmartAdvisorPage />} />
               <Route path="/property/:id" element={<PropertyDetailPage />} />
             </Route>
             
