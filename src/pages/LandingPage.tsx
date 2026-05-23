@@ -14,6 +14,7 @@ import {
   ArrowRight,
   Loader2,
   Briefcase,
+  Sparkles,
 } from "lucide-react";
 
 const PROPERTIES_PER_PAGE = 6;
@@ -101,6 +102,27 @@ export default function LandingPage() {
                   Search
                 </Button>
               </div>
+            </div>
+
+            {/* Renthob AI Banner Link Card */}
+            <div className="mt-4 animate-fade-in [animation-delay:250ms]">
+              <Link 
+                to="/advisor" 
+                className="flex items-center justify-between text-left p-4 rounded-xl bg-gradient-to-r from-blue-50/70 to-sky-50/50 dark:from-blue-950/20 dark:to-transparent border border-blue-100/80 dark:border-blue-900/30 shadow-sm hover:shadow-md transition-all group"
+              >
+                <div className="flex items-center gap-3.5">
+                  <div className="h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200 dark:shadow-none">
+                    <Sparkles className="h-5 w-5 fill-white/10" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-foreground text-sm sm:text-base tracking-tight">Renthob AI</h4>
+                    <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">
+                      Find neighborhoods that match your budget, lifestyle, and commute
+                    </p>
+                  </div>
+                </div>
+                <ArrowRight className="h-5 w-5 text-blue-600 dark:text-blue-400 ml-2 transform group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
 
             {/* Quick Stats — compact pill row */}

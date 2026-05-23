@@ -1,14 +1,13 @@
-// Rental Advisor edge function: extracts structured filters from a natural-language
-// request and ranks properties, returning the top matches with AI-generated reasons.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
+const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -119,10 +118,17 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const { query, budget, incomeBracket } = await req.json();
+    if (!GROQ_API_KEY) {
+      return new Response(JSON.stringify({ error: "Backend Config Error: GROQ_API_KEY is not set in Supabase Secrets." }), {
+        status: 200, // Return 200 so your frontend toast component can actually read the message string!
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { query, budget, incomeBracket, filters: layoutFilters } = await req.json();
     if (!query || typeof query !== "string") {
-      return new Response(JSON.stringify({ error: "Missing query" }), {
-        status: 400,
+      return new Response(JSON.stringify({ error: "Missing query parameter" }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -131,15 +137,15 @@ Deno.serve(async (req) => {
       budget ? ` User budget context: ₦${budget} per year.` : ""
     }${incomeBracket ? ` Income bracket: ${incomeBracket}.` : ""}`;
 
-    // 1) Extract filters
-    const extractResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // 1) Extract filters using Groq's standard stable production tier model
+    const extractResp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${GROQ_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "llama-3.3-70b-versatile", 
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: query },
@@ -150,20 +156,10 @@ Deno.serve(async (req) => {
     });
 
     if (!extractResp.ok) {
-      const t = await extractResp.text();
-      console.error("AI extract error:", extractResp.status, t);
-      if (extractResp.status === 429)
-        return new Response(JSON.stringify({ error: "Rate limit reached, try again shortly." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      if (extractResp.status === 402)
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Add funds in Settings > Workspace." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      return new Response(JSON.stringify({ error: "AI extraction failed" }), {
-        status: 500,
+      const errorText = await extractResp.text();
+      console.error("Groq extraction server log:", errorText);
+      return new Response(JSON.stringify({ error: `Groq Gateway Error: ${extractResp.statusText || "Check API Key privileges"}` }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -174,41 +170,55 @@ Deno.serve(async (req) => {
     try {
       filters = toolCall ? JSON.parse(toolCall.function.arguments) : {};
     } catch (e) {
-      console.error("parse filters", e);
+      console.error("Failed to parse arguments:", e);
     }
+    
     if (budget && !filters.max_price) filters.max_price = budget;
+    if (layoutFilters?.location && !filters.location) filters.location = layoutFilters.location;
+    if (layoutFilters?.minBudget && !filters.min_price) filters.min_price = layoutFilters.minBudget;
+    if (layoutFilters?.lifestyle) {
+      if (!filters.lifestyle_tags) filters.lifestyle_tags = [];
+      if (!filters.lifestyle_tags.includes(layoutFilters.lifestyle)) {
+        filters.lifestyle_tags.push(layoutFilters.lifestyle);
+      }
+    }
 
-    // 2) Query properties (service role, only active listings)
+    // 2) Query database properties
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     let q = supabase.from("properties").select("*").eq("status", "active").limit(200);
-    if (filters.city) q = q.ilike("city", `%${filters.city}%`);
+    
+    if (filters.location) {
+      q = q.or(`location.ilike.%${filters.location}%,city.ilike.%${filters.location}%`);
+    } else if (filters.city) {
+      q = q.ilike("city", `%${filters.city}%`);
+    }
+
     const { data: props, error } = await q;
     if (error) {
-      console.error("db error", error);
-      return new Response(JSON.stringify({ error: "Database error" }), {
-        status: 500,
+      return new Response(JSON.stringify({ error: `Supabase DB Error: ${error.message}` }), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // 3) Score & rank
+    // 3) Score & rank results
     const ranked = (props || [])
       .map((p) => ({ p, ...scoreProperty(p, filters) }))
       .filter((r) => r.score > 0)
       .sort((a, b) => b.score - a.score)
       .slice(0, 6);
 
-    // 4) Generate a short overall summary
+    // 4) Generate short advice description summary via Groq
     let summary = "";
     if (ranked.length > 0) {
-      const summaryResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const summaryResp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          Authorization: `Bearer ${GROQ_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash-lite",
+          model: "llama3-8b-8192", 
           messages: [
             {
               role: "system",
@@ -237,9 +247,8 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
-    console.error("rental-advisor error", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown" }), {
-      status: 500,
+    return new Response(JSON.stringify({ error: `Runtime Catch: ${e instanceof Error ? e.message : "Unknown error"}` }), {
+      status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
