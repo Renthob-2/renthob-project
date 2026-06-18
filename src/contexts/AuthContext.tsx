@@ -70,7 +70,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRole(roleData?.role as AppRole | null);
   };
 
-  // Re-fetch role when tab regains focus (catches admin role changes)
   const refetchUserData = async () => {
     const currentUser = (await supabase.auth.getUser()).data.user;
     if (currentUser) {
@@ -89,7 +88,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Also poll every 60 seconds for role changes
     const interval = setInterval(() => {
       if (user) {
         fetchRole(user.id);
@@ -97,7 +95,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }, 60000);
 
-    // Realtime: instantly reflect when admin changes this user's role
     let channel: ReturnType<typeof supabase.channel> | null = null;
     if (user) {
       channel = supabase
@@ -120,7 +117,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, currentSession) => {
         setSession(currentSession);
@@ -129,11 +125,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (currentSession?.user) {
           const userId = currentSession.user.id;
           
-          // On first sign-in after email verification, insert the role from metadata
           if (event === "SIGNED_IN") {
             const appRole = currentSession.user.user_metadata?.app_role;
+            const fullName = currentSession.user.user_metadata?.full_name;
+            
             if (appRole) {
-              // Check if role already exists before inserting
+              // 1. Ensure the custom user profile exists cleanly manually
+              await supabase
+                .from("profiles")
+                .insert({ 
+                  user_id: userId, 
+                  full_name: fullName || "", 
+                  email: currentSession.user.email 
+                })
+                .select()
+                .maybeSingle();
+
+              // 2. Check and assign the selected dynamic role directly
               const { data: existingRole } = await supabase
                 .from("user_roles")
                 .select("id")
@@ -141,30 +149,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 .maybeSingle();
               
               if (!existingRole) {
-                // Always insert tenant role first (RLS only allows tenant self-assignment)
                 const { error: roleInsertError } = await supabase
                   .from("user_roles")
-                  .insert({ user_id: userId, role: "tenant" });
+                  .insert({ user_id: userId, role: appRole });
                 
                 if (roleInsertError) {
-                  console.error("Failed to insert tenant role:", roleInsertError);
-                }
-                
-                // If they requested landlord/agent, create a role upgrade request
-                if (appRole === "landlord" || appRole === "agent") {
-                  const { error: requestError } = await supabase
-                    .from("role_requests")
-                    .insert({ user_id: userId, requested_role: appRole } as any);
-                  
-                  if (requestError) {
-                    console.error("Failed to create role request:", requestError);
-                  }
+                  console.error(`Failed to assign selection role (${appRole}):`, roleInsertError);
                 }
 
                 // Track referral signup if referral code was provided
                 const referralCode = currentSession.user.user_metadata?.referral_code;
                 if (referralCode) {
-                  // Look up the affiliate by referral code
                   const { data: affiliateUserId } = await supabase.rpc("get_affiliate_by_code", { code: referralCode });
                   if (affiliateUserId && affiliateUserId !== userId) {
                     const { error: refError } = await supabase
@@ -183,7 +178,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
           }
           
-          // Use setTimeout to avoid potential race conditions with Supabase
           setTimeout(() => {
             fetchProfile(userId);
             fetchRole(userId);
@@ -200,7 +194,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
       setSession(existingSession);
       setUser(existingSession?.user ?? null);
@@ -234,7 +227,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
-      // Check if user already exists (Supabase returns a fake user with no identities)
       if (data.user && data.user.identities && data.user.identities.length === 0) {
         throw new Error("An account with this email already exists. Please log in instead.");
       }

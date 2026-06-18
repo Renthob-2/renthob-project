@@ -1,5 +1,5 @@
 const BASE_URL = window.location.origin;
-const SUPABASE_PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID || "njgecwxeuuazcgshkkmj";
+const SUPABASE_PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID || "rjszvcxdxppgpikzjcbs";
 
 export function getPropertyUrl(propertyId: string): string {
   return `${BASE_URL}/property/${propertyId}`;
