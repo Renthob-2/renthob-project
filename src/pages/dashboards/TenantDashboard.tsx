@@ -16,7 +16,6 @@ import {
   MessageSquare, 
   Bell, 
   Search,
-  ArrowLeft,
   UserCircle,
   Sparkles,
   CheckCircle
@@ -27,8 +26,6 @@ export default function TenantDashboard() {
   const { isComplete, isLoading: profileLoading, completenessPercentage } = useTenantProfile();
   const { savedPropertiesWithDetails, savedCount, isLoadingDetails } = useSavedProperties();
   const navigate = useNavigate();
-
-
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -86,13 +83,17 @@ export default function TenantDashboard() {
               <span>Saved ({savedCount})</span>
             </Link>
           </Button>
-          <Button variant="outline" className="h-auto py-4 flex flex-col gap-2">
-            <FileText className="h-6 w-6 text-primary" />
-            <span>Applications</span>
+          <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2">
+            <Link to="/applications">
+              <FileText className="h-6 w-6 text-primary" />
+              <span>Applications</span>
+            </Link>
           </Button>
-          <Button variant="outline" className="h-auto py-4 flex flex-col gap-2">
-            <MessageSquare className="h-6 w-6 text-primary" />
-            <span>Messages</span>
+          <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2">
+            <Link to="/messages">
+              <MessageSquare className="h-6 w-6 text-primary" />
+              <span>Messages</span>
+            </Link>
           </Button>
           <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2">
             <Link to="/profile/setup">
@@ -135,12 +136,18 @@ export default function TenantDashboard() {
                     {savedPropertiesWithDetails.slice(0, 3).map((item: any) => {
                       const p = item.properties;
                       if (!p) return null;
+                      
                       const formatPrice = (price: number) => {
                         if (price >= 1000000) return `₦${(price / 1000000).toFixed(1)}M`;
                         return `₦${price.toLocaleString()}`;
                       };
+
                       return (
-                        <div key={p.id} className="flex gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer" onClick={() => navigate(`/property/${p.id}`)}>
+                        <div 
+                          key={p.id} 
+                          className="flex gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer" 
+                          onClick={() => navigate(`/property/${p.id}`)}
+                        >
                           <img 
                             src={(p.images && p.images[0]) || "/placeholder.svg"} 
                             alt={p.title}
@@ -148,10 +155,23 @@ export default function TenantDashboard() {
                           />
                           <div className="flex-1">
                             <h4 className="font-medium">{p.title}</h4>
-                            <p className="text-sm text-muted-foreground">{p.location}, {p.city}</p>
-                            <p className="text-sm font-semibold text-primary mt-1">{formatPrice(Number(p.price))}/{p.price_period === "year" ? "yr" : "mo"}</p>
+                            <p className="text-sm text-muted-foreground">{p.location || p.address}, {p.city}</p>
+                            <p className="text-sm font-semibold text-primary mt-1">
+                              {formatPrice(Number(p.price))}/{p.price_period === "year" ? "yr" : "mo"}
+                            </p>
                           </div>
-                          <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/property/${p.id}`); }}>View</Button>
+                          <div className="flex items-center">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={(e) => { 
+                                e.stopPropagation(); 
+                                navigate(`/property/${p.id}`); 
+                              }}
+                            >
+                              View
+                            </Button>
+                          </div>
                         </div>
                       );
                     })}
@@ -245,7 +265,7 @@ export default function TenantDashboard() {
                     <p className="text-xs text-muted-foreground">Properties Viewed</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted">
-                    <p className="text-2xl font-bold text-primary">3</p>
+                    <p className="text-2xl font-bold text-primary">{savedCount || 0}</p>
                     <p className="text-xs text-muted-foreground">Saved</p>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-muted">

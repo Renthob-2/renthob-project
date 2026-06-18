@@ -22,8 +22,7 @@ import {
   Calendar,
   Phone,
   Mail,
-  Star,
-  ArrowLeft
+  Star
 } from "lucide-react";
 
 export default function AgentDashboard() {
@@ -53,11 +52,11 @@ export default function AgentDashboard() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "active":
-        return <Badge className="bg-green-100 text-green-800">Active</Badge>;
+        return <Badge className="bg-green-100 text-green-800 border-0">Active</Badge>;
       case "rented":
-        return <Badge className="bg-blue-100 text-blue-800">Rented</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 border-0">Rented</Badge>;
       case "pending":
-        return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800 border-0">Pending</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -66,11 +65,11 @@ export default function AgentDashboard() {
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case "hot":
-        return <Badge className="bg-red-100 text-red-800">🔥 Hot</Badge>;
+        return <Badge className="bg-red-100 text-red-800 border-0">🔥 Hot</Badge>;
       case "warm":
-        return <Badge className="bg-orange-100 text-orange-800">Warm</Badge>;
+        return <Badge className="bg-orange-100 text-orange-800 border-0">Warm</Badge>;
       case "cold":
-        return <Badge className="bg-blue-100 text-blue-800">Cold</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 border-0">Cold</Badge>;
       default:
         return <Badge variant="secondary">{priority}</Badge>;
     }
@@ -91,7 +90,7 @@ export default function AgentDashboard() {
               Manage your portfolio and close more deals
             </p>
           </div>
-          <div className="flex gap-2 mt-4 md:mt-0">
+          <div className="flex items-center gap-2 mt-4 md:mt-0">
             <AddClientDialog />
             <Button size="lg" asChild>
               <Link to="/property/create">
@@ -181,7 +180,11 @@ export default function AgentDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   {managedProperties.map((property) => (
-                    <div key={property.id} className="p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors">
+                    <div 
+                      key={property.id} 
+                      className="p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
+                      onClick={() => navigate(`/property/${property.id}`)}
+                    >
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
@@ -196,7 +199,16 @@ export default function AgentDashboard() {
                             <p className="text-lg font-bold text-primary">{property.leads}</p>
                             <p className="text-xs text-muted-foreground">Leads</p>
                           </div>
-                          <Button variant="outline" size="sm">Manage</Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/property/${property.id}/manage`);
+                            }}
+                          >
+                            Manage
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -215,12 +227,14 @@ export default function AgentDashboard() {
                   </CardTitle>
                   <CardDescription>Potential clients to follow up</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm">View All</Button>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/leads">View All</Link>
+                </Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {recentLeads.map((lead) => (
-                    <div key={lead.id} className="flex items-center justify-between p-3 rounded-lg border">
+                    <div key={lead.id} className="flex items-center justify-between p-3 rounded-lg border bg-card">
                       <div className="flex items-center gap-3">
                         <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                           <span className="text-sm font-medium text-primary">
@@ -235,11 +249,15 @@ export default function AgentDashboard() {
                       <div className="flex items-center gap-3">
                         {getPriorityBadge(lead.priority)}
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Phone className="h-4 w-4" />
+                          <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                            <a href={`tel:${lead.contact}`}>
+                              <Phone className="h-4 w-4" />
+                            </a>
                           </Button>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Mail className="h-4 w-4" />
+                          <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                            <Link to={`/messages?userId=${lead.id}`}>
+                              <Mail className="h-4 w-4" />
+                            </Link>
                           </Button>
                         </div>
                       </div>
@@ -266,7 +284,7 @@ export default function AgentDashboard() {
               <CardContent>
                 <div className="space-y-3">
                   {upcomingViewings.map((viewing) => (
-                    <div key={viewing.id} className="p-3 rounded-lg border">
+                    <div key={viewing.id} className="p-3 rounded-lg border bg-card">
                       <div className="flex justify-between items-start mb-1">
                         <h4 className="font-medium text-sm">{viewing.property}</h4>
                         <Badge variant="outline" className="text-xs">{viewing.time}</Badge>
@@ -278,8 +296,10 @@ export default function AgentDashboard() {
                     </div>
                   ))}
                 </div>
-                <Button variant="outline" className="w-full mt-4">
-                  Schedule Viewing
+                <Button variant="outline" className="w-full mt-4" asChild>
+                  <Link to="/viewings/schedule">
+                    Schedule Viewing
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
@@ -321,7 +341,7 @@ export default function AgentDashboard() {
             {/* Display Name Settings */}
             <DisplayNameSettings />
 
-            {/* Quick Actions */}
+            {/* Quick Actions Sidebar Menu */}
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Quick Actions</CardTitle>
@@ -333,6 +353,7 @@ export default function AgentDashboard() {
                     Add New Listing
                   </Link>
                 </Button>
+                
                 <AddClientDialog
                   trigger={
                     <Button variant="outline" className="w-full justify-start">
@@ -341,13 +362,19 @@ export default function AgentDashboard() {
                     </Button>
                   }
                 />
-                <Button variant="outline" className="w-full justify-start">
-                  <BarChart3 className="h-4 w-4 mr-2" />
-                  View Reports
+                
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <Link to="/reports">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    View Reports
+                  </Link>
                 </Button>
-                <Button variant="outline" className="w-full justify-start">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Messages
+                
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <Link to="/messages">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Messages
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
