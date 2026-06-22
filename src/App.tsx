@@ -40,6 +40,7 @@ import AdminApplicationsPage from "./pages/admin/AdminApplicationsPage";
 import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
 import AdminActivityPage from "./pages/admin/AdminActivityPage";
 import AdminRoleRequestsPage from "./pages/admin/AdminRoleRequestsPage";
+import AdminRoleAuditPage from "./pages/admin/AdminRoleAuditPage";
 import AdminAffiliatesPage from "./pages/admin/AdminAffiliatesPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import NotFound from "./pages/NotFound";
@@ -158,6 +159,7 @@ const App = () => (
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="approvals" element={<AdminApprovalsPage />} />
               <Route path="role-requests" element={<AdminRoleRequestsPage />} />
+              <Route path="role-audit" element={<AdminRoleAuditPage />} />
               <Route path="properties" element={<AdminPropertiesPage />} />
               <Route path="verifications" element={<AdminVerificationsPage />} />
               <Route path="applications" element={<AdminApplicationsPage />} />

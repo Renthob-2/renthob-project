@@ -9,6 +9,7 @@ import {
   UserCheck,
   Shield,
   Link2,
+  History,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
@@ -40,6 +41,7 @@ const navItems = [
   { title: "Users", url: "/admin/users", icon: Users },
   { title: "Approvals", url: "/admin/approvals", icon: UserCheck },
   { title: "Role Requests", url: "/admin/role-requests", icon: Shield },
+  { title: "Role Audit", url: "/admin/role-audit", icon: History },
   { title: "Properties", url: "/admin/properties", icon: Building2 },
   { title: "Verifications", url: "/admin/verifications", icon: ShieldCheck },
   { title: "Applications", url: "/admin/applications", icon: FileText },
