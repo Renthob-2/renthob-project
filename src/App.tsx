@@ -40,6 +40,7 @@ import AdminApplicationsPage from "./pages/admin/AdminApplicationsPage";
 import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
 import AdminActivityPage from "./pages/admin/AdminActivityPage";
 import AdminRoleRequestsPage from "./pages/admin/AdminRoleRequestsPage";
+import AdminRoleAuditPage from "./pages/admin/AdminRoleAuditPage";
 import AdminAffiliatesPage from "./pages/admin/AdminAffiliatesPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import NotFound from "./pages/NotFound";
