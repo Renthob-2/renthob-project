@@ -94,6 +94,21 @@ export default function AdminRoleAuditPage() {
   const filtered = useMemo(() => {
     return rows.filter((r) => {
       if (eventFilter !== "all" && r.event_type !== eventFilter) return false;
+
+      // Target user filter (subject name or email)
+      if (targetUserFilter) {
+        const tu = targetUserFilter.toLowerCase();
+        const subject = nameFor(r.subject_user_id).toLowerCase();
+        const subjectEmail = (profiles.get(r.subject_user_id)?.email || "").toLowerCase();
+        if (!subject.includes(tu) && !subjectEmail.includes(tu)) return false;
+      }
+
+      // Request ID filter
+      if (requestIdFilter) {
+        const ri = requestIdFilter.toLowerCase();
+        if (!r.request_id || !r.request_id.toLowerCase().includes(ri)) return false;
+      }
+
       if (!search) return true;
       const q = search.toLowerCase();
       const actor = nameFor(r.actor_id).toLowerCase();
@@ -108,7 +123,7 @@ export default function AdminRoleAuditPage() {
         (r.requested_role || "").includes(q)
       );
     });
-  }, [rows, search, eventFilter, profiles]);
+  }, [rows, search, eventFilter, profiles, targetUserFilter, requestIdFilter]);
 
   return (
     <div className="space-y-6">
