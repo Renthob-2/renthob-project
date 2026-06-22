@@ -51,6 +51,8 @@ export default function AdminRoleAuditPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [eventFilter, setEventFilter] = useState("all");
+  const [targetUserFilter, setTargetUserFilter] = useState("");
+  const [requestIdFilter, setRequestIdFilter] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -92,6 +94,21 @@ export default function AdminRoleAuditPage() {
   const filtered = useMemo(() => {
     return rows.filter((r) => {
       if (eventFilter !== "all" && r.event_type !== eventFilter) return false;
+
+      // Target user filter (subject name or email)
+      if (targetUserFilter) {
+        const tu = targetUserFilter.toLowerCase();
+        const subject = nameFor(r.subject_user_id).toLowerCase();
+        const subjectEmail = (profiles.get(r.subject_user_id)?.email || "").toLowerCase();
+        if (!subject.includes(tu) && !subjectEmail.includes(tu)) return false;
+      }
+
+      // Request ID filter
+      if (requestIdFilter) {
+        const ri = requestIdFilter.toLowerCase();
+        if (!r.request_id || !r.request_id.toLowerCase().includes(ri)) return false;
+      }
+
       if (!search) return true;
       const q = search.toLowerCase();
       const actor = nameFor(r.actor_id).toLowerCase();
@@ -106,7 +123,7 @@ export default function AdminRoleAuditPage() {
         (r.requested_role || "").includes(q)
       );
     });
-  }, [rows, search, eventFilter, profiles]);
+  }, [rows, search, eventFilter, profiles, targetUserFilter, requestIdFilter]);
 
   return (
     <div className="space-y-6">
@@ -128,8 +145,8 @@ export default function AdminRoleAuditPage() {
               <RefreshCw className="h-4 w-4 mr-1" /> Refresh
             </Button>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by user, role, details..."
@@ -139,7 +156,7 @@ export default function AdminRoleAuditPage() {
               />
             </div>
             <Select value={eventFilter} onValueChange={setEventFilter}>
-              <SelectTrigger className="w-[220px]">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -152,6 +169,24 @@ export default function AdminRoleAuditPage() {
                 <SelectItem value="role_removed">Role removed</SelectItem>
               </SelectContent>
             </Select>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Filter by target user (name/email)..."
+                value={targetUserFilter}
+                onChange={(e) => setTargetUserFilter(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Filter by request ID..."
+                value={requestIdFilter}
+                onChange={(e) => setRequestIdFilter(e.target.value)}
+                className="pl-9"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
