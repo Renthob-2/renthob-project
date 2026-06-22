@@ -145,8 +145,8 @@ export default function AdminRoleAuditPage() {
               <RefreshCw className="h-4 w-4 mr-1" /> Refresh
             </Button>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search by user, role, details..."
@@ -156,7 +156,7 @@ export default function AdminRoleAuditPage() {
               />
             </div>
             <Select value={eventFilter} onValueChange={setEventFilter}>
-              <SelectTrigger className="w-[220px]">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -169,6 +169,24 @@ export default function AdminRoleAuditPage() {
                 <SelectItem value="role_removed">Role removed</SelectItem>
               </SelectContent>
             </Select>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Filter by target user (name/email)..."
+                value={targetUserFilter}
+                onChange={(e) => setTargetUserFilter(e.target.value)}
+                className="pl-9"
+              />
+            </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Filter by request ID..."
+                value={requestIdFilter}
+                onChange={(e) => setRequestIdFilter(e.target.value)}
+                className="pl-9"
+              />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
