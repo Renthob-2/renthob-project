@@ -51,6 +51,8 @@ export default function AdminRoleAuditPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [eventFilter, setEventFilter] = useState("all");
+  const [targetUserFilter, setTargetUserFilter] = useState("");
+  const [requestIdFilter, setRequestIdFilter] = useState("");
 
   const load = async () => {
     setLoading(true);
