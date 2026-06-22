@@ -159,6 +159,7 @@ const App = () => (
               <Route path="users" element={<AdminUsersPage />} />
               <Route path="approvals" element={<AdminApprovalsPage />} />
               <Route path="role-requests" element={<AdminRoleRequestsPage />} />
+              <Route path="role-audit" element={<AdminRoleAuditPage />} />
               <Route path="properties" element={<AdminPropertiesPage />} />
               <Route path="verifications" element={<AdminVerificationsPage />} />
               <Route path="applications" element={<AdminApplicationsPage />} />
