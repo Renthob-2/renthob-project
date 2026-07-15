@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { BackButton } from "@/components/BackButton";
 import { supabase } from "@/integrations/supabase/client";
@@ -85,19 +85,18 @@ export default function MyPropertiesPage() {
   const [propertyToDelete, setPropertyToDelete] = useState<Property | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      fetchProperties();
+  const fetchProperties = useCallback(async () => {
+    if (!user) {
+      setProperties([]);
+      setLoading(false);
+      return;
     }
-  }, [user]);
-
-  const fetchProperties = async () => {
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from("properties")
         .select("*")
-        .eq("owner_id", user?.id)
+        .eq("owner_id", user.id)
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -112,7 +111,11 @@ export default function MyPropertiesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast, user]);
+
+  useEffect(() => {
+    void fetchProperties();
+  }, [fetchProperties]);
 
   const handleStatusChange = async (propertyId: string, newStatus: PropertyStatus) => {
     try {
@@ -373,10 +376,10 @@ export default function MyPropertiesPage() {
                             Copy Link
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          {property.status !== "active" && (
-                            <DropdownMenuItem onClick={() => handleStatusChange(property.id, "active")}>
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Set Active
+                          {property.status !== "active" && property.status !== "pending" && (
+                            <DropdownMenuItem onClick={() => handleStatusChange(property.id, "pending")}>
+                              <Clock className="h-4 w-4 mr-2" />
+                              Submit for Review
                             </DropdownMenuItem>
                           )}
                           {property.status !== "inactive" && (

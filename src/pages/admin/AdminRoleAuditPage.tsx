@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,7 @@ export default function AdminRoleAuditPage() {
   const [targetUserFilter, setTargetUserFilter] = useState("");
   const [requestIdFilter, setRequestIdFilter] = useState("");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const { data } = await supabase
       .from("role_audit_log" as any)
@@ -79,17 +79,17 @@ export default function AdminRoleAuditPage() {
       setProfiles(new Map());
     }
     setLoading(false);
-  };
-
-  useEffect(() => {
-    load();
   }, []);
 
-  const nameFor = (id: string | null) => {
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const nameFor = useCallback((id: string | null) => {
     if (!id) return "System";
     const p = profiles.get(id);
     return p?.full_name || p?.email || id.slice(0, 8);
-  };
+  }, [profiles]);
 
   const filtered = useMemo(() => {
     return rows.filter((r) => {
@@ -123,7 +123,7 @@ export default function AdminRoleAuditPage() {
         (r.requested_role || "").includes(q)
       );
     });
-  }, [rows, search, eventFilter, profiles, targetUserFilter, requestIdFilter]);
+  }, [rows, search, eventFilter, profiles, targetUserFilter, requestIdFilter, nameFor]);
 
   return (
     <div className="space-y-6">

@@ -6,6 +6,7 @@ import { X, Eye, Bed, Bath, Square, MapPin, Home, Check } from "lucide-react";
 import type { SearchProperty } from "@/hooks/useProperties";
 import type { ComparisonHighlights } from "@/hooks/useComparisonData";
 import { cn } from "@/lib/utils";
+import { formatDataLabel } from "@/lib/format";
 
 interface ComparisonTableProps {
   properties: SearchProperty[];
@@ -203,7 +204,7 @@ export function ComparisonTable({
           {allAmenities.map((amenity) => (
             <TableRow key={amenity}>
               <TableCell className="text-sm sticky left-0 bg-background">
-                {amenity}
+                {formatDataLabel(amenity)}
               </TableCell>
               {properties.map((property) => (
                 <TableCell key={property.id} className="text-center">

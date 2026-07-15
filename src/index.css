@@ -19,7 +19,7 @@
     --popover-foreground: 222 47% 11%;
 
     /* Primary - Soft blue */
-    --primary: 217 91% 60%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Warm cream/beige */
@@ -41,7 +41,7 @@
     /* Border and inputs */
     --border: 220 13% 90%;
     --input: 220 13% 90%;
-    --ring: 217 91% 60%;
+    --ring: 221 83% 53%;
 
     /* Border radius - rounded for friendliness */
     --radius: 0.75rem;
@@ -66,12 +66,12 @@
     /* Sidebar */
     --sidebar-background: 40 40% 99%;
     --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary: 221 83% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 214 95% 93%;
     --sidebar-accent-foreground: 217 91% 40%;
     --sidebar-border: 220 13% 90%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-ring: 221 83% 53%;
   }
 
   .dark {
@@ -84,7 +84,7 @@
     --popover: 222 47% 11%;
     --popover-foreground: 40 33% 98%;
 
-    --primary: 217 91% 60%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 222 30% 18%;
@@ -101,16 +101,16 @@
 
     --border: 222 30% 20%;
     --input: 222 30% 20%;
-    --ring: 217 91% 60%;
+    --ring: 221 83% 53%;
 
     --sidebar-background: 222 47% 8%;
     --sidebar-foreground: 40 33% 98%;
-    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary: 221 83% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 222 47% 15%;
     --sidebar-accent-foreground: 214 95% 70%;
     --sidebar-border: 222 30% 20%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-ring: 221 83% 53%;
   }
 }
 

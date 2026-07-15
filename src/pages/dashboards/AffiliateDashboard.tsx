@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { BackButton } from "@/components/BackButton";
 import { useAffiliateData } from "@/hooks/useAffiliateData";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -11,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Copy, Users, DollarSign, TrendingUp, Wallet, ArrowDownToLine, Check, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export default function AffiliateDashboard() {
   const { profile, referrals, commissions, withdrawals, loading, refetch, requestWithdrawal } = useAffiliateData();
@@ -36,7 +38,7 @@ export default function AffiliateDashboard() {
             <CardTitle>Affiliate Program</CardTitle>
             <CardDescription>
               You haven't joined the affiliate program yet. Go to your{" "}
-              <a href="/settings/profile" className="text-primary underline">Profile Settings</a>{" "}
+              <Link to="/settings/profile" className="text-primary underline">Profile Settings</Link>{" "}
               to apply.
             </CardDescription>
           </CardHeader>
@@ -61,16 +63,19 @@ export default function AffiliateDashboard() {
     );
   }
 
-  const referralLink = `${window.location.origin}/signup?ref=${profile.referral_code}`;
+  const referralLink = getSiteUrl(`/signup?ref=${profile.referral_code}`);
   const totalSignups = referrals.length;
-  const verifiedSignups = referrals.filter(r => r.status === "verified" || r.status === "converted").length;
   const conversions = referrals.filter(r => r.status === "converted").length;
 
-  const copyReferralLink = () => {
-    navigator.clipboard.writeText(referralLink);
-    setCopied(true);
-    toast({ title: "Copied!", description: "Referral link copied to clipboard" });
-    setTimeout(() => setCopied(false), 2000);
+  const copyReferralLink = async () => {
+    try {
+      await navigator.clipboard.writeText(referralLink);
+      setCopied(true);
+      toast({ title: "Copied!", description: "Referral link copied to clipboard" });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({ title: "Unable to copy", description: "Select and copy the referral link manually.", variant: "destructive" });
+    }
   };
 
   const handleWithdraw = async () => {
@@ -118,7 +123,7 @@ export default function AffiliateDashboard() {
               <p className="text-sm font-medium text-muted-foreground mb-1">Referral Link</p>
               <div className="flex gap-2">
                 <Input value={referralLink} readOnly className="text-xs" />
-                <Button size="sm" onClick={copyReferralLink} variant="outline">
+                <Button size="sm" onClick={copyReferralLink} variant="outline" aria-label="Copy referral link">
                   {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                 </Button>
               </div>

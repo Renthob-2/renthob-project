@@ -1,12 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Home, Menu, X, LogOut, User, Mail, Settings, Users, Heart, Bell, Link2 } from "lucide-react";
+import { Home, Menu, X, LogOut, User, Mail, Settings, Users, Heart, Bell, Link2, Sparkles } from "lucide-react";
 import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMessages } from "@/hooks/useMessages";
 import { useChatRooms } from "@/hooks/useChatRooms";
+import { getDashboardPath } from "@/lib/dashboardPath";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,6 +19,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const navLinks = [
   { href: "/search", label: "Browse Properties" },
+  { href: "/advisor", label: "AI Advisor", highlighted: true },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/features", label: "Features" },
   { href: "/faqs", label: "FAQs" },
@@ -29,6 +31,7 @@ export function Header() {
   const { unreadCount } = useMessages();
   const { pendingInvites } = useChatRooms();
   const navigate = useNavigate();
+  const isMarketplaceRole = role === "tenant" || role === "landlord" || role === "agent";
 
   const handleSignOut = async () => {
     await signOut();
@@ -52,6 +55,7 @@ export function Header() {
       landlord: "bg-green-100 text-green-700",
       agent: "bg-purple-100 text-purple-700",
       admin: "bg-red-100 text-red-700",
+      affiliate: "bg-amber-100 text-amber-800",
     };
     return (
       <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${colors[role] || ""}`}>
@@ -60,27 +64,12 @@ export function Header() {
     );
   };
 
-  const getDashboardPath = () => {
-    switch (role) {
-      case "tenant":
-        return "/dashboard/tenant";
-      case "landlord":
-        return "/dashboard/landlord";
-      case "agent":
-        return "/dashboard/agent";
-      case "admin":
-        return "/admin";
-      default:
-        return "/";
-    }
-  };
-
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center">
-          <img src="/logo.png" alt="Renthob" className="h-10" />
+          <img src="/logo-small.png" alt="Renthob" width="71" height="40" className="h-10 w-auto" />
         </Link>
 
         {/* Desktop Navigation */}
@@ -89,8 +78,9 @@ export function Header() {
             <Link
               key={link.href}
               to={link.href}
-              className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className={`inline-flex items-center gap-1 text-sm font-medium transition-colors hover:text-foreground ${link.highlighted ? "text-primary" : "text-muted-foreground"}`}
             >
+              {link.highlighted && <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />}
               {link.label}
             </Link>
           ))}
@@ -124,39 +114,43 @@ export function Header() {
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link to={getDashboardPath()} className="flex items-center gap-2">
+                  <Link to={getDashboardPath(role)} className="flex items-center gap-2">
                     <User className="h-4 w-4" />
                     Dashboard
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/messages" className="flex items-center gap-2">
-                    <Mail className="h-4 w-4" />
-                    Messages
-                    {unreadCount > 0 && (
-                      <Badge variant="destructive" className="ml-auto h-5 min-w-5 p-0 flex items-center justify-center text-xs">
-                        {unreadCount}
-                      </Badge>
-                    )}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/saved" className="flex items-center gap-2">
-                    <Heart className="h-4 w-4" />
-                    Saved Properties
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/chat-rooms" className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    Group Chats
-                    {pendingInvites.length > 0 && (
-                      <Badge variant="destructive" className="ml-auto h-5 min-w-5 p-0 flex items-center justify-center text-xs">
-                        {pendingInvites.length}
-                      </Badge>
-                    )}
-                  </Link>
-                </DropdownMenuItem>
+                {isMarketplaceRole && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to="/messages" className="flex items-center gap-2">
+                        <Mail className="h-4 w-4" />
+                        Messages
+                        {unreadCount > 0 && (
+                          <Badge variant="destructive" className="ml-auto h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                            {unreadCount}
+                          </Badge>
+                        )}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/saved" className="flex items-center gap-2">
+                        <Heart className="h-4 w-4" />
+                        Saved Properties
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/chat-rooms" className="flex items-center gap-2">
+                        <Users className="h-4 w-4" />
+                        Group Chats
+                        {pendingInvites.length > 0 && (
+                          <Badge variant="destructive" className="ml-auto h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                            {pendingInvites.length}
+                          </Badge>
+                        )}
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/affiliate" className="flex items-center gap-2">
                     <Link2 className="h-4 w-4" />
@@ -211,9 +205,10 @@ export function Header() {
               <Link
                 key={link.href}
                 to={link.href}
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground py-2"
+                className={`inline-flex items-center gap-1 py-2 text-sm font-medium transition-colors hover:text-foreground ${link.highlighted ? "text-primary" : "text-muted-foreground"}`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
+                {link.highlighted && <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />}
                 {link.label}
               </Link>
             ))}
@@ -232,39 +227,43 @@ export function Header() {
                     </div>
                   </div>
                   <Button variant="ghost" asChild className="w-full justify-start">
-                    <Link to={getDashboardPath()} onClick={() => setIsMobileMenuOpen(false)}>
+                    <Link to={getDashboardPath(role)} onClick={() => setIsMobileMenuOpen(false)}>
                       <User className="h-4 w-4 mr-2" />
                       Dashboard
                     </Link>
                   </Button>
-                  <Button variant="ghost" asChild className="w-full justify-start">
-                    <Link to="/messages" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Mail className="h-4 w-4 mr-2" />
-                      Messages
-                      {unreadCount > 0 && (
-                        <Badge variant="destructive" className="ml-2 h-5 min-w-5 p-0 flex items-center justify-center text-xs">
-                          {unreadCount}
-                        </Badge>
-                      )}
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" asChild className="w-full justify-start">
-                    <Link to="/saved" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Heart className="h-4 w-4 mr-2" />
-                      Saved Properties
-                    </Link>
-                  </Button>
-                  <Button variant="ghost" asChild className="w-full justify-start">
-                    <Link to="/chat-rooms" onClick={() => setIsMobileMenuOpen(false)}>
-                      <Users className="h-4 w-4 mr-2" />
-                      Group Chats
-                      {pendingInvites.length > 0 && (
-                        <Badge variant="destructive" className="ml-2 h-5 min-w-5 p-0 flex items-center justify-center text-xs">
-                          {pendingInvites.length}
-                        </Badge>
-                      )}
-                    </Link>
-                  </Button>
+                  {isMarketplaceRole && (
+                    <>
+                      <Button variant="ghost" asChild className="w-full justify-start">
+                        <Link to="/messages" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Mail className="h-4 w-4 mr-2" />
+                          Messages
+                          {unreadCount > 0 && (
+                            <Badge variant="destructive" className="ml-2 h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                              {unreadCount}
+                            </Badge>
+                          )}
+                        </Link>
+                      </Button>
+                      <Button variant="ghost" asChild className="w-full justify-start">
+                        <Link to="/saved" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Heart className="h-4 w-4 mr-2" />
+                          Saved Properties
+                        </Link>
+                      </Button>
+                      <Button variant="ghost" asChild className="w-full justify-start">
+                        <Link to="/chat-rooms" onClick={() => setIsMobileMenuOpen(false)}>
+                          <Users className="h-4 w-4 mr-2" />
+                          Group Chats
+                          {pendingInvites.length > 0 && (
+                            <Badge variant="destructive" className="ml-2 h-5 min-w-5 p-0 flex items-center justify-center text-xs">
+                              {pendingInvites.length}
+                            </Badge>
+                          )}
+                        </Link>
+                      </Button>
+                    </>
+                  )}
                   <Button variant="ghost" asChild className="w-full justify-start">
                     <Link to="/affiliate" onClick={() => setIsMobileMenuOpen(false)}>
                       <Link2 className="h-4 w-4 mr-2" />

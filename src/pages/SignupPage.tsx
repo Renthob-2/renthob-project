@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,12 +11,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Home, Building2, Users, Eye, EyeOff, Loader2, ArrowLeft, Mail } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, type SelfServiceRole } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
-type Role = "tenant" | "landlord" | "agent";
-
-const roles: { value: Role; label: string; icon: React.ElementType; description: string }[] = [
+const roles: { value: SelfServiceRole; label: string; icon: React.ElementType; description: string }[] = [
   { value: "tenant", label: "Tenant", icon: Home, description: "Looking for a place to rent" },
   { value: "landlord", label: "Landlord", icon: Building2, description: "List and manage properties" },
   { value: "agent", label: "Agent", icon: Users, description: "Help clients find homes" },
@@ -24,13 +22,15 @@ const roles: { value: Role; label: string; icon: React.ElementType; description:
 
 export default function SignupPage() {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const { signUp } = useAuth();
   const { toast } = useToast();
 
-  const initialRole = (searchParams.get("role") as Role) || "tenant";
+  const requestedRole = searchParams.get("role");
+  const initialRole: SelfServiceRole = roles.some((role) => role.value === requestedRole)
+    ? requestedRole as SelfServiceRole
+    : "tenant";
 
-  const [selectedRole, setSelectedRole] = useState<Role>(initialRole);
+  const [selectedRole, setSelectedRole] = useState<SelfServiceRole>(initialRole);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailSent, setShowEmailSent] = useState(false);
@@ -89,7 +89,7 @@ export default function SignupPage() {
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center">
-              <img src="/logo.png" alt="Renthob" className="h-12" />
+              <img src="/logo-small.png" alt="Renthob" width="84" height="48" className="h-12 w-auto" />
             </Link>
           </div>
 
@@ -136,7 +136,7 @@ export default function SignupPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center">
-            <img src="/logo.png" alt="Renthob" className="h-12" />
+            <img src="/logo-small.png" alt="Renthob" width="84" height="48" className="h-12 w-auto" />
           </Link>
         </div>
 
@@ -154,6 +154,7 @@ export default function SignupPage() {
                   <button
                     key={role.value}
                     type="button"
+                    aria-pressed={selectedRole === role.value}
                     onClick={() => setSelectedRole(role.value)}
                     className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all ${
                       selectedRole === role.value
@@ -231,6 +232,7 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

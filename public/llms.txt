@@ -1,0 +1,14 @@
+# Renthob
+
+> Renthob is a rental-property discovery and listing platform for renters, landlords, and agents in Nigeria.
+
+## Public pages
+
+- [Browse properties](https://renthob.com/search): Search active rental listings by location, budget, property type, and amenities.
+- [Rental advisor](https://renthob.com/advisor): Describe rental requirements in plain language and see matching active listings.
+- [How Renthob works](https://renthob.com/how-it-works): Steps for renters, landlords, and agents.
+- [Features](https://renthob.com/features): Currently available platform features.
+- [Frequently asked questions](https://renthob.com/faqs): Account, listing, and renter guidance.
+- [Contact](https://renthob.com/contact): Renthob support details.
+- [Privacy policy](https://renthob.com/privacy): How Renthob handles personal information.
+- [Terms of service](https://renthob.com/terms): Rules for using Renthob.

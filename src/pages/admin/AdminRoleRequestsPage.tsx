@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,7 +60,7 @@ export default function AdminRoleRequestsPage() {
   const [rejectNote, setRejectNote] = useState("");
   const [processing, setProcessing] = useState<string | null>(null);
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     setLoading(true);
     // Fetch role requests
     const { data: reqData, error: reqError } = await supabase
@@ -99,11 +99,11 @@ export default function AdminRoleRequestsPage() {
 
     setRequests(merged);
     setLoading(false);
-  };
+  }, [toast]);
 
   useEffect(() => {
-    fetchRequests();
-  }, []);
+    void fetchRequests();
+  }, [fetchRequests]);
 
   const handleApprove = async (req: RoleRequest) => {
     setProcessing(req.id);
@@ -124,7 +124,7 @@ export default function AdminRoleRequestsPage() {
         title: "Role Approved",
         description: `${req.full_name || "User"} is now a ${req.requested_role}.`,
       });
-      fetchRequests();
+      void fetchRequests();
     }
     setProcessing(null);
   };

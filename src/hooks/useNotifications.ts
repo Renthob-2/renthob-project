@@ -20,6 +20,8 @@ export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const { preferences } = useNotificationPreferences();
+  const soundEnabled = preferences.sound_enabled;
+  const browserNotificationsEnabled = preferences.browser_notifications;
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
@@ -71,8 +73,8 @@ export function useNotifications() {
         (payload) => {
           const newNotif = payload.new as Notification;
           setNotifications((prev) => [newNotif, ...prev]);
-          if (preferences.sound_enabled) playNotificationSound();
-          if (preferences.browser_notifications) showBrowserNotification(newNotif.title, newNotif.message);
+          if (soundEnabled) playNotificationSound();
+          if (browserNotificationsEnabled) showBrowserNotification(newNotif.title, newNotif.message);
         }
       )
       .subscribe();
@@ -80,7 +82,7 @@ export function useNotifications() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+  }, [browserNotificationsEnabled, soundEnabled, user]);
 
   return { notifications, unreadCount, loading, markAsRead, markAllAsRead, refetch: fetchNotifications };
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,8 +40,8 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
   const targetLabel = currentUserRole === "agent" ? "Landlord" : "Agent";
 
   const handleSearch = async () => {
-    if (!searchEmail.trim()) {
-      toast.error("Please enter an email to search.");
+    if (searchEmail.trim().length < 3) {
+      toast.error("Enter at least 3 characters to search.");
       return;
     }
 
@@ -146,8 +146,8 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
             <div className="flex-1 space-y-2">
               <Label htmlFor="client-search">Email or Username</Label>
               <Input
-                id="client-email"
-                type="email"
+                id="client-search"
+                type="search"
                 value={searchEmail}
                 onChange={(e) => setSearchEmail(e.target.value)}
                 placeholder={`Search ${targetLabel.toLowerCase()} by email or username...`}
@@ -155,7 +155,7 @@ export function AddClientDialog({ trigger }: AddClientDialogProps) {
               />
             </div>
           </div>
-          <Button onClick={handleSearch} disabled={searching || !searchEmail.trim()} className="w-full">
+          <Button onClick={handleSearch} disabled={searching || searchEmail.trim().length < 3} className="w-full">
             {searching ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />

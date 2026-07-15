@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck, Check, X, ExternalLink } from "lucide-react";
 import type { AdminVerification } from "@/hooks/useAdminData";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface AdminVerificationsTabProps {
   verifications: AdminVerification[];
@@ -18,6 +20,32 @@ const statusBadge: Record<string, string> = {
 export function AdminVerificationsTab({ verifications, onUpdateStatus }: AdminVerificationsTabProps) {
   const pending = verifications.filter((v) => v.status === "pending");
   const reviewed = verifications.filter((v) => v.status !== "pending");
+
+  const viewDocument = async (documentPath: string) => {
+    if (/^https?:\/\//i.test(documentPath)) {
+      window.open(documentPath, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    const reviewWindow = window.open("about:blank", "_blank");
+    if (reviewWindow) reviewWindow.opener = null;
+
+    const { data, error } = await supabase.storage
+      .from("verification-documents")
+      .createSignedUrl(documentPath, 60);
+
+    if (error || !data?.signedUrl) {
+      reviewWindow?.close();
+      toast.error("Unable to open this verification document.");
+      return;
+    }
+
+    if (reviewWindow) {
+      reviewWindow.location.replace(data.signedUrl);
+    } else {
+      toast.error("Allow pop-ups to view this document.");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -48,10 +76,8 @@ export function AdminVerificationsTab({ verifications, onUpdateStatus }: AdminVe
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button size="sm" variant="outline" asChild>
-                        <a href={v.document_url} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-4 w-4 mr-1" /> View Doc
-                        </a>
+                      <Button size="sm" variant="outline" onClick={() => void viewDocument(v.document_url)}>
+                        <ExternalLink className="h-4 w-4 mr-1" /> View Doc
                       </Button>
                       <Button size="sm" variant="default" onClick={() => onUpdateStatus(v.id, "verified")}>
                         <Check className="h-4 w-4 mr-1" /> Approve

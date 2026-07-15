@@ -10,22 +10,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Home, Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-
-const getDashboardPath = (role: string | null) => {
-  switch (role) {
-    case "tenant":
-      return "/dashboard/tenant";
-    case "landlord":
-      return "/dashboard/landlord";
-    case "agent":
-      return "/dashboard/agent";
-    default:
-      return "/";
-  }
-};
+import { getDashboardPath } from "@/lib/dashboardPath";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -85,7 +73,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center">
-            <img src="/logo.png" alt="Renthob" className="h-12" />
+            <img src="/logo-small.png" alt="Renthob" className="h-12 w-auto" width="84" height="48" />
           </Link>
         </div>
 
@@ -151,6 +139,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? (

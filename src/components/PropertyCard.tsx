@@ -10,14 +10,16 @@ import { useComparisonContext } from "@/contexts/ComparisonContext";
 import { useSavedProperties } from "@/hooks/useSavedProperties";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { pluralize } from "@/lib/format";
 
 interface PropertyCardProps {
   property: SearchProperty;
   onSave?: (id: string) => void;
   showCompareButton?: boolean;
+  priority?: boolean;
 }
 
-function PropertyCardComponent({ property, onSave, showCompareButton = true }: PropertyCardProps) {
+function PropertyCardComponent({ property, onSave, showCompareButton = true, priority = false }: PropertyCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const navigate = useNavigate();
   const { isInComparison, addToCompare, removeFromCompare, canAddMore } = useComparisonContext();
@@ -110,7 +112,9 @@ function PropertyCardComponent({ property, onSave, showCompareButton = true }: P
           alt={`${property.title} - Image ${currentImageIndex + 1}`}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           draggable={false}
-          loading="lazy"
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
+          decoding="async"
         />
 
         {/* Navigation Arrows */}
@@ -118,14 +122,14 @@ function PropertyCardComponent({ property, onSave, showCompareButton = true }: P
           <>
             <button
               onClick={goToPrev}
-              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+              className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-background"
               aria-label="Previous image"
             >
               <ChevronLeft className="h-4 w-4 text-foreground" />
             </button>
             <button
               onClick={goToNext}
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background"
+              className="absolute right-14 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity hover:bg-background"
               aria-label="Next image"
             >
               <ChevronRight className="h-4 w-4 text-foreground" />
@@ -236,11 +240,11 @@ function PropertyCardComponent({ property, onSave, showCompareButton = true }: P
         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
           <div className="flex items-center gap-1">
             <Bed className="h-4 w-4" />
-            <span>{property.bedrooms} beds</span>
+            <span>{pluralize(property.bedrooms, "bed")}</span>
           </div>
           <div className="flex items-center gap-1">
             <Bath className="h-4 w-4" />
-            <span>{property.bathrooms} baths</span>
+            <span>{pluralize(property.bathrooms, "bath")}</span>
           </div>
           {property.sqft > 0 && (
             <div className="flex items-center gap-1">

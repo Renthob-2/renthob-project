@@ -10,7 +10,7 @@ const footerLinks = {
   ],
   forRenters: [
     { href: "/search", label: "Search Properties" },
-    { href: "/signup?role=renter", label: "Create Account" },
+    { href: "/signup?role=tenant", label: "Create Account" },
     { href: "/faqs#renters", label: "Renter FAQ" },
   ],
   forLandlords: [
@@ -33,7 +33,7 @@ export function Footer() {
           {/* Brand Section */}
           <div className="space-y-4 lg:col-span-2">
             <Link to="/" className="flex items-center">
-              <img src="/logo.png" alt="Renthob" className="h-10" />
+                <img src="/logo-small.png" alt="Renthob" width="71" height="40" className="h-10 w-auto" />
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
               Making rental searching simple and stress-free. Find your perfect

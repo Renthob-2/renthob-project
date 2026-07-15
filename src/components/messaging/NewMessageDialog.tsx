@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/dialog";
 import { PenSquare, Loader2, Search, Send, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
 import { useMessages } from "@/hooks/useMessages";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -33,7 +32,6 @@ const roleBadgeClass: Record<string, string> = {
 };
 
 export function NewMessageDialog() {
-  const { user } = useAuth();
   const { sendMessage } = useMessages();
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"search" | "compose">("search");
@@ -57,17 +55,16 @@ export function NewMessageDialog() {
   };
 
   const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+    if (searchQuery.trim().length < 3) {
+      toast.error("Enter at least 3 characters to search.");
+      return;
+    }
     setSearching(true);
     setHasSearched(true);
 
     try {
       const { data: profiles, error } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, email, username")
-        .or(`email.ilike.%${searchQuery.trim()}%,full_name.ilike.%${searchQuery.trim()}%,username.ilike.%${searchQuery.trim()}%`)
-        .neq("user_id", user?.id || "")
-        .limit(10);
+        .rpc("search_profiles_for_invite", { search_term: searchQuery.trim() });
 
       if (error) throw error;
 
@@ -77,15 +74,7 @@ export function NewMessageDialog() {
         return;
       }
 
-      // Fetch roles for found users
-      const userIds = profiles.map((p) => p.user_id);
-      const { data: roles } = await supabase
-        .from("user_roles")
-        .select("user_id, role")
-        .in("user_id", userIds);
-
-      const roleMap = new Map((roles || []).map((r) => [r.user_id, r.role]));
-      setResults(profiles.map((p) => ({ ...p, role: roleMap.get(p.user_id) || undefined })));
+      setResults(profiles);
     } catch (err: any) {
       toast.error(err.message || "Search failed");
     } finally {
@@ -145,13 +134,19 @@ export function NewMessageDialog() {
           <div className="space-y-4 pt-2">
             <div className="flex gap-2">
               <Input
+                aria-label="Search users"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by name, email, or username..."
                 onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 className="flex-1"
               />
-              <Button onClick={handleSearch} disabled={searching || !searchQuery.trim()} size="icon">
+              <Button
+                onClick={handleSearch}
+                disabled={searching || searchQuery.trim().length < 3}
+                size="icon"
+                aria-label="Search"
+              >
                 {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
               </Button>
             </div>

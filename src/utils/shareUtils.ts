@@ -1,8 +1,7 @@
-const BASE_URL = window.location.origin;
-const SUPABASE_PROJECT_ID = import.meta.env.VITE_SUPABASE_PROJECT_ID || "njgecwxeuuazcgshkkmj";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export function getPropertyUrl(propertyId: string): string {
-  return `${BASE_URL}/property/${propertyId}`;
+  return getSiteUrl(`/property/${propertyId}`);
 }
 
 /**
@@ -10,24 +9,10 @@ export function getPropertyUrl(propertyId: string): string {
  * so WhatsApp / Facebook / Twitter crawlers can read the preview image.
  */
 export function getPropertyShareUrl(propertyId: string): string {
-  return `https://${SUPABASE_PROJECT_ID}.supabase.co/functions/v1/og-property?id=${propertyId}`;
-}
-
-/**
- * Fetches an image URL as a File object, bypassing canvas CORS issues.
- */
-async function fetchImageAsFile(imageUrl: string, filename = "property.jpg"): Promise<File | null> {
-  try {
-    const response = await fetch(imageUrl);
-    if (!response.ok) return null;
-    const blob = await response.blob();
-    const type = blob.type || "image/jpeg";
-    const ext = type.includes("png") ? ".png" : ".jpg";
-    return new File([blob], filename.replace(/\.[^.]+$/, ext), { type });
-  } catch (err) {
-    console.warn("Could not fetch image for sharing:", err);
-    return null;
-  }
+  const shareFunctionUrl = import.meta.env.VITE_OG_SHARE_BASE_URL?.replace(/\/+$/, "");
+  return shareFunctionUrl
+    ? `${shareFunctionUrl}?id=${encodeURIComponent(propertyId)}`
+    : getPropertyUrl(propertyId);
 }
 
 
@@ -60,8 +45,8 @@ export async function shareProperty(
         url: ogUrl,
       });
       return;
-    } catch (err: any) {
-      if (err?.name === "AbortError") return;
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
     }
   }
 

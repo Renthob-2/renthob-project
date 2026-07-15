@@ -1,8 +1,17 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, Session } from "@supabase/supabase-js";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { getSiteUrl } from "@/lib/siteUrl";
 
-type AppRole = "tenant" | "landlord" | "agent" | "admin" | "affiliate";
+export type AppRole = "tenant" | "landlord" | "agent" | "admin" | "affiliate";
+export type SelfServiceRole = "tenant" | "landlord" | "agent";
 
 interface Profile {
   id: string;
@@ -14,6 +23,9 @@ interface Profile {
   display_name_preference: string | null;
   agency_name: string | null;
   username: string | null;
+  is_approved: boolean;
+  is_suspended: boolean;
+  suspension_reason: string | null;
 }
 
 interface AuthContextType {
@@ -24,12 +36,86 @@ interface AuthContextType {
   isAffiliate: boolean;
   affiliateActive: boolean;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role: AppRole, referralCode?: string) => Promise<{ error: Error | null }>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string,
+    requestedRole: SelfServiceRole,
+    referralCode?: string,
+  ) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function isUpgradeRole(value: unknown): value is "landlord" | "agent" {
+  return value === "landlord" || value === "agent";
+}
+
+async function ensureSignupIntent(user: User): Promise<void> {
+  const { data: existingRole } = await supabase
+    .from("user_roles")
+    .select("id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  // The database trigger normally creates this. Keeping this fallback makes
+  // older projects safe without allowing a user to grant a privileged role.
+  if (!existingRole) {
+    const { error } = await supabase
+      .from("user_roles")
+      .insert({ user_id: user.id, role: "tenant" });
+    if (error && error.code !== "23505") throw error;
+  }
+
+  const requestedRole =
+    user.user_metadata?.requested_role ?? user.user_metadata?.app_role;
+
+  if (isUpgradeRole(requestedRole)) {
+    const { data: existingRequest, error: requestLookupError } = await supabase
+      .from("role_requests")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("requested_role", requestedRole)
+      .limit(1)
+      .maybeSingle();
+
+    if (requestLookupError) throw requestLookupError;
+    if (!existingRequest) {
+      const { error } = await supabase
+        .from("role_requests")
+        .insert({ user_id: user.id, requested_role: requestedRole });
+      if (error && error.code !== "23505") throw error;
+    }
+  }
+
+  const referralCode = user.user_metadata?.referral_code;
+  if (typeof referralCode !== "string" || !referralCode.trim()) return;
+
+  const { data: existingReferral } = await supabase
+    .from("referral_signups")
+    .select("id")
+    .eq("referred_user_id", user.id)
+    .limit(1)
+    .maybeSingle();
+  if (existingReferral) return;
+
+  const { data: affiliateUserId, error: affiliateError } = await supabase.rpc(
+    "get_affiliate_by_code",
+    { code: referralCode.trim() },
+  );
+  if (affiliateError) throw affiliateError;
+
+  if (affiliateUserId && affiliateUserId !== user.id) {
+    const { error } = await supabase.from("referral_signups").insert({
+      referred_user_id: user.id,
+      affiliate_user_id: affiliateUserId,
+      referral_code_used: referralCode.trim(),
+    });
+    if (error && error.code !== "23505") throw error;
+  }
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -40,223 +126,153 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [affiliateActive, setAffiliateActive] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  const fetchAffiliate = async (userId: string) => {
+  const fetchAffiliate = useCallback(async (userId: string) => {
     const { data } = await supabase
       .from("affiliate_profiles")
       .select("is_active")
       .eq("user_id", userId)
       .maybeSingle();
-    setIsAffiliate(!!data);
-    setAffiliateActive(!!data?.is_active);
-  };
+    setIsAffiliate(Boolean(data));
+    setAffiliateActive(Boolean(data?.is_active));
+  }, []);
 
-  const fetchProfile = async (userId: string) => {
-    const { data: profileData } = await supabase
+  const fetchProfile = useCallback(async (userId: string) => {
+    const { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("user_id", userId)
       .maybeSingle();
-    
-    setProfile(profileData);
-  };
+    setProfile(data);
+  }, []);
 
-  const fetchRole = async (userId: string) => {
-    const { data: roleData } = await supabase
+  const fetchRole = useCallback(async (userId: string) => {
+    const { data } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
       .maybeSingle();
-    
-    setRole(roleData?.role as AppRole | null);
-  };
-
-  // Re-fetch role when tab regains focus (catches admin role changes)
-  const refetchUserData = async () => {
-    const currentUser = (await supabase.auth.getUser()).data.user;
-    if (currentUser) {
-      await fetchProfile(currentUser.id);
-      await fetchRole(currentUser.id);
-      await fetchAffiliate(currentUser.id);
-    }
-  };
-
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && user) {
-        refetchUserData();
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Also poll every 60 seconds for role changes
-    const interval = setInterval(() => {
-      if (user) {
-        fetchRole(user.id);
-        fetchAffiliate(user.id);
-      }
-    }, 60000);
-
-    // Realtime: instantly reflect when admin changes this user's role
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-    if (user) {
-      channel = supabase
-        .channel(`user-role-${user.id}`)
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'user_roles', filter: `user_id=eq.${user.id}` },
-          () => {
-            fetchRole(user.id);
-          }
-        )
-        .subscribe();
-    }
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      clearInterval(interval);
-      if (channel) supabase.removeChannel(channel);
-    };
-  }, [user]);
-
-  useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        
-        if (currentSession?.user) {
-          const userId = currentSession.user.id;
-          
-          // On first sign-in after email verification, insert the role from metadata
-          if (event === "SIGNED_IN") {
-            const appRole = currentSession.user.user_metadata?.app_role;
-            if (appRole) {
-              // Check if role already exists before inserting
-              const { data: existingRole } = await supabase
-                .from("user_roles")
-                .select("id")
-                .eq("user_id", userId)
-                .maybeSingle();
-              
-              if (!existingRole) {
-                // Always insert tenant role first (RLS only allows tenant self-assignment)
-                const { error: roleInsertError } = await supabase
-                  .from("user_roles")
-                  .insert({ user_id: userId, role: "tenant" });
-                
-                if (roleInsertError) {
-                  console.error("Failed to insert tenant role:", roleInsertError);
-                }
-                
-                // If they requested landlord/agent, create a role upgrade request
-                if (appRole === "landlord" || appRole === "agent") {
-                  const { error: requestError } = await supabase
-                    .from("role_requests")
-                    .insert({ user_id: userId, requested_role: appRole } as any);
-                  
-                  if (requestError) {
-                    console.error("Failed to create role request:", requestError);
-                  }
-                }
-
-                // Track referral signup if referral code was provided
-                const referralCode = currentSession.user.user_metadata?.referral_code;
-                if (referralCode) {
-                  // Look up the affiliate by referral code
-                  const { data: affiliateUserId } = await supabase.rpc("get_affiliate_by_code", { code: referralCode });
-                  if (affiliateUserId && affiliateUserId !== userId) {
-                    const { error: refError } = await supabase
-                      .from("referral_signups")
-                      .insert({
-                        referred_user_id: userId,
-                        affiliate_user_id: affiliateUserId,
-                        referral_code_used: referralCode,
-                      } as any);
-                    if (refError) {
-                      console.error("Failed to track referral:", refError);
-                    }
-                  }
-                }
-              }
-            }
-          }
-          
-          // Use setTimeout to avoid potential race conditions with Supabase
-          setTimeout(() => {
-            fetchProfile(userId);
-            fetchRole(userId);
-            fetchAffiliate(userId);
-          }, 0);
-        } else {
-          setProfile(null);
-          setRole(null);
-          setIsAffiliate(false);
-          setAffiliateActive(false);
-        }
-        
-        setLoading(false);
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
-      setSession(existingSession);
-      setUser(existingSession?.user ?? null);
-      
-      if (existingSession?.user) {
-        fetchProfile(existingSession.user.id);
-        fetchRole(existingSession.user.id);
-        fetchAffiliate(existingSession.user.id);
-      }
-      
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    setRole((data?.role as AppRole | undefined) ?? null);
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, role: AppRole, referralCode?: string) => {
+  const refreshUserData = useCallback(
+    async (userId: string) => {
+      await Promise.all([
+        fetchProfile(userId),
+        fetchRole(userId),
+        fetchAffiliate(userId),
+      ]);
+    },
+    [fetchAffiliate, fetchProfile, fetchRole],
+  );
+
+  useEffect(() => {
+    if (!user) return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") void refreshUserData(user.id);
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    const interval = window.setInterval(() => {
+      void Promise.all([fetchRole(user.id), fetchAffiliate(user.id)]);
+    }, 60_000);
+
+    const channel = supabase
+      .channel(`user-role-${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "user_roles",
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => void fetchRole(user.id),
+      )
+      .subscribe();
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.clearInterval(interval);
+      void supabase.removeChannel(channel);
+    };
+  }, [fetchAffiliate, fetchRole, refreshUserData, user]);
+
+  useEffect(() => {
+    const applySession = async (currentSession: Session | null) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+
+      if (!currentSession?.user) {
+        setProfile(null);
+        setRole(null);
+        setIsAffiliate(false);
+        setAffiliateActive(false);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        await ensureSignupIntent(currentSession.user);
+      } catch (error) {
+        console.error("Unable to complete account setup:", error);
+      }
+      await refreshUserData(currentSession.user.id);
+      setLoading(false);
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, currentSession) => {
+        void applySession(currentSession);
+      },
+    );
+
+    void supabase.auth.getSession().then(({ data }) => applySession(data.session));
+    return () => subscription.unsubscribe();
+  }, [refreshUserData]);
+
+  const signUp: AuthContextType["signUp"] = async (
+    email,
+    password,
+    fullName,
+    requestedRole,
+    referralCode,
+  ) => {
     try {
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/login?verified=1`,
+          emailRedirectTo: getSiteUrl("/login?verified=1"),
           data: {
-            full_name: fullName,
-            app_role: role,
-            referral_code: referralCode || null,
+            full_name: fullName.trim(),
+            app_role: "tenant",
+            requested_role: requestedRole,
+            referral_code: referralCode?.trim() || null,
           },
         },
       });
 
       if (error) throw error;
-
-      // Check if user already exists (Supabase returns a fake user with no identities)
-      if (data.user && data.user.identities && data.user.identities.length === 0) {
+      if (data.user?.identities?.length === 0) {
         throw new Error("An account with this email already exists. Please log in instead.");
       }
-
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error instanceof Error ? error : new Error("Unable to create account") };
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn: AuthContextType["signIn"] = async (email, password) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       });
-
       if (error) throw error;
-
       return { error: null };
     } catch (error) {
-      return { error: error as Error };
+      return { error: error instanceof Error ? error : new Error("Unable to log in") };
     }
   };
 
@@ -292,8 +308,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
+  if (!context) throw new Error("useAuth must be used within an AuthProvider");
   return context;
 }
