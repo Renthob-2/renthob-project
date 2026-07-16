@@ -1,73 +1,35 @@
-# Welcome to your Lovable project
+# Renthob
 
-## Project info
+Renthob is a Nigerian rental marketplace for renters, landlords, agents, affiliates, and platform administrators. It supports property discovery, saved listings, applications, tours, messaging, listing management, role approvals, identity review, and a deterministic plain-language rental advisor.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Local development
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Requirements: Node.js 20+ and npm.
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+npm install
+cp .env.example .env
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Set the public Supabase URL and publishable key in `.env`. Never add a service-role key to a browser environment variable.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Verification
 
-**Use GitHub Codespaces**
+```sh
+npm run check
+npm audit --omit=dev
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+`npm run check` runs TypeScript, ESLint, unit tests, and a production build. GitHub Actions runs the same checks for pushes to `main` and pull requests.
 
-## What technologies are used for this project?
+## Deployment
 
-This project is built with:
+1. Install a valid TLS certificate covering `renthob.com` and `www.renthob.com`.
+2. Apply the pending files in `supabase/migrations/` to the production Supabase project.
+3. Deploy the `rental-advisor` and `og-property` edge functions.
+4. Configure the variables documented in `.env.example` in the hosting dashboard.
+5. Run `npm run build` and publish `dist/`.
+6. On LiteSpeed/Apache, include the hidden `dist/.htaccess` file so client-side routes work after a refresh and HTTP is redirected to the now-valid HTTPS origin. Vercel uses the included `vercel.json` rewrite instead.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+The production origin is `https://renthob.com`.

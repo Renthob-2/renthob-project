@@ -53,9 +53,6 @@ export function useRentalApplications() {
           monthly_income: isPending ? null : app.monthly_income,
         } as RentalApplication;
       });
-
-      if (error) throw error;
-      return data as RentalApplication[];
     },
     enabled: !!user,
   });

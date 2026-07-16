@@ -18,14 +18,8 @@ import {
 
 const PROPERTIES_PER_PAGE = 6;
 
-const stats = [
-  { value: "500+", label: "Renters" },
-  { value: "200+", label: "Landlords" },
-  { value: "98%", label: "Satisfied" },
-];
-
 const benefits = [
-  { icon: Shield, title: "Verified Listings", description: "Every property verified for quality." },
+  { icon: Shield, title: "Reviewed Listings", description: "Listings are reviewed before they become active." },
   { icon: Clock, title: "Quick Applications", description: "Apply in minutes, not hours." },
   { icon: Users, title: "Direct Messaging", description: "Message landlords securely." },
 ];
@@ -79,7 +73,7 @@ export default function LandingPage() {
               <span className="text-gradient">Rental Home</span>
             </h1>
             <p className="text-base md:text-lg text-muted-foreground mb-5 animate-fade-in [animation-delay:100ms]">
-              Discover rental properties across Nigeria. Connect with trusted landlords instantly.
+              Discover rental properties across Nigeria and contact property owners or agents directly.
             </p>
 
             {/* Search Bar */}
@@ -103,13 +97,17 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Quick Stats — compact pill row */}
+            {/* Live platform highlights */}
             <div className="flex items-center justify-center gap-4 sm:gap-8 mt-5 animate-fade-in [animation-delay:300ms]">
-              {stats.map((stat, i) => (
+              {[
+                { value: loading ? "…" : properties.length.toLocaleString(), label: properties.length === 1 ? "Active listing" : "Active listings" },
+                { value: "Direct", label: "Messaging" },
+                { value: "Free", label: "To browse" },
+              ].map((stat, i, highlights) => (
                 <div key={stat.label} className="flex items-center gap-1.5">
                   <span className="text-lg font-bold text-foreground">{stat.value}</span>
                   <span className="text-xs text-muted-foreground">{stat.label}</span>
-                  {i < stats.length - 1 && (
+                  {i < highlights.length - 1 && (
                     <span className="ml-4 sm:ml-8 text-border hidden sm:inline">|</span>
                   )}
                 </div>
@@ -143,14 +141,14 @@ export default function LandingPage() {
             </div>
           ) : visibleProperties.length > 0 ? (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
                 {visibleProperties.map((property, index) => (
                   <div
                     key={property.id}
                     className="animate-fade-in"
                     style={{ animationDelay: `${(index % PROPERTIES_PER_PAGE) * 80}ms`, animationFillMode: 'backwards' }}
                   >
-                    <PropertyCard property={property} />
+                    <PropertyCard property={property} priority={index === 0} />
                   </div>
                 ))}
               </div>
@@ -230,7 +228,7 @@ export default function LandingPage() {
                 Search, save, and apply to properties all in one place.
               </p>
               <Button asChild size="sm" className="self-start">
-                <Link to="/signup?role=renter">Start Searching</Link>
+                <Link to="/signup?role=tenant">Start Searching</Link>
               </Button>
             </div>
 
@@ -240,7 +238,7 @@ export default function LandingPage() {
                 <h3 className="font-display text-lg font-bold text-foreground">For Landlords</h3>
               </div>
               <p className="text-sm text-muted-foreground mb-4 flex-1">
-                List your property and connect with qualified renters.
+                List your property and respond directly to interested renters.
               </p>
               <Button asChild size="sm" className="self-start">
                 <Link to="/signup?role=landlord">List Property</Link>
@@ -271,7 +269,7 @@ export default function LandingPage() {
               Ready to Find Your New Home?
             </h2>
             <p className="text-primary-foreground/80 text-sm mt-1">
-              Join thousands of happy renters and landlords on Renthob.
+              Browse available homes or publish your first property listing.
             </p>
           </div>
           <div className="flex gap-3 flex-shrink-0">

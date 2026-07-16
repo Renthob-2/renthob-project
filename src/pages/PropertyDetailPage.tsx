@@ -15,6 +15,8 @@ import {
   Heart,
   CheckCircle2,
   Building2,
+  ExternalLink,
+  Sparkles,
 } from "lucide-react";
 import { PropertyImageGallery } from "@/components/property/PropertyImageGallery";
 import { PropertyShareSheet } from "@/components/property/PropertyShareSheet";
@@ -23,13 +25,14 @@ import { ApplyNowDialog } from "@/components/property/ApplyNowDialog";
 import { ScheduleTourDialog } from "@/components/property/ScheduleTourDialog";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { toast } from "sonner";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
+import { formatDataLabel } from "@/lib/format";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 type DbProperty = Database["public"]["Tables"]["properties"]["Row"];
 
 interface OwnerProfile {
   full_name: string | null;
-  email: string | null;
   display_name_preference: string | null;
   agency_name: string | null;
 }
@@ -66,9 +69,9 @@ function formatDisplayName(fullName: string, preference: string | null): string 
 export default function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { isSaved: isPropertySaved, toggleSave } = useSavedProperties();
   const [property, setProperty] = useState<PropertyWithOwner | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isSaved, setIsSaved] = useState(false);
 
   // Update OG meta tags dynamically when property loads
   useEffect(() => {
@@ -107,7 +110,7 @@ export default function PropertyDetailPage() {
     setMeta("og:description", ogDesc);
     setMeta("og:image", ogImage);
     setMeta("og:type", "website");
-    setMeta("og:url", window.location.href);
+    setMeta("og:url", getSiteUrl(`/property/${property.id}`));
     setMetaName("twitter:title", ogTitle);
     setMetaName("twitter:description", ogDesc);
     setMetaName("twitter:image", ogImage);
@@ -133,24 +136,22 @@ export default function PropertyDetailPage() {
         if (error) throw error;
 
         if (data) {
-          // Fetch owner profile with display preferences
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("full_name, email, display_name_preference, agency_name")
-            .eq("user_id", data.owner_id)
-            .maybeSingle();
-
-          // Fetch owner role
-          const { data: roleData } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", data.owner_id)
-            .maybeSingle();
+          const { data: ownerRows } = await supabase.rpc(
+            "get_public_property_owner",
+            { p_property_id: data.id },
+          );
+          const owner = ownerRows?.[0];
 
           setProperty({
             ...data,
-            owner_profile: profile || undefined,
-            owner_role: roleData || undefined,
+            owner_profile: owner
+              ? {
+                  full_name: owner.full_name,
+                  display_name_preference: owner.display_name_preference,
+                  agency_name: owner.agency_name,
+                }
+              : undefined,
+            owner_role: owner?.role ? { role: owner.role } : undefined,
           });
         }
       } catch (err) {
@@ -224,6 +225,12 @@ export default function PropertyDetailPage() {
     .join("")
     .toUpperCase()
     .slice(0, 2);
+  const saved = isPropertySaved(property.id);
+  const mapQuery = encodeURIComponent(
+    [property.address, property.location, property.city, property.state, "Nigeria"]
+      .filter(Boolean)
+      .join(", "),
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -241,11 +248,11 @@ export default function PropertyDetailPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsSaved(!isSaved)}
+              onClick={() => toggleSave(property.id)}
               className="gap-2"
             >
-              <Heart className={`h-4 w-4 ${isSaved ? "fill-destructive text-destructive" : ""}`} />
-              <span className="hidden sm:inline">{isSaved ? "Saved" : "Save"}</span>
+              <Heart className={`h-4 w-4 ${saved ? "fill-destructive text-destructive" : ""}`} />
+              <span className="hidden sm:inline">{saved ? "Saved" : "Save"}</span>
             </Button>
             <PropertyShareSheet
               propertyId={property.id}
@@ -363,7 +370,7 @@ export default function PropertyDetailPage() {
                         className="flex items-center gap-2 p-3 rounded-lg bg-muted/50"
                       >
                         <CheckCircle2 className="h-4 w-4 text-primary flex-shrink-0" />
-                        <span className="text-sm text-foreground">{amenity}</span>
+                        <span className="text-sm text-foreground">{formatDataLabel(amenity)}</span>
                       </div>
                     ))}
                   </div>
@@ -371,20 +378,20 @@ export default function PropertyDetailPage() {
               </>
             )}
 
-            {(property as any).neighborhood_features && (property as any).neighborhood_features.length > 0 && (
+            {property.neighborhood_features && property.neighborhood_features.length > 0 && (
               <>
                 <Separator />
                 {/* Neighborhood Features */}
                 <div>
                   <h2 className="text-xl font-semibold text-foreground mb-4">Neighborhood Features</h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    {((property as any).neighborhood_features as string[]).map((feature) => (
+                    {property.neighborhood_features.map((feature) => (
                       <div
                         key={feature}
                         className="flex items-center gap-2 p-3 rounded-lg bg-muted/50"
                       >
                         <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                        <span className="text-sm text-foreground">{feature}</span>
+                        <span className="text-sm text-foreground">{formatDataLabel(feature)}</span>
                       </div>
                     ))}
                   </div>
@@ -405,10 +412,16 @@ export default function PropertyDetailPage() {
                     <p className="text-sm text-muted-foreground">{property.city}, {property.state}</p>
                   </div>
                 </div>
-                {/* Placeholder for future map integration */}
-                <div className="mt-4 h-48 rounded-lg bg-muted flex items-center justify-center">
-                  <p className="text-muted-foreground text-sm">Map view coming soon</p>
-                </div>
+                <Button asChild variant="outline" className="mt-4">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${mapQuery}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open location in Google Maps
+                    <ExternalLink className="ml-2 h-4 w-4" aria-hidden="true" />
+                  </a>
+                </Button>
               </div>
             </div>
           </div>
@@ -469,21 +482,23 @@ export default function PropertyDetailPage() {
                   </div>
 
                   <p className="text-xs text-muted-foreground text-center">
-                    Typically responds within 24 hours
+                    Keep conversations in Renthob messaging for a clear record.
                   </p>
                 </CardContent>
               </Card>
 
-              {/* AI Placeholder Card */}
-              <Card className="mt-4 border-dashed border-2 bg-muted/30">
+              <Card className="mt-4 bg-primary/5">
                 <CardContent className="py-6 text-center">
                   <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-                    <span className="text-lg">✨</span>
+                    <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-1">Neighborhood Insights</h3>
-                  <p className="text-sm text-muted-foreground">
-                    AI-powered neighborhood analysis coming soon
+                  <h3 className="font-semibold text-foreground mb-1">Need help comparing this area?</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Describe your budget and preferences to see the closest available matches.
                   </p>
+                  <Button asChild size="sm" variant="outline">
+                    <Link to="/advisor">Ask Renthob Advisor</Link>
+                  </Button>
                 </CardContent>
               </Card>
             </div>

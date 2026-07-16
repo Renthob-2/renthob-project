@@ -100,13 +100,12 @@ export function useAffiliateData() {
       toast({ title: "Below minimum", description: `Minimum withdrawal is ₦${minAmount.toLocaleString()}.`, variant: "destructive" });
       return;
     }
-    const { error } = await supabase.from("affiliate_withdrawals").insert({
-      affiliate_user_id: user.id,
-      amount,
-      bank_name: bankName,
-      account_number: accountNumber,
-      account_name: accountName,
-    } as any);
+    const { error } = await supabase.rpc("request_affiliate_withdrawal", {
+      p_amount: amount,
+      p_bank_name: bankName,
+      p_account_number: accountNumber,
+      p_account_name: accountName,
+    });
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {

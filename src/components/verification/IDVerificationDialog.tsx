@@ -34,7 +34,15 @@ const DOCUMENT_TYPES = [
 interface VerificationStatus {
   status: "none" | "pending" | "verified" | "rejected";
   document_type?: string;
+  document_url?: string;
 }
+
+const FILE_EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "application/pdf": "pdf",
+};
 
 export function IDVerificationDialog() {
   const { user } = useAuth();
@@ -49,12 +57,16 @@ export function IDVerificationDialog() {
     async function fetchStatus() {
       const { data } = await supabase
         .from("id_verifications")
-        .select("status, document_type")
+        .select("status, document_type, document_url")
         .eq("user_id", user!.id)
         .maybeSingle();
 
       if (data) {
-        setVerification({ status: data.status as any, document_type: data.document_type });
+        setVerification({
+          status: data.status as VerificationStatus["status"],
+          document_type: data.document_type,
+          document_url: data.document_url,
+        });
       }
     }
     fetchStatus();
@@ -67,8 +79,8 @@ export function IDVerificationDialog() {
       toast.error("File must be less than 5MB");
       return;
     }
-    if (!selected.type.startsWith("image/") && selected.type !== "application/pdf") {
-      toast.error("Please upload an image or PDF file");
+    if (!FILE_EXTENSIONS[selected.type]) {
+      toast.error("Please upload a JPG, PNG, WebP, or PDF file");
       return;
     }
     setFile(selected);
@@ -80,22 +92,20 @@ export function IDVerificationDialog() {
       return;
     }
 
+    let uploadedPath: string | null = null;
     try {
       setSubmitting(true);
 
       // Upload document
-      const fileExt = file.name.split(".").pop();
+      const fileExt = FILE_EXTENSIONS[file.type];
       const fileName = `${user.id}/id-verification-${Date.now()}.${fileExt}`;
+      uploadedPath = fileName;
 
       const { error: uploadError } = await supabase.storage
-        .from("property-images")
+        .from("verification-documents")
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from("property-images")
-        .getPublicUrl(fileName);
 
       // Upsert verification record
       const { error } = await supabase
@@ -103,16 +113,29 @@ export function IDVerificationDialog() {
         .upsert({
           user_id: user.id,
           document_type: documentType,
-          document_url: publicUrl,
+          document_url: fileName,
           status: "pending",
         }, { onConflict: "user_id" });
 
       if (error) throw error;
 
-      setVerification({ status: "pending", document_type: documentType });
+      if (
+        verification.document_url
+        && !verification.document_url.startsWith("http")
+        && verification.document_url !== fileName
+      ) {
+        await supabase.storage
+          .from("verification-documents")
+          .remove([verification.document_url]);
+      }
+
+      setVerification({ status: "pending", document_type: documentType, document_url: fileName });
       toast.success("ID verification submitted! We'll review it shortly.");
       setOpen(false);
     } catch (err: any) {
+      if (uploadedPath) {
+        await supabase.storage.from("verification-documents").remove([uploadedPath]);
+      }
       console.error("Verification error:", err);
       toast.error("Failed to submit verification. Please try again.");
     } finally {
@@ -193,7 +216,7 @@ export function IDVerificationDialog() {
                       <p className="text-sm text-muted-foreground">Click to upload image or PDF (max 5MB)</p>
                       <input
                         type="file"
-                        accept="image/*,.pdf"
+                        accept="image/jpeg,image/png,image/webp,application/pdf"
                         onChange={handleFileChange}
                         className="hidden"
                       />

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,7 +42,6 @@ interface WithdrawalWithUser {
 
 export default function AdminAffiliatesPage() {
   const { toast } = useToast();
-  const { user } = useAuth();
   const [affiliates, setAffiliates] = useState<AffiliateWithProfile[]>([]);
   const [withdrawals, setWithdrawals] = useState<WithdrawalWithUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,7 +85,7 @@ export default function AdminAffiliatesPage() {
 
   const searchUsers = async (term: string) => {
     setSearchTerm(term);
-    if (term.length < 2) { setSearchResults([]); return; }
+    if (term.trim().length < 3) { setSearchResults([]); return; }
     const { data } = await supabase.rpc("search_profiles_for_invite", { search_term: term });
     const existingIds = new Set(affiliates.map(a => a.user_id));
     setSearchResults((data || []).filter((u: any) => !existingIds.has(u.user_id)));
@@ -194,25 +192,16 @@ export default function AdminAffiliatesPage() {
     }
   };
 
-  const handleWithdrawalAction = async (withdrawalId: string, status: "approved" | "rejected", affiliateUserId: string, amount: number) => {
-    const { error } = await supabase.from("affiliate_withdrawals").update({
-      status,
-      reviewed_by: user?.id,
-      reviewed_at: new Date().toISOString(),
-    } as any).eq("id", withdrawalId);
+  const handleWithdrawalAction = async (withdrawalId: string, status: "approved" | "rejected") => {
+    const { error } = await supabase.rpc("review_affiliate_withdrawal", {
+      p_withdrawal_id: withdrawalId,
+      p_status: status,
+      p_admin_note: null,
+    });
 
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;
-    }
-
-    if (status === "approved") {
-      const aff = affiliates.find(a => a.user_id === affiliateUserId);
-      if (aff) {
-        await supabase.from("affiliate_profiles").update({
-          available_balance: Math.max(0, aff.available_balance - amount),
-        } as any).eq("user_id", affiliateUserId);
-      }
     }
 
     toast({ title: `Withdrawal ${status}` });
@@ -512,8 +501,8 @@ export default function AdminAffiliatesPage() {
                       <TableCell>
                         {w.status === "pending" && (
                           <div className="flex gap-1">
-                            <Button size="sm" variant="default" className="h-7" onClick={() => handleWithdrawalAction(w.id, "approved", w.affiliate_user_id, w.amount)}>Approve</Button>
-                            <Button size="sm" variant="destructive" className="h-7" onClick={() => handleWithdrawalAction(w.id, "rejected", w.affiliate_user_id, w.amount)}>Reject</Button>
+                            <Button size="sm" variant="default" className="h-7" onClick={() => handleWithdrawalAction(w.id, "approved")}>Approve</Button>
+                            <Button size="sm" variant="destructive" className="h-7" onClick={() => handleWithdrawalAction(w.id, "rejected")}>Reject</Button>
                           </div>
                         )}
                       </TableCell>

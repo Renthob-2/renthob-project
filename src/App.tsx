@@ -1,181 +1,145 @@
+import { lazy, Suspense, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ComparisonProvider } from "@/contexts/ComparisonContext";
 import { PublicLayout } from "@/components/layout/PublicLayout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AdminLayout } from "@/components/admin/AdminLayout";
-import LandingPage from "./pages/LandingPage";
-import HowItWorksPage from "./pages/HowItWorksPage";
-import FeaturesPage from "./pages/FeaturesPage";
-import FAQsPage from "./pages/FAQsPage";
-import ContactPage from "./pages/ContactPage";
-import SearchPage from "./pages/SearchPage";
-import PropertyDetailPage from "./pages/PropertyDetailPage";
-import SignupPage from "./pages/SignupPage";
-import LoginPage from "./pages/LoginPage";
-import TenantDashboard from "./pages/dashboards/TenantDashboard";
-import TenantProfileSetup from "./pages/TenantProfileSetup";
-import LandlordDashboard from "./pages/dashboards/LandlordDashboard";
-import AgentDashboard from "./pages/dashboards/AgentDashboard";
-import AffiliateDashboard from "./pages/dashboards/AffiliateDashboard";
-import CreateListingPage from "./pages/CreateListingPage";
-import EditPropertyPage from "./pages/EditPropertyPage";
-import MyPropertiesPage from "./pages/MyPropertiesPage";
-import MessagesPage from "./pages/MessagesPage";
-import ProfileSettingsPage from "./pages/ProfileSettingsPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import ChatRoomsPage from "./pages/ChatRoomsPage";
-import SavedPropertiesPage from "./pages/SavedPropertiesPage";
-import AdminOverviewPage from "./pages/admin/AdminOverviewPage";
-import AdminUsersPage from "./pages/admin/AdminUsersPage";
-import AdminApprovalsPage from "./pages/admin/AdminApprovalsPage";
-import AdminPropertiesPage from "./pages/admin/AdminPropertiesPage";
-import AdminVerificationsPage from "./pages/admin/AdminVerificationsPage";
-import AdminApplicationsPage from "./pages/admin/AdminApplicationsPage";
-import AdminAnnouncementsPage from "./pages/admin/AdminAnnouncementsPage";
-import AdminActivityPage from "./pages/admin/AdminActivityPage";
-import AdminRoleRequestsPage from "./pages/admin/AdminRoleRequestsPage";
-import AdminRoleAuditPage from "./pages/admin/AdminRoleAuditPage";
-import AdminAffiliatesPage from "./pages/admin/AdminAffiliatesPage";
-import NotificationsPage from "./pages/NotificationsPage";
-import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const HowItWorksPage = lazy(() => import("./pages/HowItWorksPage"));
+const FeaturesPage = lazy(() => import("./pages/FeaturesPage"));
+const FAQsPage = lazy(() => import("./pages/FAQsPage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+const SearchPage = lazy(() => import("./pages/SearchPage"));
+const SmartAdvisorPage = lazy(() => import("./pages/SmartAdvisorPage"));
+const PropertyDetailPage = lazy(() => import("./pages/PropertyDetailPage"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage"));
+const SignupPage = lazy(() => import("./pages/SignupPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage"));
+const TenantDashboard = lazy(() => import("./pages/dashboards/TenantDashboard"));
+const TenantProfileSetup = lazy(() => import("./pages/TenantProfileSetup"));
+const LandlordDashboard = lazy(() => import("./pages/dashboards/LandlordDashboard"));
+const AgentDashboard = lazy(() => import("./pages/dashboards/AgentDashboard"));
+const AffiliateDashboard = lazy(() => import("./pages/dashboards/AffiliateDashboard"));
+const ApplicationsPage = lazy(() => import("./pages/ApplicationsPage"));
+const CreateListingPage = lazy(() => import("./pages/CreateListingPage"));
+const EditPropertyPage = lazy(() => import("./pages/EditPropertyPage"));
+const MyPropertiesPage = lazy(() => import("./pages/MyPropertiesPage"));
+const MessagesPage = lazy(() => import("./pages/MessagesPage"));
+const ChatRoomsPage = lazy(() => import("./pages/ChatRoomsPage"));
+const ProfileSettingsPage = lazy(() => import("./pages/ProfileSettingsPage"));
+const SavedPropertiesPage = lazy(() => import("./pages/SavedPropertiesPage"));
+const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
+const AdminOverviewPage = lazy(() => import("./pages/admin/AdminOverviewPage"));
+const AdminUsersPage = lazy(() => import("./pages/admin/AdminUsersPage"));
+const AdminApprovalsPage = lazy(() => import("./pages/admin/AdminApprovalsPage"));
+const AdminRoleRequestsPage = lazy(() => import("./pages/admin/AdminRoleRequestsPage"));
+const AdminRoleAuditPage = lazy(() => import("./pages/admin/AdminRoleAuditPage"));
+const AdminPropertiesPage = lazy(() => import("./pages/admin/AdminPropertiesPage"));
+const AdminVerificationsPage = lazy(() => import("./pages/admin/AdminVerificationsPage"));
+const AdminApplicationsPage = lazy(() => import("./pages/admin/AdminApplicationsPage"));
+const AdminAnnouncementsPage = lazy(() => import("./pages/admin/AdminAnnouncementsPage"));
+const AdminActivityPage = lazy(() => import("./pages/admin/AdminActivityPage"));
+const AdminAffiliatesPage = lazy(() => import("./pages/admin/AdminAffiliatesPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <ComparisonProvider>
-            <Routes>
-            {/* Public Website Routes */}
-            <Route element={<PublicLayout />}>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/how-it-works" element={<HowItWorksPage />} />
-              <Route path="/features" element={<FeaturesPage />} />
-              <Route path="/faqs" element={<FAQsPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/search" element={<SearchPage />} />
-              <Route path="/property/:id" element={<PropertyDetailPage />} />
-            </Route>
-            
-            {/* Auth Routes (no header/footer) */}
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
-            
-            {/* Protected Dashboard Routes - with header/footer */}
-            <Route element={<PublicLayout />}>
-              <Route path="/dashboard/tenant" element={
-                <ProtectedRoute allowedRoles={["tenant"]}>
-                  <TenantDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/profile/setup" element={
-                <ProtectedRoute allowedRoles={["tenant"]}>
-                  <TenantProfileSetup />
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard/landlord" element={
-                <ProtectedRoute allowedRoles={["landlord"]}>
-                  <LandlordDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard/agent" element={
-                <ProtectedRoute allowedRoles={["agent"]}>
-                  <AgentDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/dashboard/affiliate" element={
-                <ProtectedRoute allowedRoles={["affiliate"]}>
-                  <AffiliateDashboard />
-                </ProtectedRoute>
-              } />
-              <Route path="/affiliate" element={
-                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin", "affiliate"]}>
-                  <AffiliateDashboard />
-                </ProtectedRoute>
-              } />
-              
-              {/* Property Management Routes */}
-              <Route path="/property/create" element={
-                <ProtectedRoute allowedRoles={["landlord", "agent"]}>
-                  <CreateListingPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/property/:id/edit" element={
-                <ProtectedRoute allowedRoles={["landlord", "agent"]}>
-                  <EditPropertyPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/my-properties" element={
-                <ProtectedRoute allowedRoles={["landlord", "agent"]}>
-                  <MyPropertiesPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/messages" element={
-                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
-                  <MessagesPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/chat-rooms" element={
-                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
-                  <ChatRoomsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/settings/profile" element={
-                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin", "affiliate"]}>
-                  <ProfileSettingsPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/saved" element={
-                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent"]}>
-                  <SavedPropertiesPage />
-                </ProtectedRoute>
-              } />
-              <Route path="/notifications" element={
-                <ProtectedRoute allowedRoles={["tenant", "landlord", "agent", "admin", "affiliate"]}>
-                  <NotificationsPage />
-                </ProtectedRoute>
-              } />
-            </Route>
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      retry: 1,
+    },
+  },
+});
 
-            {/* Admin Routes - with sidebar layout */}
-            <Route path="/admin" element={
-              <ProtectedRoute allowedRoles={["admin"]}>
-                <AdminLayout />
-              </ProtectedRoute>
-            }>
-              <Route index element={<AdminOverviewPage />} />
-              <Route path="users" element={<AdminUsersPage />} />
-              <Route path="approvals" element={<AdminApprovalsPage />} />
-              <Route path="role-requests" element={<AdminRoleRequestsPage />} />
-              <Route path="role-audit" element={<AdminRoleAuditPage />} />
-              <Route path="properties" element={<AdminPropertiesPage />} />
-              <Route path="verifications" element={<AdminVerificationsPage />} />
-              <Route path="applications" element={<AdminApplicationsPage />} />
-              <Route path="announcements" element={<AdminAnnouncementsPage />} />
-              <Route path="activity" element={<AdminActivityPage />} />
-              <Route path="affiliates" element={<AdminAffiliatesPage />} />
-            </Route>
-            
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </ComparisonProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function PageFallback() {
+  return (
+    <div className="flex min-h-[50vh] items-center justify-center" role="status" aria-label="Loading page">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+    </div>
+  );
+}
 
-export default App;
+function Protected({ roles, children }: { roles: Parameters<typeof ProtectedRoute>[0]["allowedRoles"]; children: ReactNode }) {
+  return <ProtectedRoute allowedRoles={roles}>{children}</ProtectedRoute>;
+}
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <ComparisonProvider>
+              <Suspense fallback={<PageFallback />}>
+                <Routes>
+                  <Route element={<PublicLayout />}>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/how-it-works" element={<HowItWorksPage />} />
+                    <Route path="/features" element={<FeaturesPage />} />
+                    <Route path="/faqs" element={<FAQsPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/advisor" element={<SmartAdvisorPage />} />
+                    <Route path="/property/:id" element={<PropertyDetailPage />} />
+                    <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                    <Route path="/terms" element={<TermsPage />} />
+                  </Route>
+
+                  <Route path="/signup" element={<SignupPage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+                  <Route element={<PublicLayout />}>
+                    <Route path="/dashboard/tenant" element={<Protected roles={["tenant"]}><TenantDashboard /></Protected>} />
+                    <Route path="/profile/setup" element={<Protected roles={["tenant"]}><TenantProfileSetup /></Protected>} />
+                    <Route path="/dashboard/landlord" element={<Protected roles={["landlord"]}><LandlordDashboard /></Protected>} />
+                    <Route path="/dashboard/agent" element={<Protected roles={["agent"]}><AgentDashboard /></Protected>} />
+                    <Route path="/dashboard/affiliate" element={<Protected roles={["affiliate"]}><AffiliateDashboard /></Protected>} />
+                    <Route path="/affiliate" element={<Protected roles={["tenant", "landlord", "agent", "admin", "affiliate"]}><AffiliateDashboard /></Protected>} />
+                    <Route path="/applications" element={<Protected roles={["tenant"]}><ApplicationsPage /></Protected>} />
+                    <Route path="/property/create" element={<Protected roles={["landlord", "agent"]}><CreateListingPage /></Protected>} />
+                    <Route path="/property/:id/edit" element={<Protected roles={["landlord", "agent"]}><EditPropertyPage /></Protected>} />
+                    <Route path="/my-properties" element={<Protected roles={["landlord", "agent"]}><MyPropertiesPage /></Protected>} />
+                    <Route path="/messages" element={<Protected roles={["tenant", "landlord", "agent"]}><MessagesPage /></Protected>} />
+                    <Route path="/chat-rooms" element={<Protected roles={["tenant", "landlord", "agent"]}><ChatRoomsPage /></Protected>} />
+                    <Route path="/settings/profile" element={<Protected roles={["tenant", "landlord", "agent", "admin", "affiliate"]}><ProfileSettingsPage /></Protected>} />
+                    <Route path="/saved" element={<Protected roles={["tenant", "landlord", "agent"]}><SavedPropertiesPage /></Protected>} />
+                    <Route path="/notifications" element={<Protected roles={["tenant", "landlord", "agent", "admin", "affiliate"]}><NotificationsPage /></Protected>} />
+                  </Route>
+
+                  <Route path="/admin" element={<Protected roles={["admin"]}><AdminLayout /></Protected>}>
+                    <Route index element={<AdminOverviewPage />} />
+                    <Route path="users" element={<AdminUsersPage />} />
+                    <Route path="approvals" element={<AdminApprovalsPage />} />
+                    <Route path="role-requests" element={<AdminRoleRequestsPage />} />
+                    <Route path="role-audit" element={<AdminRoleAuditPage />} />
+                    <Route path="properties" element={<AdminPropertiesPage />} />
+                    <Route path="verifications" element={<AdminVerificationsPage />} />
+                    <Route path="applications" element={<AdminApplicationsPage />} />
+                    <Route path="announcements" element={<AdminAnnouncementsPage />} />
+                    <Route path="activity" element={<AdminActivityPage />} />
+                    <Route path="affiliates" element={<AdminAffiliatesPage />} />
+                  </Route>
+
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </ComparisonProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}

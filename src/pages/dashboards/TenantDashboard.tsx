@@ -1,34 +1,65 @@
-import { AnnouncementsBanner } from "@/components/dashboard/AnnouncementsBanner";
+import {
+  Bell,
+  CalendarDays,
+  CheckCircle,
+  FileText,
+  Heart,
+  MessageSquare,
+  Search,
+  Sparkles,
+  UserCircle,
+} from "lucide-react";
+import { Link } from "react-router-dom";
+
 import { BackButton } from "@/components/BackButton";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { useAuth } from "@/contexts/AuthContext";
-import { useTenantProfile } from "@/hooks/useTenantProfile";
-import { useSavedProperties } from "@/hooks/useSavedProperties";
+import { AnnouncementsBanner } from "@/components/dashboard/AnnouncementsBanner";
 import { TenantActivityList } from "@/components/dashboard/TenantActivityList";
 import { IDVerificationDialog } from "@/components/verification/IDVerificationDialog";
-import { Link, useNavigate } from "react-router-dom";
-import { 
-  Heart, 
-  FileText, 
-  MessageSquare, 
-  Bell, 
-  Search,
-  ArrowLeft,
-  UserCircle,
-  Sparkles,
-  CheckCircle
-} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/contexts/AuthContext";
+import { useMessages } from "@/hooks/useMessages";
+import { useNotifications } from "@/hooks/useNotifications";
+import { useSavedProperties } from "@/hooks/useSavedProperties";
+import { useTenantApplications } from "@/hooks/useTenantApplications";
+import { useTenantProfile } from "@/hooks/useTenantProfile";
+import { useTenantTourRequests } from "@/hooks/useTenantTourRequests";
+import { formatCompactNaira } from "@/lib/format";
+
+interface SavedPropertyItem {
+  property_id: string;
+  created_at: string;
+  properties: {
+    id: string;
+    title: string;
+    location: string;
+    city: string;
+    price: number;
+    price_period: string;
+    images: string[] | null;
+  } | null;
+}
 
 export default function TenantDashboard() {
   const { profile } = useAuth();
   const { isComplete, isLoading: profileLoading, completenessPercentage } = useTenantProfile();
   const { savedPropertiesWithDetails, savedCount, isLoadingDetails } = useSavedProperties();
-  const navigate = useNavigate();
+  const { applications } = useTenantApplications();
+  const { tourRequests } = useTenantTourRequests();
+  const { unreadCount: unreadMessages } = useMessages();
+  const { notifications, unreadCount: unreadNotifications, loading: notificationsLoading } = useNotifications();
+  const savedItems = savedPropertiesWithDetails as unknown as SavedPropertyItem[];
 
-
+  const actions = [
+    { to: "/search", label: "Search properties", Icon: Search },
+    { to: "/saved", label: `Saved (${savedCount})`, Icon: Heart },
+    { to: "/applications", label: "Applications", Icon: FileText },
+    { to: "/messages", label: "Messages", Icon: MessageSquare },
+    { to: "/profile/setup", label: "Edit profile", Icon: UserCircle },
+    { to: "/advisor", label: "AI Advisor", Icon: Sparkles },
+  ];
 
   return (
     <div className="min-h-screen bg-muted/30">
@@ -36,122 +67,86 @@ export default function TenantDashboard() {
         <BackButton />
         <AnnouncementsBanner />
 
-        {/* Welcome Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">
-            Welcome back, {profile?.full_name || "Tenant"}! 👋
+            Welcome back, {profile?.full_name || "Tenant"}
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Find your perfect home and manage your rental journey
-          </p>
-          <div className="mt-2">
-            <IDVerificationDialog />
-          </div>
+          <p className="mt-1 text-muted-foreground">Find a home and manage your rental journey.</p>
+          <div className="mt-3"><IDVerificationDialog /></div>
         </div>
 
-        {/* Profile Completion Banner */}
         {!profileLoading && !isComplete && (
           <Card className="mb-8 border-primary/30 bg-primary/5">
-            <CardContent className="flex flex-col sm:flex-row items-center gap-4 py-5">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <CardContent className="flex flex-col items-center gap-4 py-5 sm:flex-row">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10">
                 <Sparkles className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1 text-center sm:text-left">
-                <h3 className="font-semibold">Complete your profile for AI-powered matches</h3>
+                <h2 className="font-semibold">Complete your renter profile</h2>
                 <p className="text-sm text-muted-foreground">
-                  Tell us about your lifestyle, budget, and preferences — our AI will match you to the perfect property and neighborhood.
+                  Add your budget and preferences so landlords receive complete applications from you.
                 </p>
               </div>
-              <Button asChild>
-                <Link to="/profile/setup">
-                  <UserCircle className="h-4 w-4 mr-2" />
-                  Complete Profile
-                </Link>
-              </Button>
+              <Button asChild><Link to="/profile/setup">Complete profile</Link></Button>
             </CardContent>
           </Card>
         )}
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
-          <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2">
-            <Link to="/search">
-              <Search className="h-6 w-6 text-primary" />
-              <span>Search Properties</span>
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2">
-            <Link to="/saved">
-              <Heart className="h-6 w-6 text-primary" />
-              <span>Saved ({savedCount})</span>
-            </Link>
-          </Button>
-          <Button variant="outline" className="h-auto py-4 flex flex-col gap-2">
-            <FileText className="h-6 w-6 text-primary" />
-            <span>Applications</span>
-          </Button>
-          <Button variant="outline" className="h-auto py-4 flex flex-col gap-2">
-            <MessageSquare className="h-6 w-6 text-primary" />
-            <span>Messages</span>
-          </Button>
-          <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2">
-            <Link to="/profile/setup">
-              <UserCircle className="h-6 w-6 text-primary" />
-              <span>Edit Profile</span>
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="h-auto py-4 flex flex-col gap-2 border-primary/30">
-            <Link to="/affiliate">
-              <Sparkles className="h-6 w-6 text-primary" />
-              <span>Affiliate</span>
-            </Link>
-          </Button>
+        <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-6">
+          {actions.map(({ to, label, Icon }) => (
+            <Button key={to} asChild variant="outline" className="h-auto min-h-24 whitespace-normal py-4">
+              <Link to={to} className="flex flex-col gap-2 text-center">
+                <Icon className="h-6 w-6 text-primary" />
+                <span>{label}</span>
+              </Link>
+            </Button>
+          ))}
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Saved Properties */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="space-y-6 lg:col-span-2">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-row items-center justify-between gap-4">
                 <div>
                   <CardTitle className="flex items-center gap-2">
-                    <Heart className="h-5 w-5 text-primary" />
-                    Saved Properties
+                    <Heart className="h-5 w-5 text-primary" />Saved properties
                   </CardTitle>
-                  <CardDescription>Properties you've bookmarked</CardDescription>
+                  <CardDescription>Properties you bookmarked</CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" asChild>
-                  <Link to="/saved">View All</Link>
-                </Button>
+                <Button variant="ghost" size="sm" asChild><Link to="/saved">View all</Link></Button>
               </CardHeader>
               <CardContent>
                 {isLoadingDetails ? (
-                  <p className="text-sm text-muted-foreground">Loading...</p>
-                ) : savedPropertiesWithDetails.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No saved properties yet. Browse and save properties you like!</p>
+                  <p className="text-sm text-muted-foreground">Loading saved properties…</p>
+                ) : savedItems.length === 0 ? (
+                  <div className="py-8 text-center text-muted-foreground">
+                    <Heart className="mx-auto mb-3 h-10 w-10 opacity-30" />
+                    <p className="text-sm">No saved properties yet.</p>
+                    <Button variant="link" asChild><Link to="/search">Browse properties</Link></Button>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
-                    {savedPropertiesWithDetails.slice(0, 3).map((item: any) => {
-                      const p = item.properties;
-                      if (!p) return null;
-                      const formatPrice = (price: number) => {
-                        if (price >= 1000000) return `₦${(price / 1000000).toFixed(1)}M`;
-                        return `₦${price.toLocaleString()}`;
-                      };
+                  <div className="space-y-3">
+                    {savedItems.slice(0, 3).map((item) => {
+                      const property = item.properties;
+                      if (!property) return null;
                       return (
-                        <div key={p.id} className="flex gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer" onClick={() => navigate(`/property/${p.id}`)}>
-                          <img 
-                            src={(p.images && p.images[0]) || "/placeholder.svg"} 
-                            alt={p.title}
-                            className="w-20 h-20 rounded-md object-cover bg-muted"
+                        <div key={property.id} className="flex flex-col gap-3 rounded-lg border p-3 sm:flex-row sm:items-center">
+                          <img
+                            src={property.images?.[0] || "/placeholder.svg"}
+                            alt=""
+                            className="h-24 w-full rounded-md bg-muted object-cover sm:h-20 sm:w-24"
+                            loading="lazy"
                           />
-                          <div className="flex-1">
-                            <h4 className="font-medium">{p.title}</h4>
-                            <p className="text-sm text-muted-foreground">{p.location}, {p.city}</p>
-                            <p className="text-sm font-semibold text-primary mt-1">{formatPrice(Number(p.price))}/{p.price_period === "year" ? "yr" : "mo"}</p>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="truncate font-medium">{property.title}</h3>
+                            <p className="truncate text-sm text-muted-foreground">{property.location}, {property.city}</p>
+                            <p className="mt-1 text-sm font-semibold text-primary">
+                              {formatCompactNaira(Number(property.price))}/{property.price_period}
+                            </p>
                           </div>
-                          <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); navigate(`/property/${p.id}`); }}>View</Button>
+                          <Button variant="outline" size="sm" asChild>
+                            <Link to={`/property/${property.id}`}>View</Link>
+                          </Button>
                         </div>
                       );
                     })}
@@ -160,106 +155,78 @@ export default function TenantDashboard() {
               </CardContent>
             </Card>
 
-            {/* Applications & Tour Requests - Real Data */}
             <TenantActivityList />
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Profile Completeness */}
+          <aside className="space-y-6">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <UserCircle className="h-5 w-5 text-primary" />
-                  Profile Completeness
+                  <UserCircle className="h-5 w-5 text-primary" />Profile completeness
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-primary">{completenessPercentage}%</span>
-                    {completenessPercentage === 100 ? (
-                      <Badge className="bg-primary/10 text-primary border-0">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Complete
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        In Progress
-                      </Badge>
-                    )}
-                  </div>
-                  <Progress value={completenessPercentage} className="h-2" />
-                  <p className="text-xs text-muted-foreground">
-                    {completenessPercentage === 100 
-                      ? "Your profile is complete! AI matching is active."
-                      : "Complete your profile to unlock AI-powered property matching."}
-                  </p>
-                  {completenessPercentage < 100 && (
-                    <Button asChild size="sm" className="w-full mt-2">
-                      <Link to="/profile/setup">
-                        Complete Profile
-                      </Link>
-                    </Button>
-                  )}
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-bold text-primary">{completenessPercentage}%</span>
+                  <Badge variant={completenessPercentage === 100 ? "default" : "secondary"}>
+                    {completenessPercentage === 100 && <CheckCircle className="mr-1 h-3 w-3" />}
+                    {completenessPercentage === 100 ? "Complete" : "In progress"}
+                  </Badge>
                 </div>
+                <Progress value={completenessPercentage} className="h-2" />
+                {completenessPercentage < 100 && (
+                  <Button size="sm" className="w-full" asChild><Link to="/profile/setup">Complete profile</Link></Button>
+                )}
               </CardContent>
             </Card>
 
-            {/* Notifications */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between gap-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Bell className="h-5 w-5 text-primary" />
-                  Notifications
+                  <Bell className="h-5 w-5 text-primary" />Notifications
                 </CardTitle>
+                {unreadNotifications > 0 && <Badge>{unreadNotifications} unread</Badge>}
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="p-3 rounded-lg bg-primary/5 border-l-4 border-primary">
-                    <p className="text-sm font-medium">New property match!</p>
-                    <p className="text-xs text-muted-foreground">A property matching your criteria is now available</p>
+                {notificationsLoading ? (
+                  <p className="text-sm text-muted-foreground">Loading notifications…</p>
+                ) : notifications.length === 0 ? (
+                  <p className="py-4 text-sm text-muted-foreground">You have no notifications.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {notifications.slice(0, 3).map((notification) => (
+                      <div key={notification.id} className={`rounded-lg border p-3 ${notification.is_read ? "" : "border-primary/30 bg-primary/5"}`}>
+                        <p className="text-sm font-medium">{notification.title}</p>
+                        <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{notification.message}</p>
+                      </div>
+                    ))}
                   </div>
-                  <div className="p-3 rounded-lg bg-muted">
-                    <p className="text-sm font-medium">Application update</p>
-                    <p className="text-xs text-muted-foreground">Your application for Luxury Penthouse was approved</p>
-                  </div>
-                  <div className="p-3 rounded-lg bg-muted">
-                    <p className="text-sm font-medium">Message from landlord</p>
-                    <p className="text-xs text-muted-foreground">You have a new message regarding...</p>
-                  </div>
-                </div>
+                )}
+                <Button variant="link" className="mt-2 h-auto px-0" asChild><Link to="/notifications">View all</Link></Button>
               </CardContent>
             </Card>
 
-            {/* Quick Stats */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Your Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center p-3 rounded-lg bg-muted">
-                    <p className="text-2xl font-bold text-primary">12</p>
-                    <p className="text-xs text-muted-foreground">Properties Viewed</p>
+              <CardHeader><CardTitle className="text-lg">Your activity</CardTitle></CardHeader>
+              <CardContent className="grid grid-cols-2 gap-3">
+                {[
+                  [savedCount, savedCount === 1 ? "Saved property" : "Saved properties"],
+                  [applications.length, applications.length === 1 ? "Application" : "Applications"],
+                  [tourRequests.length, tourRequests.length === 1 ? "Tour request" : "Tour requests"],
+                  [unreadMessages, unreadMessages === 1 ? "Unread message" : "Unread messages"],
+                ].map(([value, label]) => (
+                  <div key={String(label)} className="rounded-lg bg-muted p-3 text-center">
+                    <p className="text-2xl font-bold text-primary">{String(value)}</p>
+                    <p className="text-xs text-muted-foreground">{String(label)}</p>
                   </div>
-                  <div className="text-center p-3 rounded-lg bg-muted">
-                    <p className="text-2xl font-bold text-primary">3</p>
-                    <p className="text-xs text-muted-foreground">Saved</p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-muted">
-                    <p className="text-2xl font-bold text-primary">3</p>
-                    <p className="text-xs text-muted-foreground">Applications</p>
-                  </div>
-                  <div className="text-center p-3 rounded-lg bg-muted">
-                    <p className="text-2xl font-bold text-primary">2</p>
-                    <p className="text-xs text-muted-foreground">Messages</p>
-                  </div>
-                </div>
+                ))}
               </CardContent>
             </Card>
-          </div>
+
+            <Button variant="outline" className="w-full" asChild>
+              <Link to="/applications"><CalendarDays className="mr-2 h-4 w-4" />Open rental activity</Link>
+            </Button>
+          </aside>
         </div>
       </div>
     </div>

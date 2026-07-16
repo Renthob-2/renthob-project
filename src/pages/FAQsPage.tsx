@@ -22,7 +22,7 @@ const generalFaqs = [
   {
     question: "Are listings verified?",
     answer:
-      "We encourage landlords and agencies to verify their listings to ensure reliability and transparency.",
+      "Listings are reviewed before being made active, and owners can submit identity verification. Renters should still inspect a property and verify the person they are dealing with before making any payment.",
   },
   {
     question: "Can I list properties if I'm not an agency?",
@@ -60,7 +60,7 @@ const renterFaqs = [
   {
     question: "Are the listings verified?",
     answer:
-      "Renthob works to ensure listings are legitimate and encourages landlord verification.",
+      "Renthob reviews listings before activation, but no online review replaces an in-person inspection. Never send money until you have verified the property and the owner or agent.",
   },
   {
     question: "Does Renthob charge renters?",
@@ -73,12 +73,12 @@ const landlordFaqs = [
   {
     question: "Who can list a property on Renthob?",
     answer:
-      "Any verified property owner can list rental properties on Renthob.",
+      "Approved landlord and agent accounts can submit rental properties for review.",
   },
   {
     question: "How much does it cost to list a property?",
     answer:
-      "Basic property listing may be free, while premium listing options may offer greater visibility.",
+      "Contact Renthob support for the current listing terms. The website does not currently process listing payments.",
   },
   {
     question: "How do renters contact me?",
@@ -106,7 +106,7 @@ const agencyFaqs = [
   {
     question: "Can agencies manage multiple agents?",
     answer:
-      "Yes. Agencies can manage listings and property inquiries from multiple agents.",
+      "Each approved agent has an individual account and can manage multiple listings. Shared agency-team administration is not currently available.",
   },
   {
     question: "How do renters contact agencies?",
@@ -121,7 +121,7 @@ const agencyFaqs = [
   {
     question: "Is there a cost for agencies?",
     answer:
-      "Basic listings may be free while premium visibility tools may be available for agencies.",
+      "Contact Renthob support for the current agent and listing terms. The website does not currently process subscription payments.",
   },
 ];
 
@@ -232,7 +232,7 @@ export default function FAQsPage() {
             Still Have Questions?
           </h2>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Our support team is here to help. Reach out and we'll get back to you within 24 hours.
+            Our support team is here to help with account, listing, and technical questions.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg">

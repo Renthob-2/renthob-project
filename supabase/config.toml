@@ -1,4 +1,7 @@
-project_id = "njgecwxeuuazcgshkkmj"
+project_id = "rjszvcxdxppgpikzjcbs"
 
 [functions.og-property]
+verify_jwt = false
+
+[functions.rental-advisor]
 verify_jwt = false

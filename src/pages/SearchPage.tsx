@@ -6,6 +6,7 @@ import { MobileFiltersSheet } from "@/components/search/MobileFiltersSheet";
 import { ComparisonTray } from "@/components/comparison/ComparisonTray";
 import { useProperties, useFilteredProperties } from "@/hooks/useProperties";
 import { FilterState, SortOption, DEFAULT_FILTERS } from "@/types/filters";
+import { pluralize } from "@/lib/format";
 
 const RESULTS_PER_PAGE = 6;
 
@@ -45,12 +46,8 @@ export default function SearchPage() {
 
   // Filter and sort properties
   const filteredProperties = useFilteredProperties(properties, filters, sortBy);
-  const filtersWithoutLocation = useMemo(() => ({ ...filters, location: "" }), [filters]);
-  const allFilteredProperties = useFilteredProperties(properties, filtersWithoutLocation, sortBy);
-  
-  // If location filter yields no results, fall back to showing all available properties
-  const noLocationMatches = !!filters.location && filteredProperties.length === 0 && properties.length > 0 && !loading;
-  const displayProperties = noLocationMatches ? allFilteredProperties : filteredProperties;
+  const noLocationMatches = Boolean(filters.location) && filteredProperties.length === 0 && properties.length > 0 && !loading;
+  const displayProperties = filteredProperties;
 
   const totalPages = Math.ceil(displayProperties.length / RESULTS_PER_PAGE);
 
@@ -78,7 +75,7 @@ export default function SearchPage() {
             Find Your Perfect Rental
           </h1>
           <p className="text-muted-foreground">
-            {loading ? "Loading properties..." : `Browse ${properties.length} properties available`}
+            {loading ? "Loading properties..." : `Browse ${pluralize(properties.length, "property", "properties")} available`}
           </p>
         </div>
       </div>
@@ -113,7 +110,7 @@ export default function SearchPage() {
 
             {noLocationMatches && (
               <div className="mb-4 rounded-lg border border-border bg-muted/50 p-3 text-sm text-muted-foreground">
-                No properties found in "<span className="font-medium text-foreground">{filters.location}</span>". Showing other available properties nearby.
+                No properties currently match "<span className="font-medium text-foreground">{filters.location}</span>" and the other selected filters.
               </div>
             )}
 

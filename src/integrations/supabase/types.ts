@@ -1006,6 +1006,16 @@ export type Database = {
       }
       can_join_realtime_topic: { Args: { topic: string }; Returns: boolean }
       get_affiliate_by_code: { Args: { code: string }; Returns: string }
+      get_public_property_owner: {
+        Args: { p_property_id: string }
+        Returns: {
+          agency_name: string | null
+          display_name_preference: string | null
+          full_name: string | null
+          role: Database["public"]["Enums"]["app_role"] | null
+          user_id: string
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -1035,6 +1045,23 @@ export type Database = {
       }
       reject_role_request: {
         Args: { admin_note?: string; request_id: string }
+        Returns: undefined
+      }
+      request_affiliate_withdrawal: {
+        Args: {
+          p_account_name: string
+          p_account_number: string
+          p_amount: number
+          p_bank_name: string
+        }
+        Returns: string
+      }
+      review_affiliate_withdrawal: {
+        Args: {
+          p_admin_note?: string | null
+          p_status: string
+          p_withdrawal_id: string
+        }
         Returns: undefined
       }
       search_profiles_by_role: {

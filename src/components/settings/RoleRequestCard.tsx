@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,8 +25,13 @@ export function RoleRequestCard() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState<Requested | null>(null);
 
-  const load = async () => {
-    if (!user) return;
+  const load = useCallback(async () => {
+    if (!user) {
+      setPending(null);
+      setHistory([]);
+      setLoading(false);
+      return;
+    }
     const { data } = await supabase
       .from("role_requests")
       .select("*")
@@ -36,11 +41,11 @@ export function RoleRequestCard() {
     setPending(rows.find((r) => r.status === "pending") || null);
     setHistory(rows);
     setLoading(false);
-  };
+  }, [user]);
 
   useEffect(() => {
-    load();
-  }, [user?.id]);
+    void load();
+  }, [load]);
 
   // Hide for users who are already landlord / agent / admin
   if (role === "landlord" || role === "agent" || role === "admin") return null;
@@ -57,7 +62,7 @@ export function RoleRequestCard() {
       return;
     }
     toast({ title: "Request submitted", description: "An admin will review your request shortly." });
-    load();
+    void load();
   };
 
   return (

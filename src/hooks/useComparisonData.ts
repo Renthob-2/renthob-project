@@ -42,10 +42,12 @@ export function useComparisonData(propertyIds: string[]) {
   const [properties, setProperties] = useState<SearchProperty[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const propertyKey = propertyIds.join(",");
 
   useEffect(() => {
     async function fetchProperties() {
-      if (propertyIds.length === 0) {
+      const stablePropertyIds = propertyKey ? propertyKey.split(",") : [];
+      if (stablePropertyIds.length === 0) {
         setProperties([]);
         return;
       }
@@ -57,13 +59,13 @@ export function useComparisonData(propertyIds: string[]) {
         const { data, error: fetchError } = await supabase
           .from("properties")
           .select("*")
-          .in("id", propertyIds);
+          .in("id", stablePropertyIds);
 
         if (fetchError) throw fetchError;
 
         // Maintain the order from propertyIds
         const transformedProperties = (data || []).map(transformProperty);
-        const orderedProperties = propertyIds
+        const orderedProperties = stablePropertyIds
           .map((id) => transformedProperties.find((p) => p.id === id))
           .filter((p): p is SearchProperty => p !== undefined);
 
@@ -77,7 +79,7 @@ export function useComparisonData(propertyIds: string[]) {
     }
 
     fetchProperties();
-  }, [propertyIds.join(",")]); // Join to create stable dependency
+  }, [propertyKey]);
 
   // Calculate best values for highlighting
   const highlights = useMemo<ComparisonHighlights>(() => {

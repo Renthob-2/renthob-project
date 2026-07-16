@@ -30,7 +30,7 @@ export default function ContactPage() {
             <a href="mailto:support@renthob.com" className="text-primary hover:underline">
               support@renthob.com
             </a>
-            <p className="text-sm text-muted-foreground mt-2">Typical response within 24 hours.</p>
+            <p className="text-sm text-muted-foreground mt-2">For account, listing, and technical support.</p>
           </CardContent>
         </Card>
 

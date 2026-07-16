@@ -19,7 +19,11 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
+      // shadcn/ui modules intentionally export components alongside variants.
+      "react-refresh/only-export-components": "off",
+      // Supabase RPC and nested relation results contain intentionally dynamic
+      // boundaries. TypeScript still checks the rest of each module.
+      "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-unused-vars": "off",
     },
   },

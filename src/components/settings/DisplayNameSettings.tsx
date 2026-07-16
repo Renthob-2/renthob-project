@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
@@ -19,13 +19,7 @@ export function DisplayNameSettings() {
   const [displayNamePreference, setDisplayNamePreference] = useState<DisplayNamePreference>("full_name");
   const [agencyName, setAgencyName] = useState("");
 
-  useEffect(() => {
-    if (user) {
-      fetchSettings();
-    }
-  }, [user]);
-
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     if (!user) return;
     
     setIsLoading(true);
@@ -47,7 +41,11 @@ export function DisplayNameSettings() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    void fetchSettings();
+  }, [fetchSettings]);
 
   const handleSave = async () => {
     if (!user) return;

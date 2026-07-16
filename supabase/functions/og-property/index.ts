@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://renthob.com",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     ? escapeHtml(property.description.substring(0, 160))
     : `${property.bedrooms} bed, ${property.bathrooms} bath property in ${escapeHtml(locationStr)}. Available on Renthob.`;
 
-  const canonicalUrl = `https://eazhob.lovable.app/property/${propertyId}`;
+  const canonicalUrl = `https://renthob.com/property/${propertyId}`;
   const sharedHeaders = {
     ...corsHeaders,
     "Cache-Control": "public, max-age=300",

@@ -5,7 +5,8 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Link2, Loader2, CheckCircle, Clock, XCircle } from "lucide-react";
+import { Link2, Loader2, CheckCircle, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function AffiliateSignupCard() {
   const { user } = useAuth();
@@ -93,7 +94,7 @@ export function AffiliateSignupCard() {
               <Badge className="bg-green-100 text-green-800 ml-auto shrink-0">Active</Badge>
             </div>
             <Button variant="outline" className="w-full" asChild>
-              <a href="/affiliate">View Affiliate Dashboard</a>
+              <Link to="/affiliate">View Affiliate Dashboard</Link>
             </Button>
           </div>
         )}

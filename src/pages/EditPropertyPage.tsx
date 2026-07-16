@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,19 +17,14 @@ export default function EditPropertyPage() {
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id && user) {
-      fetchProperty();
-    }
-  }, [id, user]);
-
-  const fetchProperty = async () => {
+  const fetchProperty = useCallback(async () => {
+    if (!id || !user) return;
     try {
       const { data, error } = await supabase
         .from("properties")
         .select("*")
         .eq("id", id)
-        .eq("owner_id", user?.id)
+        .eq("owner_id", user.id)
         .maybeSingle();
 
       if (error) throw error;
@@ -56,7 +51,11 @@ export default function EditPropertyPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate, toast, user]);
+
+  useEffect(() => {
+    void fetchProperty();
+  }, [fetchProperty]);
 
   if (loading) {
     return (

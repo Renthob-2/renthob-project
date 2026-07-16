@@ -13,6 +13,7 @@ import {
 import { Home, Loader2, ArrowLeft, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
@@ -26,7 +27,7 @@ export default function ForgotPasswordPage() {
 
     setIsLoading(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: getSiteUrl("/reset-password"),
     });
     setIsLoading(false);
 

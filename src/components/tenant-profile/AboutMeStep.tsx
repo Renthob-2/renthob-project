@@ -13,7 +13,7 @@ export function AboutMeStep({ formData, updateField }: Props) {
       <div>
         <h3 className="text-lg font-semibold mb-1">✨ About You</h3>
         <p className="text-sm text-muted-foreground">
-          Tell us more about yourself and what you're looking for. Our AI will use this to find your perfect match.
+          Tell us more about yourself and what you're looking for. These details help refine property matches.
         </p>
       </div>
 
@@ -57,9 +57,9 @@ export function AboutMeStep({ formData, updateField }: Props) {
       </div>
 
       <div className="p-4 rounded-lg bg-primary/5 border border-primary/20">
-        <p className="text-sm font-medium">🤖 How we'll use this</p>
+        <p className="text-sm font-medium">How we'll use this</p>
         <p className="text-sm text-muted-foreground mt-1">
-          Our AI will analyze your profile to recommend properties and neighborhoods that match your lifestyle, budget, and personality. The more detail you share, the better your matches will be.
+          Renthob uses these preferences to compare your needs with available property details. You control what you add and can update it later.
         </p>
       </div>
     </div>

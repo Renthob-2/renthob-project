@@ -21,7 +21,7 @@ const renterSteps = [
     icon: Search,
     title: "Search Properties",
     description:
-      "Browse verified rental listings based on your preferred location, budget, and property type.",
+      "Browse active rental listings based on your preferred location, budget, and property type.",
   },
   {
     icon: Eye,
@@ -39,7 +39,7 @@ const renterSteps = [
     icon: Home,
     title: "Secure Your Home",
     description:
-      "Agree on rental terms and move into your new home with confidence.",
+      "Review the property in person, verify the owner or agent, and agree on rental terms directly.",
   },
 ];
 
@@ -127,7 +127,7 @@ export default function HowItWorksPage() {
 
           <div className="text-center">
             <Button asChild size="lg">
-              <Link to="/signup?role=renter" className="gap-2">
+              <Link to="/signup?role=tenant" className="gap-2">
                 Start Searching
                 <ArrowRight className="h-4 w-4" />
               </Link>
@@ -196,7 +196,7 @@ export default function HowItWorksPage() {
               Manage Listings at Scale
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto">
-              Property agencies can manage multiple listings and reach thousands of potential renters through Renthob.
+              Approved agents can manage multiple listings and connect with renters through Renthob.
             </p>
           </div>
 

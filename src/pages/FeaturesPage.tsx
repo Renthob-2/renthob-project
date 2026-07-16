@@ -38,7 +38,7 @@ const coreFeatures = [
   {
     icon: Building2,
     title: "Property Management Tools",
-    description: "Landlords and agencies can manage listings, track inquiries, and update property availability.",
+    description: "Landlords and agents can manage listings, review applications, and update property availability.",
   },
   {
     icon: MapPin,
@@ -65,8 +65,8 @@ const landlordFeatures = [
   },
   {
     icon: Eye,
-    title: "Increased Visibility",
-    description: "Your property is exposed to thousands of renters actively searching for homes.",
+    title: "Public Search Visibility",
+    description: "Active properties appear in Renthob search and can be shared with potential renters.",
   },
   {
     icon: CheckCircle2,
@@ -75,8 +75,8 @@ const landlordFeatures = [
   },
   {
     icon: BarChart3,
-    title: "Property Performance Insights",
-    description: "Track how many renters view or inquire about your property.",
+    title: "Application Tracking",
+    description: "Review tenant applications and their current status from your dashboard.",
   },
 ];
 
@@ -98,8 +98,8 @@ const agencyFeatures = [
   },
   {
     icon: BarChart3,
-    title: "Property Analytics",
-    description: "Track listing views and renter interest.",
+    title: "Tour and Application Tracking",
+    description: "Review incoming tour requests and rental applications for your listings.",
   },
   {
     icon: Zap,
@@ -109,7 +109,7 @@ const agencyFeatures = [
   {
     icon: Megaphone,
     title: "Brand Visibility",
-    description: "Promote your agency and expand your reach in the rental market.",
+    description: "Publish shareable listings under your approved agent account.",
   },
 ];
 

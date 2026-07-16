@@ -5,6 +5,19 @@ import { FilterState, SortOption } from "@/types/filters";
 
 type DbProperty = Database["public"]["Tables"]["properties"]["Row"];
 
+function optimizePropertyImage(imageUrl: string): string {
+  try {
+    const url = new URL(imageUrl);
+    if (url.hostname !== "images.unsplash.com") return imageUrl;
+    url.searchParams.set("auto", "format");
+    url.searchParams.set("fit", "crop");
+    url.searchParams.set("q", "70");
+    return url.toString();
+  } catch {
+    return imageUrl;
+  }
+}
+
 export interface SearchProperty {
   id: string;
   title: string;
@@ -42,8 +55,8 @@ function transformProperty(dbProperty: DbProperty): SearchProperty {
     bedrooms: dbProperty.bedrooms,
     bathrooms: dbProperty.bathrooms,
     sqft: dbProperty.square_feet || 0,
-    imageUrl: dbProperty.images?.[0] || "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=60",
-    images: dbProperty.images?.length ? dbProperty.images : ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=60"],
+    imageUrl: optimizePropertyImage(dbProperty.images?.[0] || "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=60"),
+    images: (dbProperty.images?.length ? dbProperty.images : ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop&q=60"]).map(optimizePropertyImage),
     propertyType: dbProperty.property_type.charAt(0).toUpperCase() + dbProperty.property_type.slice(1),
     amenities: dbProperty.amenities || [],
     isNew: daysSinceCreated <= 7,
@@ -90,7 +103,7 @@ export function useFilteredProperties(
   sortBy: SortOption
 ) {
   return useMemo(() => {
-    let result = properties.filter((property) => {
+    const result = properties.filter((property) => {
       // Location filter
       if (filters.location) {
         const searchTerm = filters.location.toLowerCase();

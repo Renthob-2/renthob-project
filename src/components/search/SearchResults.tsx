@@ -11,6 +11,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SortOption, SORT_OPTIONS } from "@/types/filters";
+import { pluralize } from "@/lib/format";
 
 interface SearchResultsProps {
   properties: SearchProperty[];
@@ -41,8 +42,8 @@ export function SearchResults({
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-border">
         <p className="text-muted-foreground">
-          <span className="font-semibold text-foreground">{properties.length}</span>{" "}
-          properties found
+          <span className="font-semibold text-foreground">{pluralize(properties.length, "property", "properties")}</span>{" "}
+          found
         </p>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Sort by:</span>
@@ -85,11 +86,7 @@ export function SearchResults({
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {properties.slice(startIndex, endIndex).map((property) => (
-              <PropertyCard
-                key={property.id}
-                property={property}
-                onSave={(id) => console.log("Save property:", id)}
-              />
+              <PropertyCard key={property.id} property={property} />
             ))}
           </div>
 
