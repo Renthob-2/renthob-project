@@ -131,13 +131,15 @@ export default function LoginPage() {
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="identifier">Email or Phone Number</Label>
                 <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
+                  id="identifier"
+                  name="identifier"
+                  type="text"
+                  inputMode="text"
+                  autoComplete="username"
+                  placeholder="you@example.com or 08012345678"
+                  value={formData.identifier}
                   onChange={handleInputChange}
                   required
                   disabled={isLoading}
