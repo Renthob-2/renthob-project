@@ -24,8 +24,9 @@ interface AuthContextType {
   isAffiliate: boolean;
   affiliateActive: boolean;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role: AppRole, referralCode?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, role: AppRole, phone: string, referralCode?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signInWithPhone: (phone: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -217,7 +218,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, role: AppRole, referralCode?: string) => {
+  const signUp = async (email: string, password: string, fullName: string, role: AppRole, phone: string, referralCode?: string) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -227,6 +228,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: {
             full_name: fullName,
             app_role: role,
+            phone,
             referral_code: referralCode || null,
           },
         },
@@ -260,6 +262,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInWithPhone = async (phone: string, password: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("phone-login", {
+        body: { phone, password },
+      });
+
+      if (error) {
+        // Edge function returns a JSON error body on non-2xx responses
+        let message = "Invalid phone number or password.";
+        const ctx = (error as { context?: Response }).context;
+        if (ctx && typeof ctx.json === "function") {
+          try {
+            const body = await ctx.json();
+            if (body?.error) message = body.error;
+          } catch {
+            /* ignore parse errors */
+          }
+        }
+        throw new Error(message);
+      }
+
+      if (data?.error) throw new Error(data.error);
+      if (!data?.session) throw new Error("Invalid phone number or password.");
+
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      });
+      if (sessionError) throw sessionError;
+
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
   const signOut = async () => {
     setUser(null);
     setSession(null);
@@ -282,6 +320,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         signUp,
         signIn,
+        signInWithPhone,
         signOut,
       }}
     >

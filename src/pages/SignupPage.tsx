@@ -13,6 +13,7 @@ import {
 import { Home, Building2, Users, Eye, EyeOff, Loader2, ArrowLeft, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { normalizePhone } from "@/lib/phone";
 
 type Role = "tenant" | "landlord" | "agent";
 
@@ -38,6 +39,7 @@ export default function SignupPage() {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
     referralCode: referralCode,
@@ -50,6 +52,11 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const phone = normalizePhone(formData.phone);
+    if (!phone) {
+      toast({ title: "Invalid phone number", description: "Enter a valid phone number, e.g. 08012345678.", variant: "destructive" });
+      return;
+    }
     if (formData.password !== formData.confirmPassword) {
       toast({ title: "Passwords don't match", description: "Please make sure your passwords match.", variant: "destructive" });
       return;
@@ -66,6 +73,7 @@ export default function SignupPage() {
       formData.password,
       formData.fullName,
       selectedRole,
+      phone,
       formData.referralCode || undefined
     );
 
@@ -213,6 +221,25 @@ export default function SignupPage() {
                   required
                   disabled={isLoading}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  placeholder="08012345678"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  required
+                  disabled={isLoading}
+                />
+                <p className="text-xs text-muted-foreground">
+                  You can log in with this number and your password.
+                </p>
               </div>
 
               <div className="space-y-2">

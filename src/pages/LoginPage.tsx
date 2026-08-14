@@ -13,6 +13,7 @@ import {
 import { Home, Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { looksLikePhone, normalizePhone } from "@/lib/phone";
 
 const getDashboardPath = (role: string | null) => {
   switch (role) {
@@ -30,7 +31,7 @@ const getDashboardPath = (role: string | null) => {
 export default function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { signIn, role, user } = useAuth();
+  const { signIn, signInWithPhone, role, user } = useAuth();
   const { toast } = useToast();
   const justVerified = searchParams.get("verified") === "1";
   const wasReset = searchParams.get("reset") === "1";
@@ -39,7 +40,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
 
@@ -56,9 +57,25 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const identifier = formData.identifier.trim();
+    const usePhone = looksLikePhone(identifier);
+    const phone = usePhone ? normalizePhone(identifier) : null;
+
+    if (usePhone && !phone) {
+      toast({
+        title: "Invalid phone number",
+        description: "Enter a valid phone number, e.g. 08012345678.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
-    const { error } = await signIn(formData.email, formData.password);
+    const { error } = usePhone
+      ? await signInWithPhone(phone!, formData.password)
+      : await signIn(identifier, formData.password);
 
     setIsLoading(false);
 
@@ -114,13 +131,15 @@ export default function LoginPage() {
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="identifier">Email or Phone Number</Label>
                 <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
+                  id="identifier"
+                  name="identifier"
+                  type="text"
+                  inputMode="text"
+                  autoComplete="username"
+                  placeholder="you@example.com or 08012345678"
+                  value={formData.identifier}
                   onChange={handleInputChange}
                   required
                   disabled={isLoading}
