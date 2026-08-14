@@ -24,8 +24,9 @@ interface AuthContextType {
   isAffiliate: boolean;
   affiliateActive: boolean;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string, role: AppRole, referralCode?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, fullName: string, role: AppRole, phone: string, referralCode?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signInWithPhone: (phone: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
