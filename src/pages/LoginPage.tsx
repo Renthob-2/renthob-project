@@ -13,6 +13,7 @@ import {
 import { Home, Eye, EyeOff, Loader2, CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { looksLikePhone, normalizePhone } from "@/lib/phone";
 
 const getDashboardPath = (role: string | null) => {
   switch (role) {
