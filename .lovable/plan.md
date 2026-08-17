@@ -1,51 +1,41 @@
-## Affiliate Program — Full Implementation Plan
+# Email OTP verification for signup and password reset
 
-### 1. Database Schema (Migration)
-Create the following tables:
+## Current state (verified)
 
-- **`affiliate_profiles`** — Stores affiliate-specific data
-  - `user_id`, `referral_code` (unique), `commission_rate` (admin-configurable, default 5%), `is_active`, `total_earnings`, `available_balance`, `created_at`
+- There is no OTP anywhere in the app. The only OTP-related file is the unused shadcn `input-otp` UI component.
+- Signup calls Supabase `signUp` with an `emailRedirectTo` link to `/login?verified=1` — a click-the-link flow, not a code.
+- No email sending domain is configured for the project, so all auth emails go out from the default shared Lovable sender. That is the most likely reason verification mail is slow, lands in spam, or appears not to arrive.
+- Login now accepts email or phone number plus password (built last turn); that path does not depend on email at all.
 
-- **`referral_signups`** — Tracks who signed up using which code
-  - `referred_user_id`, `affiliate_user_id`, `referral_code_used`, `status` (signed_up → verified → converted), `created_at`
+## What to build
 
-- **`affiliate_commissions`** — Earned commissions per transaction
-  - `affiliate_user_id`, `referral_signup_id`, `property_id`, `transaction_amount`, `commission_rate`, `commission_amount`, `status` (pending → approved → paid), `created_at`
+### 1. Reliable email delivery (prerequisite)
 
-- **`affiliate_withdrawals`** — Withdrawal requests
-  - `affiliate_user_id`, `amount`, `status` (pending → approved → paid → rejected), `admin_note`, `reviewed_by`, `created_at`, `reviewed_at`
+Set up Renthob's own sending domain (e.g. `renthob.com`, matching `support@renthob.com`) via the email setup dialog, add the DNS records, and wait for verification. Until this is done, no change to the code will make delivery reliable.
 
-- Add `affiliate` to the `app_role` enum
+Also raise the hourly auth-email rate limit so bursts of signups don't get blocked with "email rate limit exceeded".
 
-- RLS: Affiliates see own data; admins see/manage all
+### 2. Branded auth email templates with a 6-digit code
 
-### 2. Signup Flow Update
-- Add optional "referral code" field on the signup page
-- Store referral code in `user_metadata` during signup
-- On first sign-in, create a `referral_signups` record linking the new user to the affiliate
+Scaffold the managed auth email templates and style them with the Renthob palette and logo. Each verification and password-reset email will show both:
 
-### 3. Anti-Abuse Measures
-- Prevent self-referral (affiliate can't use own code)
-- Require email verification before referral counts
-- Delay affiliate activation until profile is complete
+- a large 6-digit code, and
+- a fallback "click to verify" button.
 
-### 4. Affiliate Dashboard (`/dashboard/affiliate`)
-- Overview: referral link/code, total clicks, signups, conversions, earnings
-- Referral list with statuses
-- Withdrawal request form + history
-- Copy referral link button
+### 3. OTP screens in the app
 
-### 5. Admin Affiliate Management (`/admin/affiliates`)
-- View all affiliates, their stats, and commission rates
-- Adjust commission % per affiliate
-- Approve/reject withdrawal requests
-- View referral chains and conversion data
+- **Signup**: after creating the account, show a code-entry screen (6 boxes) instead of the current "check your email" dead end. Entering the code verifies the account and signs the user straight in. Includes a resend button with a 60-second cooldown, and a "wrong email? go back" option.
+- **Forgot password**: same code-entry step, then the new-password form — no link hopping between tabs.
+- The existing email-link flow keeps working, so anyone who clicks the link in the email is still verified normally.
 
-### 6. Commission Logic
-- Commission earned only on successful transaction (rental application approved)
-- Single commission per deal even if affiliate referred both parties
-- Admin can manually approve/adjust commissions
+## Technical notes
 
-### 7. Routes
-- `/dashboard/affiliate` — Affiliate dashboard (protected, affiliate role)
-- `/admin/affiliates` — Admin affiliate management page
+- New `src/components/auth/OtpVerification.tsx` using the existing `input-otp` component; used by both `SignupPage` and `ForgotPasswordPage`.
+- Verification uses `supabase.auth.verifyOtp({ email, token, type: 'signup' | 'recovery' })`; resend uses `supabase.auth.resend` / `resetPasswordForEmail`.
+- Templates come from `email_domain--scaffold_auth_email_templates` (signup, recovery, magic-link, invite, email-change, reauthentication) and expose the `token` variable; then deploy `auth-email-hook`.
+- Rate limit raised via `configure_auth` (`rate_limit_email_sent`) once sending is active.
+- `ResetPasswordPage` keeps its current behaviour of signing the user out after a successful password change.
+
+## Sequencing
+
+Steps 2 and 3 can be built immediately; the codes only actually arrive in inboxes reliably once the domain in step 1 is verified. If you'd rather not set up a domain right now, say so and I'll build the OTP screens against the default sender.
