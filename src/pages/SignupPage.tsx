@@ -10,10 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Home, Building2, Users, Eye, EyeOff, Loader2, ArrowLeft, Mail } from "lucide-react";
+import { Home, Building2, Users, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { normalizePhone } from "@/lib/phone";
+import { supabase } from "@/integrations/supabase/client";
+import OtpVerification from "@/components/auth/OtpVerification";
 
 type Role = "tenant" | "landlord" | "agent";
 
@@ -91,6 +93,31 @@ export default function SignupPage() {
     });
   };
 
+  const handleVerifyOtp = async (code: string) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email: formData.email.trim(),
+      token: code,
+      type: "signup",
+    });
+
+    if (error) return { error: error as Error };
+
+    toast({ title: "Account verified!", description: "Welcome to Renthob." });
+    navigate(`/dashboard/${selectedRole}`);
+    return { error: null };
+  };
+
+  const handleResendOtp = async () => {
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: formData.email.trim(),
+      options: { emailRedirectTo: `${window.location.origin}/login?verified=1` },
+    });
+    if (error) return { error: error as Error };
+    toast({ title: "Code sent", description: "We sent you a new verification code." });
+    return { error: null };
+  };
+
   if (showEmailSent) {
     return (
       <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-muted/30">
@@ -103,29 +130,20 @@ export default function SignupPage() {
 
           <Card className="shadow-soft border-border/50">
             <CardHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <Mail className="h-8 w-8 text-primary" />
-                </div>
-              </div>
-              <CardTitle className="font-display text-2xl">Check Your Email</CardTitle>
+              <CardTitle className="font-display text-2xl">Verify Your Email</CardTitle>
               <CardDescription>
-                We sent a verification link to <strong>{formData.email}</strong>. Click the link in the email to verify your account and get started.
+                One last step to activate your account
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground text-center">
-                Didn't receive the email? Check your spam folder or try signing up again.
-              </p>
-
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={() => { setShowEmailSent(false); }}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to signup
-              </Button>
+              <OtpVerification
+                email={formData.email}
+                onVerify={handleVerifyOtp}
+                onResend={handleResendOtp}
+                onBack={() => setShowEmailSent(false)}
+                backLabel="Back to signup"
+                title="Enter your verification code"
+              />
 
               <div className="text-center">
                 <Link to="/login" className="text-sm text-primary font-medium hover:underline">

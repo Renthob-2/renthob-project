@@ -38,6 +38,11 @@ export default function ResetPasswordPage() {
       setIsRecovery(true);
     }
 
+    // Code-based flow: verifyOtp({ type: 'recovery' }) already created a session
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) setIsRecovery(true);
+    });
+
     return () => subscription.unsubscribe();
   }, []);
 
