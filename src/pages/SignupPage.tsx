@@ -14,6 +14,8 @@ import { Home, Building2, Users, Eye, EyeOff, Loader2, ArrowLeft, Mail } from "l
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { normalizePhone } from "@/lib/phone";
+import { supabase } from "@/integrations/supabase/client";
+import OtpVerification from "@/components/auth/OtpVerification";
 
 type Role = "tenant" | "landlord" | "agent";
 

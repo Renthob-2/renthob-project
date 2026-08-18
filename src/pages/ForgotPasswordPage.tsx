@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,24 +10,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Home, Loader2, ArrowLeft, Mail } from "lucide-react";
+import { Home, Loader2, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import OtpVerification from "@/components/auth/OtpVerification";
 
 export default function ForgotPasswordPage() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sent, setSent] = useState(false);
+
+  const sendCode = async (address: string) =>
+    supabase.auth.resetPasswordForEmail(address, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
 
     setIsLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    const { error } = await sendCode(email.trim());
     setIsLoading(false);
 
     if (error) {
@@ -41,9 +46,29 @@ export default function ForgotPasswordPage() {
 
     setSent(true);
     toast({
-      title: "Reset link sent",
-      description: "Check your email for a password reset link.",
+      title: "Reset code sent",
+      description: "Check your email for the 6-digit code.",
     });
+  };
+
+  const handleVerify = async (code: string) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token: code,
+      type: "recovery",
+    });
+
+    if (error) return { error: error as Error };
+
+    navigate("/reset-password");
+    return { error: null };
+  };
+
+  const handleResend = async () => {
+    const { error } = await sendCode(email.trim());
+    if (error) return { error: error as Error };
+    toast({ title: "Code sent", description: "We sent you a new reset code." });
+    return { error: null };
   };
 
   return (
@@ -65,30 +90,20 @@ export default function ForgotPasswordPage() {
             <CardTitle className="font-display text-2xl">Reset Password</CardTitle>
             <CardDescription>
               {sent
-                ? "Check your email for a reset link"
-                : "Enter your email to receive a password reset link"}
+                ? "Enter the code we emailed you"
+                : "Enter your email to receive a reset code"}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {sent ? (
-              <div className="text-center space-y-4">
-                <div className="flex justify-center">
-                  <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Mail className="h-8 w-8 text-primary" />
-                  </div>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  We've sent a password reset link to <strong>{email}</strong>. 
-                  Click the link in your email to set a new password.
-                </p>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => { setSent(false); setEmail(""); }}
-                >
-                  Send again
-                </Button>
-              </div>
+              <OtpVerification
+                email={email}
+                onVerify={handleVerify}
+                onResend={handleResend}
+                onBack={() => { setSent(false); setEmail(""); }}
+                backLabel="Use a different email"
+                title="Enter your reset code"
+              />
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
@@ -110,7 +125,7 @@ export default function ForgotPasswordPage() {
                       Sending...
                     </>
                   ) : (
-                    "Send Reset Link"
+                    "Send Reset Code"
                   )}
                 </Button>
               </form>
