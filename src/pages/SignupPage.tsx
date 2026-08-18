@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Home, Building2, Users, Eye, EyeOff, Loader2, ArrowLeft, Mail } from "lucide-react";
+import { Home, Building2, Users, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { normalizePhone } from "@/lib/phone";
